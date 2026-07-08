@@ -1,22 +1,27 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ProductGrid } from "@/components/ui/ProductGrid";
-import { placeholderProducts } from "@/lib/products";
+import { getAllProducts, type Product } from "@/lib/products";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    getAllProducts().then(setAllProducts);
+  }, []);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
-    return placeholderProducts.filter(
+    return allProducts.filter(
       (p) =>
         p.name.toLowerCase().includes(q) ||
         p.brand.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q),
     );
-  }, [query]);
+  }, [query, allProducts]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-8">

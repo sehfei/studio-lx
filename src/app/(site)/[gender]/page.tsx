@@ -30,7 +30,7 @@ export default async function GenderPage({
   const category = getCategory(gender);
   if (!category) notFound();
 
-  const products = getProductsByGender(gender as "women" | "men");
+  const products = await getProductsByGender(gender as "women" | "men");
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-8">

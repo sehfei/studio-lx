@@ -4,10 +4,12 @@ import { ProductGrid } from "@/components/ui/ProductGrid";
 import { getProductsByTag } from "@/lib/products";
 import { genderCategories } from "@/lib/site-config";
 
-export default function Home() {
-  const newArrivals = getProductsByTag("new-arrival");
-  const bestSellers = getProductsByTag("best-seller");
-  const promotions = getProductsByTag("promotion");
+export default async function Home() {
+  const [newArrivals, bestSellers, promotions] = await Promise.all([
+    getProductsByTag("new-arrival"),
+    getProductsByTag("best-seller"),
+    getProductsByTag("promotion"),
+  ]);
 
   return (
     <div>

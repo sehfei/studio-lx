@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { placeholderProducts } from "@/lib/products";
+import { getAllProducts } from "@/lib/products";
 
-export default function AdminProductsPage() {
+export default async function AdminProductsPage() {
+  const products = await getAllProducts();
+
   return (
     <div>
       <div className="mb-8 flex items-center justify-between">
@@ -22,7 +24,7 @@ export default function AdminProductsPage() {
           </tr>
         </thead>
         <tbody>
-          {placeholderProducts.map((p) => (
+          {products.map((p) => (
             <tr key={p.id} className="border-b border-border-subtle">
               <td className="py-3">{p.name}</td>
               <td className="py-3 text-foreground/60">{p.sku}</td>
@@ -34,7 +36,8 @@ export default function AdminProductsPage() {
         </tbody>
       </table>
       <p className="mt-6 text-xs text-foreground/40">
-        商品数据目前是占位数据，接入 Supabase 数据库后可在此新增/编辑/删除商品。
+        商品数据来自 Supabase。新增/编辑商品的表单还在开发中，现在只能在
+        Supabase 后台直接改数据。
       </p>
     </div>
   );

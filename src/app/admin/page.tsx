@@ -1,13 +1,15 @@
-import { placeholderProducts } from "@/lib/products";
+import { getAllProducts } from "@/lib/products";
 
-const stats = [
-  { label: "Total Products", value: placeholderProducts.length },
-  { label: "Orders", value: 0 },
-  { label: "Customers", value: 0 },
-  { label: "Revenue (RM)", value: "0.00" },
-];
+export default async function AdminDashboardPage() {
+  const products = await getAllProducts();
 
-export default function AdminDashboardPage() {
+  const stats = [
+    { label: "Total Products", value: products.length },
+    { label: "Orders", value: 0 },
+    { label: "Customers", value: 0 },
+    { label: "Revenue (RM)", value: "0.00" },
+  ];
+
   return (
     <div>
       <h1 className="mb-8 text-lg font-medium">Dashboard</h1>
@@ -25,7 +27,7 @@ export default function AdminDashboardPage() {
         ))}
       </div>
       <p className="mt-8 text-sm text-foreground/40">
-        数据统计功能开发中，接入 Supabase 后会显示真实数据。
+        商品数据已经接入 Supabase，订单/客户/营收还是占位，等对应功能做完会显示真实数据。
       </p>
     </div>
   );

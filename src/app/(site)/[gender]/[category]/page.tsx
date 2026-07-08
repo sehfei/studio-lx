@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ProductGrid } from "@/components/ui/ProductGrid";
-import { placeholderProducts, type Product } from "@/lib/products";
+import { getProductsByGenderCategory } from "@/lib/products";
 import { genderCategories } from "@/lib/site-config";
 
 type Params = { gender: string; category: string };
@@ -32,8 +32,9 @@ export default async function CategoryPage({
   const { genderEntry, categoryEntry } = resolve(gender, category);
   if (!genderEntry || !categoryEntry) notFound();
 
-  const products = placeholderProducts.filter(
-    (p: Product) => p.gender === gender && p.category === category,
+  const products = await getProductsByGenderCategory(
+    gender as "women" | "men",
+    category as "clothing" | "shoes" | "bags" | "glasses" | "accessories",
   );
 
   return (

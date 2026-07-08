@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
 import { siteConfig, genderCategories } from "@/lib/site-config";
-import { placeholderProducts } from "@/lib/products";
+import { getAllProducts } from "@/lib/products";
 import { placeholderPosts } from "@/lib/blog";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
     "",
     "about",
@@ -28,7 +28,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
   ]);
 
-  const productRoutes = placeholderProducts.map((p) => ({
+  const products = await getAllProducts();
+  const productRoutes = products.map((p) => ({
     url: `${siteConfig.url}/product/${p.slug}`,
     changeFrequency: "weekly" as const,
     priority: 0.5,
