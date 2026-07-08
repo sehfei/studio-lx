@@ -1,0 +1,15 @@
+export const adminNavItems = [
+  { label: "Dashboard", href: "/admin" },
+  { label: "Products", href: "/admin/products" },
+  { label: "Orders", href: "/admin/orders" },
+  { label: "Customers", href: "/admin/customers" },
+  { label: "Inventory", href: "/admin/inventory" },
+  { label: "Coupons", href: "/admin/coupons" },
+  { label: "Sales Report", href: "/admin/sales-report" },
+  { label: "Banner Management", href: "/admin/banners" },
+  { label: "Category Management", href: "/admin/categories" },
+  { label: "User Management", href: "/admin/users" },
+  { label: "Shipping", href: "/admin/shipping" },
+  { label: "Payment Settings", href: "/admin/payment-settings" },
+  { label: "Website Settings", href: "/admin/settings" },
+];
