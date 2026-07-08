@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PlaceholderImage } from "./PlaceholderImage";
+import { ProductImage } from "./ProductImage";
 import type { Product } from "@/lib/products";
 
 export function ProductCard({ product }: { product: Product }) {
@@ -9,7 +9,7 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <Link href={`/product/${product.slug}`} className="group block">
-      <PlaceholderImage label={product.name} />
+      <ProductImage src={product.images[0]} label={product.name} />
       <div className="mt-3 space-y-1">
         <p className="eyebrow">{product.brand}</p>
         <h3 className="text-sm text-foreground group-hover:text-gold">

@@ -5,11 +5,54 @@ import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { slugify } from "@/lib/slugify";
 
+const IMAGE_BUCKET = "product-images";
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+];
+
 function splitList(value: string): string[] {
   return value
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
+}
+
+async function uploadProductImages(
+  files: File[],
+  slug: string,
+): Promise<{ urls?: string[]; error?: string }> {
+  const urls: string[] = [];
+
+  for (const file of files) {
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      return { error: `${file.name}：只支持 JPEG / PNG / WEBP / GIF 图片` };
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+      return { error: `${file.name}：文件不能超过 5MB` };
+    }
+
+    const ext = file.name.includes(".")
+      ? file.name.slice(file.name.lastIndexOf("."))
+      : ".jpg";
+    const path = `${slug}/${crypto.randomUUID()}${ext}`;
+
+    const { error } = await supabaseAdmin.storage
+      .from(IMAGE_BUCKET)
+      .upload(path, file, { contentType: file.type });
+
+    if (error) {
+      return { error: `图片上传失败：${error.message}` };
+    }
+
+    const { data } = supabaseAdmin.storage.from(IMAGE_BUCKET).getPublicUrl(path);
+    urls.push(data.publicUrl);
+  }
+
+  return { urls };
 }
 
 export async function createProduct(
@@ -56,6 +99,19 @@ export async function createProduct(
 
   const slug = slugify(slugInput || name);
 
+  const imageFiles = formData
+    .getAll("images")
+    .filter((f): f is File => f instanceof File && f.size > 0);
+
+  let imageUrls: string[] = [];
+  if (imageFiles.length > 0) {
+    const result = await uploadProductImages(imageFiles, slug);
+    if (result.error) {
+      return { error: result.error };
+    }
+    imageUrls = result.urls ?? [];
+  }
+
   const { error } = await supabaseAdmin.from("products").insert({
     slug,
     name,
@@ -65,6 +121,7 @@ export async function createProduct(
     price,
     discount_price: discountPrice,
     stock: Number.isFinite(stock) ? stock : 0,
+    images: imageUrls,
     colors,
     sizes,
     material,

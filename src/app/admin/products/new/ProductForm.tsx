@@ -152,6 +152,17 @@ export function ProductForm() {
       </div>
 
       <div>
+        <label className={labelClass}>Images（可多选，JPEG/PNG/WEBP/GIF，单张最大5MB）</label>
+        <input
+          type="file"
+          name="images"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          multiple
+          className={`${inputClass} file:mr-4 file:border-0 file:bg-foreground file:px-3 file:py-1.5 file:text-xs file:text-background`}
+        />
+      </div>
+
+      <div>
         <label className={labelClass}>Shipping Info</label>
         <input
           name="shippingInfo"

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
+import { ProductImage } from "@/components/ui/ProductImage";
 import { getProductBySlug } from "@/lib/products";
 
 type Params = { slug: string };
@@ -36,9 +36,13 @@ export default async function ProductPage({
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-8">
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
         <div className="grid grid-cols-2 gap-3">
-          <PlaceholderImage label={product.name} className="col-span-2" />
-          <PlaceholderImage label="Detail 1" />
-          <PlaceholderImage label="Detail 2" />
+          <ProductImage
+            src={product.images[0]}
+            label={product.name}
+            className="col-span-2"
+          />
+          <ProductImage src={product.images[1]} label={`${product.name} 细节图 1`} />
+          <ProductImage src={product.images[2]} label={`${product.name} 细节图 2`} />
         </div>
 
         <div>
