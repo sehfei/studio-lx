@@ -15,7 +15,10 @@ export function ProductImage({
   }
 
   return (
-    <div className={`relative aspect-[3/4] w-full overflow-hidden ${className}`}>
+    <div
+      className={`relative aspect-[3/4] w-full overflow-hidden ${className}`}
+      style={{ borderRadius: "var(--radius)" }}
+    >
       <Image
         src={src}
         alt={label}

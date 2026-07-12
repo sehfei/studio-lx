@@ -1,38 +1,47 @@
 import type { Metadata } from "next";
-import { siteConfig } from "@/lib/site-config";
+import { getIdentity } from "@/lib/identity";
+import { getI18n } from "@/lib/i18n/dictionaries";
 
 export const metadata: Metadata = { title: "Contact Us" };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const [identity, { t }] = await Promise.all([getIdentity(), getI18n()]);
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-8">
-      <h1 className="section-title mb-8">Contact Us</h1>
+      <h1 className="section-title mb-8">{t.contact.title}</h1>
       <div className="space-y-4 text-sm text-foreground/70">
-        <p>WhatsApp：+{siteConfig.whatsappNumber}</p>
-        <p>Email：hello@studiolx.example.com</p>
-        <p>营业时间：周一至周日 10:00 - 20:00</p>
+        <p>
+          {t.contact.whatsapp}：+{identity.whatsappNumber}
+        </p>
+        <p>{t.contact.email}：hello@studiolx.example.com</p>
+        <p>
+          {t.contact.hours}：{t.contact.hoursValue}
+        </p>
       </div>
       <form className="mt-10 space-y-4">
         <input
-          className="w-full border border-border-subtle px-4 py-3 text-sm outline-none focus:border-gold"
-          placeholder="Your Name"
+          className="input-theme"
+          placeholder={t.contact.yourName}
           disabled
         />
         <input
-          className="w-full border border-border-subtle px-4 py-3 text-sm outline-none focus:border-gold"
-          placeholder="Your Email"
+          className="input-theme"
+          placeholder={t.contact.yourEmail}
           disabled
         />
         <textarea
-          className="w-full border border-border-subtle px-4 py-3 text-sm outline-none focus:border-gold"
+          className="input-theme"
           rows={5}
-          placeholder="Message"
+          placeholder={t.contact.message}
           disabled
         />
         <button className="btn-primary" disabled>
-          Send Message
+          {t.contact.send}
         </button>
-        <p className="text-xs text-foreground/40">表单提交功能开发中。</p>
+        <p className="text-xs text-foreground/40">
+          {t.contact.formComingSoon}
+        </p>
       </form>
     </div>
   );

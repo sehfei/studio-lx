@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getAllProducts } from "@/lib/products";
+import { DeleteProductButton } from "./DeleteProductButton";
 
 export default async function AdminProductsPage() {
   const products = await getAllProducts();
@@ -14,6 +15,7 @@ export default async function AdminProductsPage() {
         </Link>
       </div>
 
+      <div className="overflow-x-auto">
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="border-b border-border-subtle text-left text-xs tracking-widest text-foreground/50 uppercase">
@@ -23,6 +25,7 @@ export default async function AdminProductsPage() {
             <th className="py-3">Brand</th>
             <th className="py-3">Price</th>
             <th className="py-3">Stock</th>
+            <th className="py-3">操作</th>
           </tr>
         </thead>
         <tbody>
@@ -47,14 +50,23 @@ export default async function AdminProductsPage() {
               <td className="py-3 text-foreground/60">{p.brand}</td>
               <td className="py-3">RM {p.price.toFixed(2)}</td>
               <td className="py-3">{p.stock}</td>
+              <td className="py-3">
+                <div className="flex items-center gap-3">
+                  <Link
+                    href={`/admin/products/${p.id}/edit`}
+                    className="text-xs text-foreground/60 hover:text-gold hover:underline"
+                  >
+                    编辑
+                  </Link>
+                  <DeleteProductButton id={p.id} name={p.name} />
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <p className="mt-6 text-xs text-foreground/40">
-        商品数据来自 Supabase。编辑/删除商品的表单还在开发中，暂时需要在
-        Supabase 后台改。
-      </p>
+      </div>
+      <p className="mt-6 text-xs text-foreground/40">商品数据来自 Supabase。</p>
     </div>
   );
 }

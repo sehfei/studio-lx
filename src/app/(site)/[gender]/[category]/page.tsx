@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { ProductGrid } from "@/components/ui/ProductGrid";
 import { getProductsByGenderCategory } from "@/lib/products";
 import { genderCategories } from "@/lib/site-config";
+import { getI18n } from "@/lib/i18n/dictionaries";
+import { categoryLabel } from "@/lib/i18n/nav-labels";
 
 type Params = { gender: string; category: string };
 
@@ -32,17 +34,25 @@ export default async function CategoryPage({
   const { genderEntry, categoryEntry } = resolve(gender, category);
   if (!genderEntry || !categoryEntry) notFound();
 
-  const products = await getProductsByGenderCategory(
-    gender as "women" | "men",
-    category as "clothing" | "shoes" | "bags" | "glasses" | "accessories",
-  );
+  const [products, { t }] = await Promise.all([
+    getProductsByGenderCategory(
+      gender as "women" | "men",
+      category as "clothing" | "shoes" | "bags" | "glasses" | "accessories",
+    ),
+    getI18n(),
+  ]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-8">
       <h1 className="section-title mb-10">
-        {genderEntry.label} / {categoryEntry.label}
+        {categoryLabel(t, genderEntry.slug, genderEntry.label)} /{" "}
+        {categoryLabel(t, categoryEntry.slug, categoryEntry.label)}
       </h1>
-      <ProductGrid products={products} />
+      <ProductGrid
+        products={products}
+        emptyText={t.home.emptyProducts}
+        outOfStockText={t.product.outOfStock}
+      />
     </div>
   );
 }

@@ -1,22 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getI18n } from "@/lib/i18n/dictionaries";
 
 export const metadata: Metadata = { title: "My Account" };
 
-const links = [
-  { label: "Order History", href: "/orders" },
-  { label: "Wishlist", href: "/wishlist" },
-  { label: "Address Book", href: "#" },
-  { label: "Account Settings", href: "#" },
-];
+export default async function AccountPage() {
+  const { t } = await getI18n();
+  const links = [
+    { label: t.account.orderHistory, href: "/orders" },
+    { label: t.account.wishlist, href: "/wishlist" },
+    { label: t.account.addressBook, href: "#" },
+    { label: t.account.settings, href: "#" },
+  ];
 
-export default function AccountPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-8">
-      <h1 className="section-title mb-8">My Account</h1>
-      <p className="mb-8 text-sm text-foreground/50">
-        会员系统开发中，登录后可在此管理订单与个人信息。
-      </p>
+      <h1 className="section-title mb-8">{t.account.title}</h1>
+      <p className="mb-8 text-sm text-foreground/50">{t.account.comingSoon}</p>
       <ul className="divide-y divide-border-subtle border-t border-b border-border-subtle">
         {links.map((link) => (
           <li key={link.label}>

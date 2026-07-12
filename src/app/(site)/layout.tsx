@@ -1,18 +1,29 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton";
+import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
+import { getAnnouncement } from "@/lib/announcement";
+import { getIdentity } from "@/lib/identity";
+import { getI18n } from "@/lib/i18n/dictionaries";
 
-export default function SiteLayout({
+export default async function SiteLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [announcement, identity, { locale, t }] = await Promise.all([
+    getAnnouncement(),
+    getIdentity(),
+    getI18n(),
+  ]);
+
   return (
     <>
-      <Navbar />
+      <AnnouncementBar announcement={announcement} closeLabel={t.nav.close} />
+      <Navbar logoUrl={identity.logoUrl} locale={locale} t={t} />
       <main className="flex-1">{children}</main>
-      <Footer />
-      <WhatsAppButton />
+      <Footer identity={identity} t={t} />
+      <WhatsAppButton whatsappNumber={identity.whatsappNumber} />
     </>
   );
 }

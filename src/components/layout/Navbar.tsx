@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import {
   featureCollections,
@@ -8,9 +9,23 @@ import {
   mainNavLinks,
   siteConfig,
 } from "@/lib/site-config";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
+import type { Locale } from "@/lib/i18n/config";
+import { categoryLabel } from "@/lib/i18n/nav-labels";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
-export function Navbar() {
+export function Navbar({
+  logoUrl,
+  locale,
+  t,
+}: {
+  logoUrl?: string;
+  locale: Locale;
+  t: Dictionary;
+}) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const label = (slug: string, fallback: string) =>
+    categoryLabel(t, slug, fallback);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border-subtle bg-background/95 backdrop-blur">
@@ -18,31 +33,47 @@ export function Navbar() {
         <button
           className="text-sm lg:hidden"
           onClick={() => setMobileOpen((v) => !v)}
-          aria-label="打开菜单"
+          aria-label={t.nav.menu}
         >
-          {mobileOpen ? "关闭" : "菜单"}
+          {mobileOpen ? t.nav.close : t.nav.menu}
         </button>
 
         <Link
           href="/"
-          className="font-display text-xl tracking-[0.15em] uppercase"
+          className="flex items-center font-display text-xl tracking-[0.15em] uppercase"
         >
-          {siteConfig.name}
+          {logoUrl ? (
+            <Image
+              src={logoUrl}
+              alt={siteConfig.name}
+              width={140}
+              height={40}
+              className="h-8 w-auto object-contain"
+              unoptimized
+            />
+          ) : (
+            siteConfig.name
+          )}
         </Link>
 
         <div className="flex items-center gap-4 text-sm">
-          <Link href="/search" aria-label="搜索">
-            搜索
+          <Link href="/search" aria-label={t.nav.search}>
+            {t.nav.search}
           </Link>
-          <Link href="/wishlist" aria-label="心愿单">
-            心愿单
+          <Link href="/wishlist" aria-label={t.nav.wishlist} className="hidden sm:inline">
+            {t.nav.wishlist}
           </Link>
-          <Link href="/cart" aria-label="购物车">
-            购物车
+          <Link href="/cart" aria-label={t.nav.cart}>
+            {t.nav.cart}
           </Link>
-          <Link href="/account" aria-label="我的账户" className="hidden sm:inline">
-            账户
+          <Link
+            href="/account"
+            aria-label={t.nav.account}
+            className="hidden sm:inline"
+          >
+            {t.nav.account}
           </Link>
+          <LanguageSwitcher current={locale} />
         </div>
       </div>
 
@@ -51,7 +82,7 @@ export function Navbar() {
           {genderCategories.map((cat) => (
             <li key={cat.slug} className="group relative">
               <Link href={`/${cat.slug}`} className="hover:text-gold">
-                {cat.label}
+                {label(cat.slug, cat.label)}
               </Link>
               <div className="absolute left-1/2 top-full hidden -translate-x-1/2 border border-border-subtle bg-background py-2 shadow-lg group-hover:block">
                 {cat.children.map((child) => (
@@ -60,7 +91,7 @@ export function Navbar() {
                     href={`/${cat.slug}/${child.slug}`}
                     className="block min-w-[10rem] px-5 py-2 text-left normal-case tracking-normal hover:text-gold"
                   >
-                    {child.label}
+                    {label(child.slug, child.label)}
                   </Link>
                 ))}
               </div>
@@ -69,14 +100,14 @@ export function Navbar() {
           {featureCollections.map((item) => (
             <li key={item.slug}>
               <Link href={`/${item.slug}`} className="hover:text-gold">
-                {item.label}
+                {label(item.slug, item.label)}
               </Link>
             </li>
           ))}
           {mainNavLinks.map((item) => (
             <li key={item.slug}>
               <Link href={`/${item.slug}`} className="hover:text-gold">
-                {item.label}
+                {label(item.slug, item.label)}
               </Link>
             </li>
           ))}
@@ -93,7 +124,7 @@ export function Navbar() {
                   className="font-medium uppercase"
                   onClick={() => setMobileOpen(false)}
                 >
-                  {cat.label}
+                  {label(cat.slug, cat.label)}
                 </Link>
                 <ul className="mt-2 space-y-2 pl-4 text-foreground/70">
                   {cat.children.map((child) => (
@@ -102,7 +133,7 @@ export function Navbar() {
                         href={`/${cat.slug}/${child.slug}`}
                         onClick={() => setMobileOpen(false)}
                       >
-                        {child.label}
+                        {label(child.slug, child.label)}
                       </Link>
                     </li>
                   ))}
@@ -115,7 +146,7 @@ export function Navbar() {
                   href={`/${item.slug}`}
                   onClick={() => setMobileOpen(false)}
                 >
-                  {item.label}
+                  {label(item.slug, item.label)}
                 </Link>
               </li>
             ))}

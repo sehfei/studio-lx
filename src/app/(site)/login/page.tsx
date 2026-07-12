@@ -1,40 +1,37 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getI18n } from "@/lib/i18n/dictionaries";
 
 export const metadata: Metadata = { title: "Login" };
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const { t } = await getI18n();
   return (
     <div className="mx-auto max-w-md px-4 py-16 sm:px-8">
-      <h1 className="section-title mb-8 text-center">Login</h1>
+      <h1 className="section-title mb-8 text-center">{t.auth.login}</h1>
       <form className="space-y-4">
+        <input className="input-theme" placeholder={t.auth.email} disabled />
         <input
-          className="w-full border border-border-subtle px-4 py-3 text-sm outline-none focus:border-gold"
-          placeholder="Email"
-          disabled
-        />
-        <input
-          className="w-full border border-border-subtle px-4 py-3 text-sm outline-none focus:border-gold"
-          placeholder="Password"
+          className="input-theme"
+          placeholder={t.auth.password}
           type="password"
           disabled
         />
         <button className="btn-primary w-full" disabled>
-          Login
+          {t.auth.login}
         </button>
-        <button
-          className="btn-outline w-full"
-          disabled
-          type="button"
-        >
-          Continue with Google
+        <button className="btn-outline w-full" disabled type="button">
+          {t.auth.continueWithGoogle}
         </button>
       </form>
       <p className="mt-6 text-center text-xs text-foreground/40">
-        登录功能开发中（将接入 Supabase Auth）。
+        {t.auth.comingSoon}
       </p>
       <p className="mt-4 text-center text-sm">
-        没有账户？<Link href="/register" className="text-gold">注册</Link>
+        {t.auth.noAccount}{" "}
+        <Link href="/register" className="text-gold">
+          {t.auth.register}
+        </Link>
       </p>
     </div>
   );

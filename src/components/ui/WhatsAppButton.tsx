@@ -1,7 +1,5 @@
-import { siteConfig } from "@/lib/site-config";
-
-export function WhatsAppButton() {
-  const href = `https://api.whatsapp.com/send?phone=${siteConfig.whatsappNumber}`;
+export function WhatsAppButton({ whatsappNumber }: { whatsappNumber: string }) {
+  const href = `https://api.whatsapp.com/send?phone=${whatsappNumber}`;
 
   return (
     <a

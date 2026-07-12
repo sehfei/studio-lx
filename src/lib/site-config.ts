@@ -4,7 +4,6 @@ export const siteConfig = {
   description:
     "STUDIO LX — 高端时尚精品店，甄选男女服饰、鞋履、包袋、眼镜与配饰。",
   url: "https://www.studiolx.example.com",
-  whatsappNumber: "60000000000", // TODO: 换成真实号码
 };
 
 export type NavCategory = {

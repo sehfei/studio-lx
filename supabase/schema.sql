@@ -20,6 +20,7 @@ create table if not exists products (
   gender text not null check (gender in ('women', 'men')),
   category text not null check (category in ('clothing', 'shoes', 'bags', 'glasses', 'accessories')),
   tags text[] not null default '{}',
+  badge_text text,
   created_at timestamptz not null default now()
 );
 
@@ -43,3 +44,51 @@ values
   ('acetate-sunglasses', 'Acetate Sunglasses', 'LX-M-GL-0005', 'STUDIO LX', '意大利板材眼镜框，UV400 防护镜片。', 590, null, 20, '{Tortoise,Black}', '{"One Size"}', 'Acetate', '0.03kg', '西马 2-4 工作日，东马 4-7 工作日', 'men', 'glasses', '{new-arrival}'),
   ('minimal-leather-sneakers', 'Minimal Leather Sneakers', 'LX-M-SH-0006', 'STUDIO LX', '极简小白鞋，头层牛皮，橡胶大底。', 790, null, 15, '{White,Black}', '{40,41,42,43,44}', 'Leather', '0.8kg', '西马 2-4 工作日，东马 4-7 工作日', 'men', 'shoes', '{best-seller}')
 on conflict (slug) do nothing;
+
+-- 网站主题设置（单行 JSON），后台 Website Settings 修改，
+-- 公开只读（前台渲染要读），写入只走服务端 service_role。
+create table if not exists site_settings (
+  id integer primary key check (id = 1),
+  theme jsonb not null default '{}'::jsonb,
+  previous_theme jsonb,
+  announcement jsonb not null default '{}'::jsonb,
+  identity jsonb not null default '{}'::jsonb,
+  pages jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+alter table site_settings enable row level security;
+
+create policy "Public can read site settings"
+  on site_settings for select
+  using (true);
+
+insert into site_settings (id) values (1) on conflict do nothing;
+
+-- Logo/favicon/hero 图片的存储桶，public=true 让公开 URL 直接可访问
+-- （跟 product-images 桶同样的模式），写入只走 service_role。
+insert into storage.buckets (id, name, public)
+values ('site-assets', 'site-assets', true)
+on conflict (id) do nothing;
+
+-- 首页横幅 banner，后台 Banner Management 管理，前台首页读取生效中的。
+-- starts_at/ends_at 为空表示不限时间；is_active + 时间窗共同决定是否显示。
+create table if not exists banners (
+  id uuid primary key default gen_random_uuid(),
+  image_url text not null,
+  title text default '',
+  subtitle text default '',
+  link_url text default '',
+  link_text text default '',
+  sort_order integer not null default 0,
+  is_active boolean not null default true,
+  starts_at timestamptz,
+  ends_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+alter table banners enable row level security;
+
+create policy "Public can read banners"
+  on banners for select
+  using (true);

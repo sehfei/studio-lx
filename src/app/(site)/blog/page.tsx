@@ -2,13 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
 import { placeholderPosts } from "@/lib/blog";
+import { getI18n } from "@/lib/i18n/dictionaries";
 
 export const metadata: Metadata = { title: "Blog" };
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const { t } = await getI18n();
   return (
     <div className="mx-auto max-w-7xl px-4 py-16 sm:px-8">
-      <h1 className="section-title mb-10">Blog</h1>
+      <h1 className="section-title mb-10">{t.categories.blog}</h1>
       <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
         {placeholderPosts.map((post) => (
           <Link key={post.slug} href={`/blog/${post.slug}`} className="group">
