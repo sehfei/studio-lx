@@ -4,6 +4,10 @@ import { ProductImage } from "@/components/ui/ProductImage";
 import { ProductBadge } from "@/components/ui/ProductBadge";
 import { discountPercent, displayBadge, getProductBySlug } from "@/lib/products";
 import { getI18n } from "@/lib/i18n/dictionaries";
+import { AddToCartForm } from "@/components/product/AddToCartForm";
+import { WishlistButton } from "@/components/product/WishlistButton";
+import { getCustomer } from "@/lib/customer-auth";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 type Params = { slug: string };
 
@@ -27,11 +31,23 @@ export default async function ProductPage({
   params: Promise<Params>;
 }) {
   const { slug } = await params;
-  const [product, { t }] = await Promise.all([
+  const [product, { t }, customer] = await Promise.all([
     getProductBySlug(slug),
     getI18n(),
+    getCustomer(),
   ]);
   if (!product) notFound();
+
+  let initialInWishlist = false;
+  if (customer) {
+    const { data } = await supabaseAdmin
+      .from("wishlist_items")
+      .select("id")
+      .eq("customer_id", customer.id)
+      .eq("product_id", product.id)
+      .maybeSingle();
+    initialInWishlist = !!data;
+  }
 
   const hasDiscount =
     typeof product.discountPrice === "number" &&
@@ -85,45 +101,15 @@ export default async function ProductPage({
             {product.description}
           </p>
 
-          <div className="mb-6">
-            <p className="eyebrow mb-2">{t.product.color}</p>
-            <div className="flex flex-wrap gap-2">
-              {product.colors.map((color) => (
-                <button
-                  key={color}
-                  className="border border-border-subtle px-4 py-2 text-sm hover:border-gold hover:text-gold"
-                >
-                  {color}
-                </button>
-              ))}
-            </div>
-          </div>
+          <AddToCartForm product={product} t={t} />
 
-          <div className="mb-8">
-            <p className="eyebrow mb-2">{t.product.size}</p>
-            <div className="flex flex-wrap gap-2">
-              {product.sizes.map((size) => (
-                <button
-                  key={size}
-                  className="border border-border-subtle px-4 py-2 text-sm hover:border-gold hover:text-gold"
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
+          <div className="-mt-6 mb-10">
+            <WishlistButton
+              productId={product.id}
+              initialInWishlist={initialInWishlist}
+              t={t}
+            />
           </div>
-
-          <div className="mb-10 flex flex-col gap-3 sm:flex-row">
-            <button className="btn-primary flex-1" disabled>
-              {t.product.addToCart}
-            </button>
-            <button className="btn-outline flex-1" disabled>
-              {t.product.buyNow}
-            </button>
-          </div>
-          <p className="mb-10 text-xs text-foreground/40">
-            {t.product.cartComingSoon}
-          </p>
 
           <dl className="space-y-2 border-t border-border-subtle pt-6 text-sm">
             <div className="flex justify-between">

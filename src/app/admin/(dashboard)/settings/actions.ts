@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { dbErrorMessage } from "@/lib/db-error";
 import {
   BUTTON_STYLE_OPTIONS,
   contrastRatio,
@@ -40,20 +41,6 @@ function readColors(formData: FormData) {
     colors[key] = value.toLowerCase();
   }
   return { colors };
-}
-
-function dbErrorMessage(error: { code?: string; message: string }): string {
-  // 42P01 = 表不存在，42703 = 列不存在，PGRST204 = PostgREST 找不到列（schema cache），
-  // 都说明数据库结构还没更新，提示先跑迁移 SQL
-  if (
-    error.code === "42P01" ||
-    error.code === "42703" ||
-    error.code === "PGRST204" ||
-    /schema cache/i.test(error.message)
-  ) {
-    return "数据库结构还没更新，请先在 Supabase SQL Editor 执行最新的迁移 SQL";
-  }
-  return error.message;
 }
 
 async function persistTheme(theme: ThemeSettings): Promise<string | null> {

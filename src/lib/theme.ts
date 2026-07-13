@@ -16,6 +16,12 @@ export type ThemeColors = {
 
 export const FONT_PRESETS = [
   {
+    id: "space-grotesk-inter",
+    label: "Space Grotesk + Inter（现代，默认）",
+    displayVar: "--font-space-grotesk",
+    sansVar: "--font-inter",
+  },
+  {
     id: "playfair-inter",
     label: "Playfair + Inter（默认）",
     displayVar: "--font-playfair",
@@ -88,7 +94,7 @@ export const DEFAULT_THEME: ThemeSettings = {
     muted: "#6b6560",
     destructive: "#dc2626",
   },
-  fontPreset: "playfair-inter",
+  fontPreset: "space-grotesk-inter",
   radius: 0,
   density: "normal",
   buttonStyle: "filled",

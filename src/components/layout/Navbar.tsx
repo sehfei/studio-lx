@@ -13,6 +13,7 @@ import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import { categoryLabel } from "@/lib/i18n/nav-labels";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { useCart } from "@/components/cart/CartContext";
 
 export function Navbar({
   logoUrl,
@@ -24,6 +25,7 @@ export function Navbar({
   t: Dictionary;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { count: cartCount } = useCart();
   const label = (slug: string, fallback: string) =>
     categoryLabel(t, slug, fallback);
 
@@ -63,8 +65,13 @@ export function Navbar({
           <Link href="/wishlist" aria-label={t.nav.wishlist} className="hidden sm:inline">
             {t.nav.wishlist}
           </Link>
-          <Link href="/cart" aria-label={t.nav.cart}>
+          <Link href="/cart" aria-label={t.nav.cart} className="relative">
             {t.nav.cart}
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-3 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-medium text-background">
+                {cartCount}
+              </span>
+            )}
           </Link>
           <Link
             href="/account"

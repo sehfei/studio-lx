@@ -92,3 +92,69 @@ alter table banners enable row level security;
 create policy "Public can read banners"
   on banners for select
   using (true);
+
+-- 订单：免注册下单（顾客不需要账号），结账时填收货信息直接建单。
+-- 不开公开读写策略——顾客下单和后台管理全部走 Server Action 里的
+-- service_role（supabaseAdmin），绕过 RLS；下单后直接把订单详情
+-- 返回给前端渲染确认页，不需要顾客再查询数据库。
+-- payment_status 独立于 status：先做「手动收款」，店主在后台联系顾客
+-- 收款后手动标记已付款，不对接任何支付网关。
+create table if not exists orders (
+  id uuid primary key default gen_random_uuid(),
+  order_number text unique not null,
+  customer_name text not null,
+  customer_phone text not null,
+  customer_email text,
+  shipping_address text not null,
+  shipping_city text not null,
+  shipping_state text not null,
+  shipping_postcode text not null,
+  notes text default '',
+  subtotal numeric(10, 2) not null,
+  shipping_fee numeric(10, 2) not null default 0,
+  total numeric(10, 2) not null,
+  status text not null default 'pending'
+    check (status in ('pending', 'processing', 'shipped', 'completed', 'cancelled')),
+  payment_status text not null default 'unpaid'
+    check (payment_status in ('unpaid', 'paid')),
+  created_at timestamptz not null default now()
+);
+
+alter table orders enable row level security;
+
+-- 商品行是订单的快照（名称/SKU/图片/单价），即使之后商品改名/降价/被删，
+-- 历史订单显示的还是下单当时的真实信息。
+create table if not exists order_items (
+  id uuid primary key default gen_random_uuid(),
+  order_id uuid not null references orders(id) on delete cascade,
+  product_id uuid references products(id) on delete set null,
+  product_name text not null,
+  product_sku text not null,
+  product_image text,
+  color text,
+  size text,
+  unit_price numeric(10, 2) not null,
+  quantity integer not null check (quantity > 0),
+  line_total numeric(10, 2) not null
+);
+
+alter table order_items enable row level security;
+
+-- 结账改为必须登录：订单要能按顾客身份查询（订单历史），
+-- 所以给 orders 加一列关联 Supabase Auth 的用户 id。
+-- 读取仍然全部走 service_role（订单历史页用 requireCustomer() 拿到当前用户后
+-- 按 customer_id 查），不开 RLS 公开读策略，跟 orders 表本身的既有约定一致。
+alter table orders add column if not exists customer_id uuid references auth.users(id) on delete set null;
+
+-- 收藏：只在商品详情页提供收藏按钮（不是每张商品卡片都加），
+-- 收藏页 /wishlist 列出当前登录顾客收藏的商品。
+-- 同前面几张表的约定：读写全部走 service_role，不开 RLS 公开策略。
+create table if not exists wishlist_items (
+  id uuid primary key default gen_random_uuid(),
+  customer_id uuid not null references auth.users(id) on delete cascade,
+  product_id uuid not null references products(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  unique (customer_id, product_id)
+);
+
+alter table wishlist_items enable row level security;
