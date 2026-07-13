@@ -29,49 +29,62 @@ export function CartClient({ t }: { t: Dictionary }) {
         {items.map((item) => {
           const key = cartItemKey(item);
           return (
-            <li key={key} className="flex items-center gap-4 py-4">
-              <div className="w-20 shrink-0">
-                <ProductImage src={item.image} label={item.name} />
+            <li
+              key={key}
+              className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:gap-4"
+            >
+              <div className="flex gap-4">
+                <div className="w-20 shrink-0">
+                  <ProductImage src={item.image} label={item.name} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <Link
+                    href={`/product/${item.slug}`}
+                    className="text-sm font-medium hover:text-gold"
+                  >
+                    {item.name}
+                  </Link>
+                  <p className="mt-1 text-xs text-foreground/50">
+                    {[item.color, item.size].filter(Boolean).join(" / ")}
+                  </p>
+                  <p className="mt-1 text-sm text-gold">
+                    RM {item.price.toFixed(2)}
+                  </p>
+                </div>
               </div>
-              <div className="min-w-0 flex-1">
-                <Link
-                  href={`/product/${item.slug}`}
-                  className="text-sm font-medium hover:text-gold"
+              <div className="flex items-center justify-between gap-4 sm:justify-end">
+                <div className="flex items-center gap-2">
+                  <label
+                    className="text-xs text-foreground/50"
+                    htmlFor={`qty-${key}`}
+                  >
+                    {t.cart.quantity}
+                  </label>
+                  <input
+                    id={`qty-${key}`}
+                    type="number"
+                    min={1}
+                    value={item.quantity}
+                    onChange={(e) =>
+                      updateQuantity(
+                        key,
+                        Math.max(1, Number(e.target.value) || 1),
+                      )
+                    }
+                    className="w-16 border border-border-subtle px-2 py-1 text-sm outline-none focus:border-gold"
+                  />
+                </div>
+                <p className="shrink-0 text-right text-sm sm:w-24">
+                  RM {(item.price * item.quantity).toFixed(2)}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => removeItem(key)}
+                  className="shrink-0 text-xs text-foreground/40 hover:text-destructive"
                 >
-                  {item.name}
-                </Link>
-                <p className="mt-1 text-xs text-foreground/50">
-                  {[item.color, item.size].filter(Boolean).join(" / ")}
-                </p>
-                <p className="mt-1 text-sm text-gold">
-                  RM {item.price.toFixed(2)}
-                </p>
+                  {t.cart.remove}
+                </button>
               </div>
-              <div className="flex items-center gap-2">
-                <label className="text-xs text-foreground/50" htmlFor={`qty-${key}`}>
-                  {t.cart.quantity}
-                </label>
-                <input
-                  id={`qty-${key}`}
-                  type="number"
-                  min={1}
-                  value={item.quantity}
-                  onChange={(e) =>
-                    updateQuantity(key, Math.max(1, Number(e.target.value) || 1))
-                  }
-                  className="w-16 border border-border-subtle px-2 py-1 text-sm outline-none focus:border-gold"
-                />
-              </div>
-              <p className="w-24 shrink-0 text-right text-sm">
-                RM {(item.price * item.quantity).toFixed(2)}
-              </p>
-              <button
-                type="button"
-                onClick={() => removeItem(key)}
-                className="shrink-0 text-xs text-foreground/40 hover:text-destructive"
-              >
-                {t.cart.remove}
-              </button>
             </li>
           );
         })}
