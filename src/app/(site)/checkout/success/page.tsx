@@ -4,30 +4,33 @@ import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getI18n } from "@/lib/i18n/dictionaries";
 import { getPaymentSettings } from "@/lib/payment-settings";
+import { requireCustomer } from "@/lib/customer-auth";
 
 export const metadata: Metadata = { title: "Order Confirmed" };
 
-// 免注册结账，顾客没有账号也要能看到自己的订单确认页，
-// 所以这里用 service_role 直接按订单 id 查（不走 RLS 公开策略）。
+// 结账现在要求先登录，这里用 service_role 按订单 id 查（不走 RLS 公开策略），
+// 查到后还要核对 customer_id 是不是当前登录人，防止拿别人的订单链接也能看。
 export default async function CheckoutSuccessPage({
   searchParams,
 }: {
   searchParams: Promise<{ order?: string }>;
 }) {
   const { order: orderId } = await searchParams;
+  if (!orderId) notFound();
+
+  const user = await requireCustomer(`/checkout/success?order=${orderId}`);
   const [{ t }, payment] = await Promise.all([
     getI18n(),
     getPaymentSettings(),
   ]);
-  if (!orderId) notFound();
 
   const { data: order } = await supabaseAdmin
     .from("orders")
-    .select("id, order_number, total, customer_name")
+    .select("id, order_number, total, customer_name, customer_id")
     .eq("id", orderId)
     .maybeSingle();
 
-  if (!order) notFound();
+  if (!order || order.customer_id !== user.id) notFound();
 
   const hasBankInfo = Boolean(payment.bankName && payment.accountNumber);
 
