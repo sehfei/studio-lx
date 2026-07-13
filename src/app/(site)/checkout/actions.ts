@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getCustomer } from "@/lib/customer-auth";
 import { dbErrorMessage } from "@/lib/db-error";
 import { calculateShippingFee, getShippingSettings } from "@/lib/shipping";
+import { checkCoupon } from "@/lib/coupon";
 
 // 结账现在要求登录：页面层 requireCustomer() 已经拦一次，
 // 这里再查一次当前登录用户，双重保险——防止有人绕过页面直接调这个 action。
@@ -28,7 +29,27 @@ export type CheckoutInput = {
   state: string;
   postcode: string;
   notes?: string;
+  couponCode?: string;
 };
+
+export type CouponPreviewResult =
+  | { ok: true; discount: number; description: string }
+  | { ok: false; error: string };
+
+// 结账页输入优惠码时的实时预览校验，用同一套 checkCoupon() 规则，
+// 真正下单时 createOrder 还会再校验一次（不信任这次预览的结果）。
+export async function previewCoupon(
+  code: string,
+  subtotal: number,
+): Promise<CouponPreviewResult> {
+  const result = await checkCoupon(code, subtotal);
+  if (!result.ok) return { ok: false, error: result.error };
+  const description =
+    result.coupon.type === "percentage"
+      ? `${result.coupon.value}% 折扣`
+      : `减 RM ${result.coupon.value.toFixed(2)}`;
+  return { ok: true, discount: result.discount, description };
+}
 
 export type CheckoutResult = {
   error?: string;
@@ -130,7 +151,22 @@ export async function createOrder(
     subtotal,
     shippingSettings,
   );
-  const total = Number((subtotal + shippingFee).toFixed(2));
+
+  // 优惠码同理：服务端重新校验一次，不信任结账页预览时算出的折扣金额
+  let discountAmount = 0;
+  let couponCode: string | null = null;
+  if (input.couponCode?.trim()) {
+    const couponResult = await checkCoupon(input.couponCode, subtotal);
+    if (!couponResult.ok) {
+      return { error: couponResult.error };
+    }
+    discountAmount = couponResult.discount;
+    couponCode = couponResult.coupon.code;
+  }
+
+  const total = Number(
+    (subtotal + shippingFee - discountAmount).toFixed(2),
+  );
 
   const orderNumber = generateOrderNumber();
 
@@ -149,6 +185,8 @@ export async function createOrder(
       notes: input.notes?.trim() || "",
       subtotal,
       shipping_fee: shippingFee,
+      coupon_code: couponCode,
+      discount_amount: discountAmount,
       total,
     })
     .select("id, order_number")
@@ -178,6 +216,22 @@ export async function createOrder(
       .from("products")
       .update({ stock: product.stock - item.quantity })
       .eq("id", item.product_id);
+  }
+
+  if (couponCode) {
+    // 订单已经成功创建，优惠码核销失败也不影响下单，静默即可，
+    // 用量统计小范围不一致比让顾客白等一个已经成立的订单更划算
+    const { data: coupon } = await supabaseAdmin
+      .from("coupons")
+      .select("used_count")
+      .eq("code", couponCode)
+      .maybeSingle();
+    if (coupon) {
+      await supabaseAdmin
+        .from("coupons")
+        .update({ used_count: coupon.used_count + 1 })
+        .eq("code", couponCode);
+    }
   }
 
   revalidatePath("/admin/orders");

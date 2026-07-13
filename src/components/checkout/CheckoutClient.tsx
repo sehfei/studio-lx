@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { useCart } from "@/components/cart/CartContext";
-import { createOrder } from "@/app/(site)/checkout/actions";
+import { createOrder, previewCoupon } from "@/app/(site)/checkout/actions";
 import {
   calculateShippingFee,
   MALAYSIA_STATES,
@@ -27,12 +27,39 @@ export function CheckoutClient({
   const [error, setError] = useState<string | null>(null);
   const [state, setState] = useState("");
 
+  const [couponInput, setCouponInput] = useState("");
+  const [couponPending, startCouponTransition] = useTransition();
+  const [appliedCoupon, setAppliedCoupon] = useState<
+    { code: string; discount: number; description: string } | null
+  >(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
+
   // 州属还没选之前不算运费，避免总计里悄悄含了一个还没显示出来的费用
   const shippingFee = useMemo(
     () => (state ? calculateShippingFee(state, subtotal, shippingSettings) : 0),
     [state, subtotal, shippingSettings],
   );
-  const total = subtotal + shippingFee;
+  const discount = appliedCoupon?.discount ?? 0;
+  const total = subtotal + shippingFee - discount;
+
+  const handleApplyCoupon = () => {
+    setCouponError(null);
+    const code = couponInput.trim();
+    if (!code) return;
+    startCouponTransition(async () => {
+      const result = await previewCoupon(code, subtotal);
+      if (!result.ok) {
+        setCouponError(result.error);
+        setAppliedCoupon(null);
+        return;
+      }
+      setAppliedCoupon({
+        code: code.toUpperCase(),
+        discount: result.discount,
+        description: result.description,
+      });
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -56,6 +83,7 @@ export function CheckoutClient({
         state: get("state"),
         postcode: get("postcode"),
         notes: get("notes"),
+        couponCode: appliedCoupon?.code,
       });
 
       if (result.error) {
@@ -163,6 +191,47 @@ export function CheckoutClient({
 
         <div>
           <h2 className="eyebrow mb-4">{t.checkout.orderSummary}</h2>
+
+          <div className="mb-4">
+            {appliedCoupon ? (
+              <div className="flex items-center justify-between border border-gold/40 bg-gold/5 px-3 py-2 text-sm">
+                <span className="text-gold">
+                  {appliedCoupon.code} — {appliedCoupon.description}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAppliedCoupon(null);
+                    setCouponInput("");
+                  }}
+                  className="text-xs text-foreground/50 hover:text-destructive"
+                >
+                  {t.checkout.removeCoupon}
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  value={couponInput}
+                  onChange={(e) => setCouponInput(e.target.value)}
+                  placeholder={t.checkout.couponPlaceholder}
+                  className="input-theme flex-1"
+                />
+                <button
+                  type="button"
+                  onClick={handleApplyCoupon}
+                  disabled={couponPending || !couponInput.trim()}
+                  className="btn-outline shrink-0"
+                >
+                  {couponPending ? t.checkout.applyingCoupon : t.checkout.applyCoupon}
+                </button>
+              </div>
+            )}
+            {couponError && (
+              <p className="mt-2 text-xs text-destructive">{couponError}</p>
+            )}
+          </div>
+
           <ul className="divide-y divide-border-subtle border-t border-b border-border-subtle">
             {items.map((item) => (
               <li
@@ -191,6 +260,12 @@ export function CheckoutClient({
                 {state ? `RM ${shippingFee.toFixed(2)}` : t.checkout.selectStateFirst}
               </span>
             </div>
+            {discount > 0 && (
+              <div className="flex justify-between text-gold">
+                <span>{t.checkout.discount}</span>
+                <span>-RM {discount.toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between text-base font-medium">
               <span>{t.checkout.total}</span>
               <span>RM {total.toFixed(2)}</span>

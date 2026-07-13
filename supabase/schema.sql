@@ -229,3 +229,28 @@ alter table blog_posts enable row level security;
 create policy "Public can read published blog posts"
   on blog_posts for select
   using (is_published = true);
+
+-- 优惠券：折扣码，结账时输入抵扣。不开公开读写策略——
+-- 校验和核销都走结账 Server Action 里的 service_role。
+create table if not exists coupons (
+  id uuid primary key default gen_random_uuid(),
+  code text unique not null,
+  type text not null check (type in ('percentage', 'fixed')),
+  value numeric(10, 2) not null,
+  min_spend numeric(10, 2),
+  max_uses integer,
+  used_count integer not null default 0,
+  is_active boolean not null default true,
+  expires_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+alter table coupons enable row level security;
+
+-- 订单要记录用了哪张券、折扣了多少，方便对账和显示
+alter table orders add column if not exists coupon_code text;
+alter table orders add column if not exists discount_amount numeric(10, 2) not null default 0;
+
+-- 支付设置：手动收款模式下，给顾客看的收款信息（银行户口等），
+-- 存进 site_settings 那张单行配置表，跟 shipping/theme 同样的模式。
+alter table site_settings add column if not exists payment jsonb not null default '{}'::jsonb;

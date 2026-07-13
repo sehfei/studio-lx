@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getI18n } from "@/lib/i18n/dictionaries";
+import { getPaymentSettings } from "@/lib/payment-settings";
 
 export const metadata: Metadata = { title: "Order Confirmed" };
 
@@ -14,7 +15,10 @@ export default async function CheckoutSuccessPage({
   searchParams: Promise<{ order?: string }>;
 }) {
   const { order: orderId } = await searchParams;
-  const { t } = await getI18n();
+  const [{ t }, payment] = await Promise.all([
+    getI18n(),
+    getPaymentSettings(),
+  ]);
   if (!orderId) notFound();
 
   const { data: order } = await supabaseAdmin
@@ -24,6 +28,8 @@ export default async function CheckoutSuccessPage({
     .maybeSingle();
 
   if (!order) notFound();
+
+  const hasBankInfo = Boolean(payment.bankName && payment.accountNumber);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-20 text-center sm:px-8">
@@ -36,6 +42,32 @@ export default async function CheckoutSuccessPage({
           RM {Number(order.total).toFixed(2)}
         </p>
       </div>
+
+      {hasBankInfo && (
+        <div className="mb-8 border border-gold/40 bg-gold/5 p-6 text-left">
+          <p className="eyebrow mb-3">{t.orderConfirm.paymentInfo}</p>
+          <dl className="space-y-1 text-sm">
+            <div className="flex justify-between">
+              <dt className="text-foreground/50">{t.orderConfirm.bankName}</dt>
+              <dd>{payment.bankName}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-foreground/50">{t.orderConfirm.accountName}</dt>
+              <dd>{payment.accountName}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-foreground/50">{t.orderConfirm.accountNumber}</dt>
+              <dd>{payment.accountNumber}</dd>
+            </div>
+          </dl>
+          {payment.instructions && (
+            <p className="mt-3 text-xs text-foreground/60">
+              {payment.instructions}
+            </p>
+          )}
+        </div>
+      )}
+
       <p className="mb-10 text-sm text-foreground/60">
         {t.orderConfirm.manualPayment}
       </p>
