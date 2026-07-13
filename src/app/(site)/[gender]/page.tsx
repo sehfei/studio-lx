@@ -4,12 +4,13 @@ import type { Metadata } from "next";
 import { ProductGrid } from "@/components/ui/ProductGrid";
 import { getProductsByGender } from "@/lib/products";
 import { genderCategories } from "@/lib/site-config";
+import { getCategories } from "@/lib/categories";
 import { getI18n } from "@/lib/i18n/dictionaries";
 import { categoryLabel } from "@/lib/i18n/nav-labels";
 
 type Params = { gender: string };
 
-function getCategory(gender: string) {
+function getGenderEntry(gender: string) {
   return genderCategories.find((c) => c.slug === gender);
 }
 
@@ -19,8 +20,8 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { gender } = await params;
-  const category = getCategory(gender);
-  return { title: category?.label ?? "Not Found" };
+  const genderEntry = getGenderEntry(gender);
+  return { title: genderEntry?.label ?? "Not Found" };
 }
 
 export default async function GenderPage({
@@ -29,21 +30,22 @@ export default async function GenderPage({
   params: Promise<Params>;
 }) {
   const { gender } = await params;
-  const category = getCategory(gender);
-  if (!category) notFound();
+  const genderEntry = getGenderEntry(gender);
+  if (!genderEntry) notFound();
 
-  const [products, { t }] = await Promise.all([
+  const [products, categories, { t }] = await Promise.all([
     getProductsByGender(gender as "women" | "men"),
+    getCategories(),
     getI18n(),
   ]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-8">
       <h1 className="section-title mb-6">
-        {categoryLabel(t, category.slug, category.label)}
+        {categoryLabel(t, genderEntry.slug, genderEntry.label)}
       </h1>
       <div className="mb-10 flex flex-wrap gap-3 text-xs tracking-widest uppercase">
-        {category.children.map((child) => (
+        {categories.map((child) => (
           <Link
             key={child.slug}
             href={`/${gender}/${child.slug}`}

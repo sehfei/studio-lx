@@ -3,14 +3,16 @@ import type { Metadata } from "next";
 import { ProductGrid } from "@/components/ui/ProductGrid";
 import { getProductsByGenderCategory } from "@/lib/products";
 import { genderCategories } from "@/lib/site-config";
+import { getCategories } from "@/lib/categories";
 import { getI18n } from "@/lib/i18n/dictionaries";
 import { categoryLabel } from "@/lib/i18n/nav-labels";
 
 type Params = { gender: string; category: string };
 
-function resolve(gender: string, category: string) {
+async function resolve(gender: string, category: string) {
   const genderEntry = genderCategories.find((c) => c.slug === gender);
-  const categoryEntry = genderEntry?.children.find((c) => c.slug === category);
+  const categories = await getCategories();
+  const categoryEntry = categories.find((c) => c.slug === category);
   return { genderEntry, categoryEntry };
 }
 
@@ -20,7 +22,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { gender, category } = await params;
-  const { genderEntry, categoryEntry } = resolve(gender, category);
+  const { genderEntry, categoryEntry } = await resolve(gender, category);
   if (!genderEntry || !categoryEntry) return { title: "Not Found" };
   return { title: `${genderEntry.label} ${categoryEntry.label}` };
 }
@@ -31,14 +33,11 @@ export default async function CategoryPage({
   params: Promise<Params>;
 }) {
   const { gender, category } = await params;
-  const { genderEntry, categoryEntry } = resolve(gender, category);
+  const { genderEntry, categoryEntry } = await resolve(gender, category);
   if (!genderEntry || !categoryEntry) notFound();
 
   const [products, { t }] = await Promise.all([
-    getProductsByGenderCategory(
-      gender as "women" | "men",
-      category as "clothing" | "shoes" | "bags" | "glasses" | "accessories",
-    ),
+    getProductsByGenderCategory(gender as "women" | "men", category),
     getI18n(),
   ]);
 

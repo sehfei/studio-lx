@@ -1,7 +1,8 @@
 import type { NextRequest } from "next/server";
 import { supabase } from "@/lib/supabase/client";
 import { mapRow, type ProductRow } from "@/lib/products";
-import { CATEGORIES, GENDERS, TAGS } from "@/lib/constants";
+import { GENDERS, TAGS } from "@/lib/constants";
+import { getCategories } from "@/lib/categories";
 import { badRequest, ok, serverError } from "@/lib/api/response";
 
 const MAX_LIMIT = 50;
@@ -17,8 +18,11 @@ export async function GET(request: NextRequest) {
   }
 
   const category = params.get("category");
-  if (category && !(CATEGORIES as readonly string[]).includes(category)) {
-    return badRequest(`category 只能是 ${CATEGORIES.join(" / ")}`);
+  if (category) {
+    const validSlugs = (await getCategories()).map((c) => c.slug);
+    if (!validSlugs.includes(category)) {
+      return badRequest(`category 只能是 ${validSlugs.join(" / ")}`);
+    }
   }
 
   const tag = params.get("tag");

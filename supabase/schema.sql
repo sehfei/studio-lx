@@ -175,3 +175,36 @@ alter table contact_messages enable row level security;
 -- 运费设置：西马/东马分开计费，配置存进 site_settings 那张单行配置表
 -- （跟 theme/announcement/identity/pages 同样的模式），公开可读、写走 service_role。
 alter table site_settings add column if not exists shipping jsonb not null default '{}'::jsonb;
+
+-- 分类管理：分类从写死在代码里改成可后台管理。
+-- 先建表 + 用现有 5 个分类做种子数据，公开只读、写走 service_role。
+create table if not exists categories (
+  id uuid primary key default gen_random_uuid(),
+  slug text unique not null,
+  label text not null,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now()
+);
+
+alter table categories enable row level security;
+
+create policy "Public can read categories"
+  on categories for select
+  using (true);
+
+insert into categories (slug, label, sort_order) values
+  ('clothing', 'Clothing', 1),
+  ('shoes', 'Shoes', 2),
+  ('bags', 'Bags', 3),
+  ('glasses', 'Glasses', 4),
+  ('accessories', 'Accessories', 5)
+on conflict (slug) do nothing;
+
+-- products.category 原本是写死的 CHECK 约束，改成引用 categories 表的外键。
+-- 现有 8 条商品数据的 category 值都在上面种子数据范围内，外键能直接生效，不用改数据。
+-- 约束名是 Postgres 对内联 CHECK 自动生成的默认名，如果你的项目里名字不一样，
+-- 这句 drop 不会报错，只是不会真的删掉旧约束——如果后台新增分类后保存商品报错，
+-- 提示约束冲突，回来告诉我，我们再手动找真实约束名处理。
+alter table products drop constraint if exists products_category_check;
+alter table products add constraint products_category_fkey
+  foreign key (category) references categories(slug);

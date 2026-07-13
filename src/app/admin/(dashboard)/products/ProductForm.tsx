@@ -3,9 +3,10 @@
 import Image from "next/image";
 import { useActionState } from "react";
 import { createProduct, updateProduct } from "./actions";
-import { CATEGORIES, GENDERS, TAGS } from "@/lib/constants";
+import { GENDERS, TAGS } from "@/lib/constants";
 import { Spinner } from "@/components/ui/Spinner";
 import type { Product } from "@/lib/products";
+import type { CategoryRow } from "@/lib/categories";
 
 // 展示名：首字母大写，连字符转空格（new-arrival -> New Arrival）
 function toLabel(value: string): string {
@@ -16,14 +17,19 @@ function toLabel(value: string): string {
 }
 
 const genders = GENDERS.map((value) => ({ value, label: toLabel(value) }));
-const categories = CATEGORIES.map((value) => ({ value, label: toLabel(value) }));
 const tagOptions = TAGS.map((value) => ({ value, label: toLabel(value) }));
 
 const inputClass = "input-theme";
 const labelClass = "mb-1 block text-xs tracking-widest text-foreground/50 uppercase";
 
 // 不传 product 是新增，传了就是编辑
-export function ProductForm({ product }: { product?: Product }) {
+export function ProductForm({
+  product,
+  categories,
+}: {
+  product?: Product;
+  categories: CategoryRow[];
+}) {
   const action = product ? updateProduct.bind(null, product.id) : createProduct;
   const [state, formAction, pending] = useActionState(action, undefined);
   // 提交报错时用返回的原始值回填，避免 React 19 重置表单清空所填内容
@@ -148,7 +154,7 @@ export function ProductForm({ product }: { product?: Product }) {
               选择 Category
             </option>
             {categories.map((c) => (
-              <option key={c.value} value={c.value}>
+              <option key={c.slug} value={c.slug}>
                 {c.label}
               </option>
             ))}

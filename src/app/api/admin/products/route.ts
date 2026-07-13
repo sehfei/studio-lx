@@ -21,7 +21,13 @@ export async function POST(request: Request) {
     return badRequest("请求体必须是合法 JSON");
   }
 
-  const validated = validateProduct(body);
+  const { data: categoryRows } = await supabaseAdmin
+    .from("categories")
+    .select("slug");
+  const validated = validateProduct(
+    body,
+    (categoryRows ?? []).map((c) => c.slug),
+  );
   if (validated.error !== undefined) {
     return badRequest(validated.error);
   }

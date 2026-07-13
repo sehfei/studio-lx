@@ -6,22 +6,29 @@ import { CartProvider } from "@/components/cart/CartContext";
 import { getAnnouncement } from "@/lib/announcement";
 import { getIdentity } from "@/lib/identity";
 import { getI18n } from "@/lib/i18n/dictionaries";
+import { getCategories } from "@/lib/categories";
 
 export default async function SiteLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [announcement, identity, { locale, t }] = await Promise.all([
+  const [announcement, identity, { locale, t }, categories] = await Promise.all([
     getAnnouncement(),
     getIdentity(),
     getI18n(),
+    getCategories(),
   ]);
 
   return (
     <CartProvider>
       <AnnouncementBar announcement={announcement} closeLabel={t.nav.close} />
-      <Navbar logoUrl={identity.logoUrl} locale={locale} t={t} />
+      <Navbar
+        logoUrl={identity.logoUrl}
+        locale={locale}
+        t={t}
+        categories={categories}
+      />
       <main className="flex-1">{children}</main>
       <Footer identity={identity} t={t} />
       <WhatsAppButton whatsappNumber={identity.whatsappNumber} />

@@ -1,9 +1,11 @@
 import type { MetadataRoute } from "next";
 import { siteConfig, genderCategories } from "@/lib/site-config";
+import { getCategories } from "@/lib/categories";
 import { getAllProducts } from "@/lib/products";
 import { placeholderPosts } from "@/lib/blog";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const categories = await getCategories();
   const staticRoutes = [
     "",
     "about",
@@ -21,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const categoryRoutes = genderCategories.flatMap((cat) => [
     { url: `${siteConfig.url}/${cat.slug}`, changeFrequency: "weekly" as const, priority: 0.8 },
-    ...cat.children.map((child) => ({
+    ...categories.map((child) => ({
       url: `${siteConfig.url}/${cat.slug}/${child.slug}`,
       changeFrequency: "weekly" as const,
       priority: 0.6,

@@ -22,6 +22,11 @@ const ALLOWED_IMAGE_TYPES = [
   "image/gif",
 ];
 
+async function getValidCategorySlugs(): Promise<string[]> {
+  const { data } = await supabaseAdmin.from("categories").select("slug");
+  return (data ?? []).map((c) => c.slug);
+}
+
 function splitList(value: string): string[] {
   return value
     .split(",")
@@ -108,7 +113,10 @@ export async function createProduct(
   await requireAdmin();
 
   const values = formValues(formData);
-  const validated = validateProduct(formToRawInput(formData));
+  const validated = validateProduct(
+    formToRawInput(formData),
+    await getValidCategorySlugs(),
+  );
   if (validated.error !== undefined) {
     return { error: validated.error, values };
   }
@@ -201,7 +209,10 @@ export async function updateProduct(
   await requireAdmin();
 
   const values = formValues(formData);
-  const validated = validateProduct(formToRawInput(formData));
+  const validated = validateProduct(
+    formToRawInput(formData),
+    await getValidCategorySlugs(),
+  );
   if (validated.error !== undefined) {
     return { error: validated.error, values };
   }

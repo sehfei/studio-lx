@@ -14,15 +14,18 @@ import type { Locale } from "@/lib/i18n/config";
 import { categoryLabel } from "@/lib/i18n/nav-labels";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useCart } from "@/components/cart/CartContext";
+import type { CategoryRow } from "@/lib/categories";
 
 export function Navbar({
   logoUrl,
   locale,
   t,
+  categories,
 }: {
   logoUrl?: string;
   locale: Locale;
   t: Dictionary;
+  categories: CategoryRow[];
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { count: cartCount } = useCart();
@@ -92,7 +95,7 @@ export function Navbar({
                 {label(cat.slug, cat.label)}
               </Link>
               <div className="absolute left-1/2 top-full hidden -translate-x-1/2 border border-border-subtle bg-background py-2 shadow-lg group-hover:block">
-                {cat.children.map((child) => (
+                {categories.map((child) => (
                   <Link
                     key={child.slug}
                     href={`/${cat.slug}/${child.slug}`}
@@ -134,7 +137,7 @@ export function Navbar({
                   {label(cat.slug, cat.label)}
                 </Link>
                 <ul className="mt-2 space-y-2 pl-4 text-foreground/70">
-                  {cat.children.map((child) => (
+                  {categories.map((child) => (
                     <li key={child.slug}>
                       <Link
                         href={`/${cat.slug}/${child.slug}`}

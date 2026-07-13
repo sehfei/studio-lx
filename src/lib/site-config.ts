@@ -9,32 +9,13 @@ export const siteConfig = {
 export type NavCategory = {
   label: string;
   slug: string;
-  children: { label: string; slug: string }[];
 };
 
+// 性别是固定的两个顶层分区，不像分类那样后台可管理——
+// 分类现在是动态的，见 src/lib/categories.ts 的 getCategories()。
 export const genderCategories: NavCategory[] = [
-  {
-    label: "Women",
-    slug: "women",
-    children: [
-      { label: "Clothing", slug: "clothing" },
-      { label: "Shoes", slug: "shoes" },
-      { label: "Bags", slug: "bags" },
-      { label: "Glasses", slug: "glasses" },
-      { label: "Accessories", slug: "accessories" },
-    ],
-  },
-  {
-    label: "Men",
-    slug: "men",
-    children: [
-      { label: "Clothing", slug: "clothing" },
-      { label: "Shoes", slug: "shoes" },
-      { label: "Bags", slug: "bags" },
-      { label: "Glasses", slug: "glasses" },
-      { label: "Accessories", slug: "accessories" },
-    ],
-  },
+  { label: "Women", slug: "women" },
+  { label: "Men", slug: "men" },
 ];
 
 export const featureCollections = [

@@ -66,7 +66,13 @@ export async function PATCH(request: Request, { params }: RouteContext) {
       "badgeText" in body ? body.badgeText : (current.badgeText ?? null),
   };
 
-  const validated = validateProduct(merged);
+  const { data: categoryRows } = await supabaseAdmin
+    .from("categories")
+    .select("slug");
+  const validated = validateProduct(
+    merged,
+    (categoryRows ?? []).map((c) => c.slug),
+  );
   if (validated.error !== undefined) {
     return badRequest(validated.error);
   }

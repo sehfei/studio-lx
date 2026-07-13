@@ -1,10 +1,4 @@
-import {
-  CATEGORIES,
-  GENDERS,
-  TAGS,
-  type Category,
-  type Gender,
-} from "@/lib/constants";
+import { GENDERS, TAGS, type Category, type Gender } from "@/lib/constants";
 
 // 商品写入的共享校验：admin Server Action 和 /api/admin/products 都走这里，
 // 保证两个入口的规则一致。
@@ -67,8 +61,11 @@ function toStrArray(value: unknown): string[] {
   return value.map((v) => String(v).trim()).filter(Boolean);
 }
 
+// validCategories 是调用方先查好的分类表 slug 列表（分类现在是后台可管理的，
+// 不再是编译期固定的几个值，校验时必须传入当前真实存在的分类）。
 export function validateProduct(
   raw: RawProductInput,
+  validCategories: readonly string[],
 ): { data: ProductInput; error?: undefined } | { data?: undefined; error: string } {
   const name = toStr(raw.name);
   const sku = toStr(raw.sku);
@@ -100,7 +97,7 @@ export function validateProduct(
   }
 
   const category = toStr(raw.category) as Category;
-  if (!CATEGORIES.includes(category)) {
+  if (!validCategories.includes(category)) {
     return { error: "请选择 Category" };
   }
 
