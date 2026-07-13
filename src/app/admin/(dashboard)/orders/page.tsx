@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { OrderStatusControls } from "./OrderStatusControls";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminOrdersPage() {
+  await requirePermission("orders");
   const { data: orders } = await supabaseAdmin
     .from("orders")
     .select(

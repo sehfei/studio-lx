@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { requirePermission } from "@/lib/auth";
 import { getBannerById } from "@/lib/banners";
 import { BannerForm } from "../../BannerForm";
 
@@ -11,6 +12,7 @@ export default async function EditBannerPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePermission("banners");
   const { id } = await params;
   const banner = await getBannerById(id);
   if (!banner) notFound();

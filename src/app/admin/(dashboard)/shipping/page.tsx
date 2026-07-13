@@ -1,9 +1,11 @@
+import { requirePermission } from "@/lib/auth";
 import { getShippingSettings } from "@/lib/shipping";
 import { ShippingForm } from "./ShippingForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminShippingPage() {
+  await requirePermission("shipping");
   const settings = await getShippingSettings();
 
   return (

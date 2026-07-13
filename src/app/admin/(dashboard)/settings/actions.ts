@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/auth";
+import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { dbErrorMessage } from "@/lib/db-error";
 import {
@@ -65,7 +65,7 @@ async function persistTheme(theme: ThemeSettings): Promise<string | null> {
 }
 
 export async function undoLastSave(): Promise<ThemeFormState> {
-  await requireAdmin();
+  await requirePermission("settings");
 
   const { data, error: findError } = await supabaseAdmin
     .from("site_settings")
@@ -96,7 +96,7 @@ export async function saveTheme(
   _prevState: ThemeFormState,
   formData: FormData,
 ): Promise<ThemeFormState> {
-  await requireAdmin();
+  await requirePermission("settings");
 
   const parsed = readColors(formData);
   if ("error" in parsed) return { error: parsed.error };
@@ -152,7 +152,7 @@ export async function saveAnnouncement(
   _prevState: AnnouncementFormState,
   formData: FormData,
 ): Promise<AnnouncementFormState> {
-  await requireAdmin();
+  await requirePermission("settings");
 
   const message = String(formData.get("message") ?? "").trim();
   const enabled = formData.get("enabled") === "on";
@@ -244,7 +244,7 @@ export async function saveIdentity(
   _prevState: IdentityFormState,
   formData: FormData,
 ): Promise<IdentityFormState> {
-  await requireAdmin();
+  await requirePermission("settings");
 
   const { data: current } = await supabaseAdmin
     .from("site_settings")
@@ -312,7 +312,7 @@ export async function savePages(
   _prevState: PagesFormState,
   formData: FormData,
 ): Promise<PagesFormState> {
-  await requireAdmin();
+  await requirePermission("settings");
 
   const s = (name: string) => String(formData.get(name) ?? "").trim();
   const pages = {} as SitePages;

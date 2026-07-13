@@ -48,9 +48,17 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  const isAdmin = !!user && user.app_metadata?.role === "admin";
+  // 员工(staff)分权限上线后，"已登录要不要从登录页弹开"不能只查 admin，
+  // 有权限的 staff 也算有效后台账号，否则会被弹回登录页又被 requireBackendUser()
+  // 弹回来，重现之前修过的死循环。具体到每一页的权限校验交给 requirePermission()。
+  const role = user?.app_metadata?.role;
+  const permissions = Array.isArray(user?.app_metadata?.permissions)
+    ? user.app_metadata.permissions
+    : [];
+  const isBackend =
+    !!user && (role === "admin" || (role === "staff" && permissions.length > 0));
 
-  if (isAdmin && isLoginPage) {
+  if (isBackend && isLoginPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin";
     url.search = "";

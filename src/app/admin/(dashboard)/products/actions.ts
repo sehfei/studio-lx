@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { slugify } from "@/lib/slugify";
-import { requireAdmin } from "@/lib/auth";
+import { requirePermission } from "@/lib/auth";
 import {
   productInputToRow,
   uniqueViolationMessage,
@@ -110,7 +110,7 @@ export async function createProduct(
   formData: FormData,
 ): Promise<ProductFormState> {
   // proxy 和 layout 挡不住直接调用 action，这里必须再验一次
-  await requireAdmin();
+  await requirePermission("products");
 
   const values = formValues(formData);
   const validated = validateProduct(
@@ -206,7 +206,7 @@ export async function updateProduct(
   _prevState: ProductFormState,
   formData: FormData,
 ): Promise<ProductFormState> {
-  await requireAdmin();
+  await requirePermission("products");
 
   const values = formValues(formData);
   const validated = validateProduct(
@@ -275,7 +275,7 @@ export async function updateProduct(
 export async function deleteProduct(
   id: string,
 ): Promise<{ error: string } | undefined> {
-  await requireAdmin();
+  await requirePermission("products");
 
   const { data: existing, error: findError } = await supabaseAdmin
     .from("products")

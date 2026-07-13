@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { requirePermission } from "@/lib/auth";
 import { getAllBanners } from "@/lib/banners";
 import { BannerRowActions } from "./BannerRowActions";
 
@@ -26,6 +27,7 @@ function statusLabel(banner: {
 }
 
 export default async function AdminBannersPage() {
+  await requirePermission("banners");
   const banners = await getAllBanners();
 
   return (

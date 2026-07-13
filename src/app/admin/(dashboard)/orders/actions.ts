@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/auth";
+import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 const ORDER_STATUSES = [
@@ -16,7 +16,7 @@ export async function updateOrderStatus(
   id: string,
   status: string,
 ): Promise<{ error: string } | undefined> {
-  await requireAdmin();
+  await requirePermission("orders");
 
   if (!ORDER_STATUSES.includes(status as (typeof ORDER_STATUSES)[number])) {
     return { error: "无效的订单状态" };
@@ -36,7 +36,7 @@ export async function setPaymentStatus(
   id: string,
   paid: boolean,
 ): Promise<{ error: string } | undefined> {
-  await requireAdmin();
+  await requirePermission("orders");
 
   const { error } = await supabaseAdmin
     .from("orders")

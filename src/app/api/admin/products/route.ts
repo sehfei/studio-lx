@@ -1,4 +1,4 @@
-import { requireAdminApi } from "@/lib/auth";
+import { requirePermissionApi } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { slugify } from "@/lib/slugify";
 import { mapRow } from "@/lib/products";
@@ -11,7 +11,7 @@ import { badRequest, fail, ok, unauthorized } from "@/lib/api/response";
 
 // POST /api/admin/products 创建商品（JSON body，images 传已上传好的 URL 数组）
 export async function POST(request: Request) {
-  const user = await requireAdminApi();
+  const user = await requirePermissionApi("products");
   if (!user) return unauthorized();
 
   let body: Record<string, unknown>;

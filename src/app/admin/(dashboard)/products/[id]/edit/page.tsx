@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { requirePermission } from "@/lib/auth";
 import { getProductById } from "@/lib/products";
 import { getCategories } from "@/lib/categories";
 import { ProductForm } from "../../ProductForm";
@@ -11,6 +12,7 @@ export default async function EditProductPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePermission("products");
   const { id } = await params;
   const [product, categories] = await Promise.all([
     getProductById(id),

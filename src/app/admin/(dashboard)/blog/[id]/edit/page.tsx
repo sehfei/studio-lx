@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { mapBlogRow, type BlogPostRow } from "@/lib/blog";
 import { BlogForm } from "../../BlogForm";
@@ -11,6 +12,7 @@ export default async function EditPostPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePermission("blog");
   const { id } = await params;
 
   const { data } = await supabaseAdmin

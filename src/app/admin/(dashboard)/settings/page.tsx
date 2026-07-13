@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { requirePermission } from "@/lib/auth";
 import { getTheme } from "@/lib/theme";
 import { getAdminI18n } from "@/lib/i18n/admin";
 import { getAnnouncement } from "@/lib/announcement";
@@ -15,6 +16,7 @@ export const metadata: Metadata = { title: "Website Settings" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminSettingsPage() {
+  await requirePermission("settings");
   const [theme, announcement, identity, pages] = await Promise.all([
     getTheme(),
     getAnnouncement(),

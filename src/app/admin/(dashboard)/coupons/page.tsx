@@ -1,3 +1,4 @@
+import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { AddCouponForm } from "./AddCouponForm";
 import { CouponControls } from "./CouponControls";
@@ -5,6 +6,7 @@ import { CouponControls } from "./CouponControls";
 export const dynamic = "force-dynamic";
 
 export default async function AdminCouponsPage() {
+  await requirePermission("coupons");
   const { data: coupons } = await supabaseAdmin
     .from("coupons")
     .select("*")

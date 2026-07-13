@@ -1,9 +1,11 @@
+import { requirePermission } from "@/lib/auth";
 import { getPaymentSettings } from "@/lib/payment-settings";
 import { PaymentSettingsForm } from "./PaymentSettingsForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPaymentSettingsPage() {
+  await requirePermission("paymentSettings");
   const settings = await getPaymentSettings();
 
   return (

@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { requirePermission } from "@/lib/auth";
 import { getAllProducts } from "@/lib/products";
 
 const LOW_STOCK_THRESHOLD = 5;
 
 export default async function AdminInventoryPage() {
+  await requirePermission("inventory");
   const products = await getAllProducts();
   const sorted = [...products].sort((a, b) => a.stock - b.stock);
 

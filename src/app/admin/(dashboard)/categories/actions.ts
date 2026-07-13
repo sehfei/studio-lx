@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/auth";
+import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { slugify } from "@/lib/slugify";
 import { dbErrorMessage } from "@/lib/db-error";
@@ -12,7 +12,7 @@ export async function createCategory(
   _prevState: CategoryFormState,
   formData: FormData,
 ): Promise<CategoryFormState> {
-  await requireAdmin();
+  await requirePermission("categories");
 
   const label = String(formData.get("label") ?? "").trim();
   const slugInput = String(formData.get("slug") ?? "").trim();
@@ -48,7 +48,7 @@ export async function deleteCategory(
   id: string,
   slug: string,
 ): Promise<{ error?: string } | undefined> {
-  await requireAdmin();
+  await requirePermission("categories");
 
   const { count } = await supabaseAdmin
     .from("products")

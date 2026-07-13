@@ -1,8 +1,10 @@
+import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCustomersPage() {
+  await requirePermission("customers");
   const { data: userList } = await supabaseAdmin.auth.admin.listUsers();
   const customers = (userList?.users ?? []).filter(
     (u) => u.app_metadata?.role !== "admin",

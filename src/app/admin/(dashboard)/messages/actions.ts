@@ -1,13 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/auth";
+import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export async function markMessageRead(
   id: string,
 ): Promise<{ error?: string } | undefined> {
-  await requireAdmin();
+  await requirePermission("messages");
 
   const { error } = await supabaseAdmin
     .from("contact_messages")

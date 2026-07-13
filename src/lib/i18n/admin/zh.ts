@@ -7,6 +7,8 @@ export const zh: AdminDictionary = {
     backToSite: "← 返回前台网站",
     signOut: "登出",
     language: "语言",
+    deniedAccessPrefix: "你没有权限访问「",
+    deniedAccessSuffix: "」。",
     nav: {
       dashboard: "仪表盘",
       products: "商品管理",

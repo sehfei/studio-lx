@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/auth";
+import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { dbErrorMessage } from "@/lib/db-error";
 
@@ -11,7 +11,7 @@ export async function createCoupon(
   _prevState: CouponFormState,
   formData: FormData,
 ): Promise<CouponFormState> {
-  await requireAdmin();
+  await requirePermission("coupons");
 
   const code = String(formData.get("code") ?? "").trim().toUpperCase();
   const type = String(formData.get("type") ?? "");
@@ -65,7 +65,7 @@ export async function toggleCouponActive(
   id: string,
   isActive: boolean,
 ): Promise<{ error?: string } | undefined> {
-  await requireAdmin();
+  await requirePermission("coupons");
   const { error } = await supabaseAdmin
     .from("coupons")
     .update({ is_active: isActive })
@@ -77,7 +77,7 @@ export async function toggleCouponActive(
 export async function deleteCoupon(
   id: string,
 ): Promise<{ error?: string } | undefined> {
-  await requireAdmin();
+  await requirePermission("coupons");
   const { error } = await supabaseAdmin.from("coupons").delete().eq("id", id);
   if (error) return { error: error.message };
   revalidatePath("/admin/coupons");

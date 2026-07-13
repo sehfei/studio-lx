@@ -6,6 +6,8 @@ export const en = {
     backToSite: "← Back to site",
     signOut: "Sign out",
     language: "Language",
+    deniedAccessPrefix: "You don't have access to “",
+    deniedAccessSuffix: "”.",
     nav: {
       dashboard: "Dashboard",
       products: "Products",

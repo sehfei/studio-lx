@@ -1,9 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
+import { requirePermission } from "@/lib/auth";
 import { getAllProducts } from "@/lib/products";
 import { DeleteProductButton } from "./DeleteProductButton";
 
 export default async function AdminProductsPage() {
+  await requirePermission("products");
   const products = await getAllProducts();
 
   return (

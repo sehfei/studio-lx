@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { OrderStatusControls } from "../OrderStatusControls";
 
@@ -10,6 +11,7 @@ export default async function AdminOrderDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePermission("orders");
   const { id } = await params;
 
   const { data: order } = await supabaseAdmin

@@ -1,4 +1,4 @@
-import { requireAdminApi } from "@/lib/auth";
+import { requirePermissionApi } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { mapRow, type ProductRow } from "@/lib/products";
 import {
@@ -28,7 +28,7 @@ async function findRow(id: string): Promise<ProductRow | null> {
 // PATCH /api/admin/products/[id] 部分更新：
 // 先取现有行，和 body 合并后整体校验，保证折扣价 < 原价这类跨字段规则不被绕过
 export async function PATCH(request: Request, { params }: RouteContext) {
-  const user = await requireAdminApi();
+  const user = await requirePermissionApi("products");
   if (!user) return unauthorized();
 
   const { id } = await params;
@@ -101,7 +101,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
 
 // DELETE /api/admin/products/[id]
 export async function DELETE(_request: Request, { params }: RouteContext) {
-  const user = await requireAdminApi();
+  const user = await requirePermissionApi("products");
   if (!user) return unauthorized();
 
   const { id } = await params;

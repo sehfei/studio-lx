@@ -1,3 +1,4 @@
+import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getCategories } from "@/lib/categories";
 import { AddCategoryForm } from "./AddCategoryForm";
@@ -6,6 +7,7 @@ import { DeleteCategoryButton } from "./DeleteCategoryButton";
 export const dynamic = "force-dynamic";
 
 export default async function AdminCategoriesPage() {
+  await requirePermission("categories");
   const categories = await getCategories();
 
   const { data: products } = await supabaseAdmin

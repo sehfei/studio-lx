@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/auth";
+import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { dbErrorMessage } from "@/lib/db-error";
 import type { ShippingSettings } from "@/lib/shipping";
@@ -12,7 +12,7 @@ export async function saveShippingSettings(
   _prevState: ShippingFormState,
   formData: FormData,
 ): Promise<ShippingFormState> {
-  await requireAdmin();
+  await requirePermission("shipping");
 
   const westFee = Number(formData.get("westFee"));
   const eastFee = Number(formData.get("eastFee"));

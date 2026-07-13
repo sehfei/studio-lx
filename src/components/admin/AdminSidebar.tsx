@@ -7,8 +7,10 @@ import type { AdminDictionary } from "@/lib/i18n/admin";
 
 export function AdminSidebar({
   dict,
+  visibleKeys,
 }: {
   dict: AdminDictionary["sidebar"];
+  visibleKeys: string[];
 }) {
   const pathname = usePathname();
 
@@ -20,7 +22,9 @@ export function AdminSidebar({
       <nav className="mt-3 lg:mt-0">
         {/* 手机：横向滑动的导航条；桌面：竖排侧栏 */}
         <ul className="flex gap-1 overflow-x-auto pb-1 text-sm lg:block lg:space-y-1 lg:overflow-visible lg:pb-0">
-          {adminNavItems.map((item) => {
+          {adminNavItems
+            .filter((item) => visibleKeys.includes(item.key))
+            .map((item) => {
             const active =
               item.href === "/admin"
                 ? pathname === "/admin"

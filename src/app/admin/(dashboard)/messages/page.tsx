@@ -1,9 +1,11 @@
+import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { MarkReadButton } from "./MarkReadButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminMessagesPage() {
+  await requirePermission("messages");
   const { data: messages } = await supabaseAdmin
     .from("contact_messages")
     .select("*")

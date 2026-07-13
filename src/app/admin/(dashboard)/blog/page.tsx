@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { mapBlogRow, type BlogPostRow } from "@/lib/blog";
 import { DeletePostButton } from "./DeletePostButton";
@@ -6,6 +7,7 @@ import { DeletePostButton } from "./DeletePostButton";
 export const dynamic = "force-dynamic";
 
 export default async function AdminBlogPage() {
+  await requirePermission("blog");
   const { data } = await supabaseAdmin
     .from("blog_posts")
     .select("*")

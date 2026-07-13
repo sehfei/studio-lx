@@ -1,8 +1,10 @@
+import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminSalesReportPage() {
+  await requirePermission("salesReport");
   const { data: orders } = await supabaseAdmin
     .from("orders")
     .select("total, status, payment_status, created_at");

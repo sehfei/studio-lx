@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { requireAdmin } from "@/lib/auth";
+import { requirePermission } from "@/lib/auth";
 import { slugify } from "@/lib/slugify";
 import { dbErrorMessage } from "@/lib/db-error";
 
@@ -77,7 +77,7 @@ export async function createPost(
   _prevState: BlogFormState,
   formData: FormData,
 ): Promise<BlogFormState> {
-  await requireAdmin();
+  await requirePermission("blog");
   const values = readValues(formData);
 
   if (!values.title) {
@@ -119,7 +119,7 @@ export async function updatePost(
   _prevState: BlogFormState,
   formData: FormData,
 ): Promise<BlogFormState> {
-  await requireAdmin();
+  await requirePermission("blog");
   const values = readValues(formData);
 
   if (!values.title) {
@@ -177,7 +177,7 @@ export async function updatePost(
 export async function deletePost(
   id: string,
 ): Promise<{ error: string } | undefined> {
-  await requireAdmin();
+  await requirePermission("blog");
 
   const { data: existing, error: findError } = await supabaseAdmin
     .from("blog_posts")

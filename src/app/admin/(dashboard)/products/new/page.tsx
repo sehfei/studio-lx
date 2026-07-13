@@ -1,7 +1,9 @@
 import { ProductForm } from "../ProductForm";
 import { getCategories } from "@/lib/categories";
+import { requirePermission } from "@/lib/auth";
 
 export default async function NewProductPage() {
+  await requirePermission("products");
   const categories = await getCategories();
   return (
     <div>

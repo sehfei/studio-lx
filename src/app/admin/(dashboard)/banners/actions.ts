@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { requireAdmin } from "@/lib/auth";
+import { requirePermission } from "@/lib/auth";
 
 const BANNER_BUCKET = "site-assets";
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -108,7 +108,7 @@ export async function createBanner(
   _prevState: BannerFormState,
   formData: FormData,
 ): Promise<BannerFormState> {
-  await requireAdmin();
+  await requirePermission("banners");
   const values = readValues(formData);
 
   const dateError = validateDates(values);
@@ -145,7 +145,7 @@ export async function updateBanner(
   _prevState: BannerFormState,
   formData: FormData,
 ): Promise<BannerFormState> {
-  await requireAdmin();
+  await requirePermission("banners");
   const values = readValues(formData);
 
   const dateError = validateDates(values);
@@ -190,7 +190,7 @@ export async function updateBanner(
 export async function deleteBanner(
   id: string,
 ): Promise<{ error: string } | undefined> {
-  await requireAdmin();
+  await requirePermission("banners");
 
   const { data: existing, error: findError } = await supabaseAdmin
     .from("banners")
@@ -213,7 +213,7 @@ export async function toggleBannerActive(
   id: string,
   isActive: boolean,
 ): Promise<{ error: string } | undefined> {
-  await requireAdmin();
+  await requirePermission("banners");
   const { error } = await supabaseAdmin
     .from("banners")
     .update({ is_active: isActive })
