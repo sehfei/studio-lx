@@ -1,13 +1,27 @@
 import { getAllProducts } from "@/lib/products";
+import { supabaseAdmin } from "@/lib/supabase/admin";
+
+export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
-  const products = await getAllProducts();
+  const [products, { data: orders }, { data: userList }] = await Promise.all([
+    getAllProducts(),
+    supabaseAdmin.from("orders").select("total, payment_status"),
+    supabaseAdmin.auth.admin.listUsers(),
+  ]);
+
+  const customerCount = (userList?.users ?? []).filter(
+    (u) => u.app_metadata?.role !== "admin",
+  ).length;
+  const revenue = (orders ?? [])
+    .filter((o) => o.payment_status === "paid")
+    .reduce((sum, o) => sum + Number(o.total), 0);
 
   const stats = [
     { label: "Total Products", value: products.length },
-    { label: "Orders", value: 0 },
-    { label: "Customers", value: 0 },
-    { label: "Revenue (RM)", value: "0.00" },
+    { label: "Orders", value: (orders ?? []).length },
+    { label: "Customers", value: customerCount },
+    { label: "Revenue (RM)", value: revenue.toFixed(2) },
   ];
 
   return (
@@ -26,9 +40,6 @@ export default async function AdminDashboardPage() {
           </div>
         ))}
       </div>
-      <p className="mt-8 text-sm text-foreground/40">
-        商品数据已经接入 Supabase，订单/客户/营收还是占位，等对应功能做完会显示真实数据。
-      </p>
     </div>
   );
 }
