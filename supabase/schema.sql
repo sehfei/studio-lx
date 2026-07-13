@@ -208,3 +208,24 @@ on conflict (slug) do nothing;
 alter table products drop constraint if exists products_category_check;
 alter table products add constraint products_category_fkey
   foreign key (category) references categories(slug);
+
+-- 博客：从写死的占位文章改成真正的后台可管理内容（建表 + 后台 CRUD）。
+-- 封面图复用 site-assets 桶（跟 banner 图同一个桶，blog/ 子目录）。
+-- 只公开读已发布的文章，草稿只有后台（service_role）能看到。
+create table if not exists blog_posts (
+  id uuid primary key default gen_random_uuid(),
+  slug text unique not null,
+  title text not null,
+  excerpt text not null default '',
+  content text not null default '',
+  cover_image text,
+  is_published boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table blog_posts enable row level security;
+
+create policy "Public can read published blog posts"
+  on blog_posts for select
+  using (is_published = true);

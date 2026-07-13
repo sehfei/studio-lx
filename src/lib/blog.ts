@@ -1,28 +1,68 @@
+import { supabase } from "@/lib/supabase/client";
+
 export type BlogPost = {
+  id: string;
   slug: string;
   title: string;
   excerpt: string;
   content: string;
-  date: string;
+  coverImage?: string;
+  isPublished: boolean;
+  createdAt: string;
 };
 
-export const placeholderPosts: BlogPost[] = [
-  {
-    slug: "summer-styling-guide",
-    title: "2026 夏季穿搭指南",
-    excerpt: "如何用几件基础单品打造高级感夏日造型。",
-    content: "（文章内容待补充）",
-    date: "2026-06-01",
-  },
-  {
-    slug: "how-to-choose-leather-bag",
-    title: "如何挑选一只值得投资的皮革包",
-    excerpt: "从皮质、五金到工艺，选包前你需要知道的事。",
-    content: "（文章内容待补充）",
-    date: "2026-05-15",
-  },
-];
+export type BlogPostRow = {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  content: string | null;
+  cover_image: string | null;
+  is_published: boolean;
+  created_at: string;
+};
 
-export function getPostBySlug(slug: string) {
-  return placeholderPosts.find((p) => p.slug === slug);
+export function mapBlogRow(row: BlogPostRow): BlogPost {
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    excerpt: row.excerpt ?? "",
+    content: row.content ?? "",
+    coverImage: row.cover_image ?? undefined,
+    isPublished: row.is_published,
+    createdAt: row.created_at,
+  };
+}
+
+// 前台：只显示已发布的文章，按时间倒序
+export async function getPublishedPosts(): Promise<BlogPost[]> {
+  try {
+    const { data, error } = await supabase
+      .from("blog_posts")
+      .select("*")
+      .eq("is_published", true)
+      .order("created_at", { ascending: false });
+    if (error) return [];
+    return (data ?? []).map(mapBlogRow);
+  } catch {
+    return [];
+  }
+}
+
+export async function getPostBySlug(
+  slug: string,
+): Promise<BlogPost | undefined> {
+  try {
+    const { data, error } = await supabase
+      .from("blog_posts")
+      .select("*")
+      .eq("slug", slug)
+      .eq("is_published", true)
+      .maybeSingle();
+    if (error || !data) return undefined;
+    return mapBlogRow(data);
+  } catch {
+    return undefined;
+  }
 }

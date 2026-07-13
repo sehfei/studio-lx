@@ -12,6 +12,7 @@ export const zh: AdminDictionary = {
       products: "商品管理",
       categories: "分类管理",
       banners: "横幅管理",
+      blog: "博客管理",
       inventory: "库存管理",
       orders: "订单管理",
       coupons: "优惠券",

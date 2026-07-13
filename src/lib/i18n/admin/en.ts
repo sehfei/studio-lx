@@ -11,6 +11,7 @@ export const en = {
       products: "Products",
       categories: "Categories",
       banners: "Banners",
+      blog: "Blog",
       inventory: "Inventory",
       orders: "Orders",
       coupons: "Coupons",

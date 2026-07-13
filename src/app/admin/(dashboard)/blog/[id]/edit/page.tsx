@@ -1,0 +1,31 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { supabaseAdmin } from "@/lib/supabase/admin";
+import { mapBlogRow, type BlogPostRow } from "@/lib/blog";
+import { BlogForm } from "../../BlogForm";
+
+export const metadata: Metadata = { title: "Edit Post" };
+
+export default async function EditPostPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  const { data } = await supabaseAdmin
+    .from("blog_posts")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (!data) notFound();
+  const post = mapBlogRow(data as BlogPostRow);
+
+  return (
+    <div>
+      <h1 className="mb-8 text-lg font-medium">Edit Post</h1>
+      <BlogForm post={post} />
+    </div>
+  );
+}

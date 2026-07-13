@@ -10,6 +10,7 @@ export const adminNavItems = [
   { key: "coupons", label: "Coupons", href: "/admin/coupons" },
   { key: "salesReport", label: "Sales Report", href: "/admin/sales-report" },
   { key: "banners", label: "Banner Management", href: "/admin/banners" },
+  { key: "blog", label: "Blog", href: "/admin/blog" },
   { key: "categories", label: "Category Management", href: "/admin/categories" },
   { key: "users", label: "User Management", href: "/admin/users" },
   { key: "shipping", label: "Shipping", href: "/admin/shipping" },

@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { siteConfig, genderCategories } from "@/lib/site-config";
 import { getCategories } from "@/lib/categories";
 import { getAllProducts } from "@/lib/products";
-import { placeholderPosts } from "@/lib/blog";
+import { getPublishedPosts } from "@/lib/blog";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const categories = await getCategories();
@@ -37,7 +37,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  const blogRoutes = placeholderPosts.map((post) => ({
+  const posts = await getPublishedPosts();
+  const blogRoutes = posts.map((post) => ({
     url: `${siteConfig.url}/blog/${post.slug}`,
     changeFrequency: "monthly" as const,
     priority: 0.4,
