@@ -89,6 +89,7 @@ export const zh: Dictionary = {
     address: "地址",
     city: "城市",
     state: "州属",
+    selectStateFirst: "请先选择州属",
     postcode: "邮编",
     notes: "订单备注（选填）",
     notesPlaceholder: "有什么需要我们知道的吗？",
@@ -168,7 +169,8 @@ export const zh: Dictionary = {
     yourEmail: "您的邮箱",
     message: "留言",
     send: "发送留言",
-    formComingSoon: "联系表单功能开发中。",
+    sending: "发送中",
+    sendSuccess: "谢谢您！我们已收到您的留言，会尽快回复。",
   },
   blog: {
     title: "博客",

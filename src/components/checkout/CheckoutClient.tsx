@@ -2,23 +2,36 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useCart } from "@/components/cart/CartContext";
 import { createOrder } from "@/app/(site)/checkout/actions";
+import {
+  calculateShippingFee,
+  MALAYSIA_STATES,
+  type ShippingSettings,
+} from "@/lib/shipping";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 export function CheckoutClient({
   t,
   customerEmail,
+  shippingSettings,
 }: {
   t: Dictionary;
   customerEmail: string;
+  shippingSettings: ShippingSettings;
 }) {
   const { items, subtotal, clear } = useCart();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const shippingFee = 0;
+  const [state, setState] = useState("");
+
+  // 州属还没选之前不算运费，避免总计里悄悄含了一个还没显示出来的费用
+  const shippingFee = useMemo(
+    () => (state ? calculateShippingFee(state, subtotal, shippingSettings) : 0),
+    [state, subtotal, shippingSettings],
+  );
   const total = subtotal + shippingFee;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -110,12 +123,22 @@ export function CheckoutClient({
               placeholder={t.checkout.city}
               className="input-theme"
             />
-            <input
+            <select
               name="state"
               required
-              placeholder={t.checkout.state}
+              value={state}
+              onChange={(e) => setState(e.target.value)}
               className="input-theme"
-            />
+            >
+              <option value="" disabled>
+                {t.checkout.state}
+              </option>
+              {MALAYSIA_STATES.map((s) => (
+                <option key={s.name} value={s.name}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
           </div>
           <input
             name="postcode"
@@ -164,7 +187,9 @@ export function CheckoutClient({
             </div>
             <div className="flex justify-between">
               <span className="text-foreground/60">{t.checkout.shippingFee}</span>
-              <span>RM {shippingFee.toFixed(2)}</span>
+              <span>
+                {state ? `RM ${shippingFee.toFixed(2)}` : t.checkout.selectStateFirst}
+              </span>
             </div>
             <div className="flex justify-between text-base font-medium">
               <span>{t.checkout.total}</span>

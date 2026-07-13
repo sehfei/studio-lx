@@ -15,6 +15,7 @@ export const en = {
       orders: "Orders",
       coupons: "Coupons",
       customers: "Customers",
+      messages: "Messages",
       users: "Users",
       salesReport: "Sales Report",
       shipping: "Shipping",

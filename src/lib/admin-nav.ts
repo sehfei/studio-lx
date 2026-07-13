@@ -5,6 +5,7 @@ export const adminNavItems = [
   { key: "products", label: "Products", href: "/admin/products" },
   { key: "orders", label: "Orders", href: "/admin/orders" },
   { key: "customers", label: "Customers", href: "/admin/customers" },
+  { key: "messages", label: "Messages", href: "/admin/messages" },
   { key: "inventory", label: "Inventory", href: "/admin/inventory" },
   { key: "coupons", label: "Coupons", href: "/admin/coupons" },
   { key: "salesReport", label: "Sales Report", href: "/admin/sales-report" },

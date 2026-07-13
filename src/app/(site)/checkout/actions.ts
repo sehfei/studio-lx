@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getCustomer } from "@/lib/customer-auth";
 import { dbErrorMessage } from "@/lib/db-error";
+import { calculateShippingFee, getShippingSettings } from "@/lib/shipping";
 
 // 结账现在要求登录：页面层 requireCustomer() 已经拦一次，
 // 这里再查一次当前登录用户，双重保险——防止有人绕过页面直接调这个 action。
@@ -122,8 +123,13 @@ export async function createOrder(
   const subtotal = Number(
     orderItems.reduce((sum, i) => sum + i.line_total, 0).toFixed(2),
   );
-  // 运费规则待做（对应任务清单阶段三），先固定包邮
-  const shippingFee = 0;
+  // 运费也用服务端算的，不信任客户端传来的金额——跟价格/库存同样的道理
+  const shippingSettings = await getShippingSettings();
+  const shippingFee = calculateShippingFee(
+    input.state.trim(),
+    subtotal,
+    shippingSettings,
+  );
   const total = Number((subtotal + shippingFee).toFixed(2));
 
   const orderNumber = generateOrderNumber();

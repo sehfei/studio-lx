@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getIdentity } from "@/lib/identity";
 import { getI18n } from "@/lib/i18n/dictionaries";
+import { ContactForm } from "@/components/contact/ContactForm";
 
 export const metadata: Metadata = { title: "Contact Us" };
 
@@ -14,35 +15,11 @@ export default async function ContactPage() {
         <p>
           {t.contact.whatsapp}：+{identity.whatsappNumber}
         </p>
-        <p>{t.contact.email}：hello@studiolx.example.com</p>
         <p>
           {t.contact.hours}：{t.contact.hoursValue}
         </p>
       </div>
-      <form className="mt-10 space-y-4">
-        <input
-          className="input-theme"
-          placeholder={t.contact.yourName}
-          disabled
-        />
-        <input
-          className="input-theme"
-          placeholder={t.contact.yourEmail}
-          disabled
-        />
-        <textarea
-          className="input-theme"
-          rows={5}
-          placeholder={t.contact.message}
-          disabled
-        />
-        <button className="btn-primary" disabled>
-          {t.contact.send}
-        </button>
-        <p className="text-xs text-foreground/40">
-          {t.contact.formComingSoon}
-        </p>
-      </form>
+      <ContactForm t={t} />
     </div>
   );
 }

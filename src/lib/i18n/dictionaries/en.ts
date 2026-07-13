@@ -88,6 +88,7 @@ export const en = {
     address: "Address",
     city: "City",
     state: "State",
+    selectStateFirst: "Select state first",
     postcode: "Postcode",
     notes: "Order Notes (optional)",
     notesPlaceholder: "Anything we should know about your order?",
@@ -168,7 +169,8 @@ export const en = {
     yourEmail: "Your Email",
     message: "Message",
     send: "Send Message",
-    formComingSoon: "Contact form under development.",
+    sending: "Sending",
+    sendSuccess: "Thank you! We've received your message and will get back to you soon.",
   },
   blog: {
     title: "Blog",

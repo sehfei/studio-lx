@@ -1,5 +1,18 @@
-import { ComingSoon } from "@/components/admin/ComingSoon";
+import { getShippingSettings } from "@/lib/shipping";
+import { ShippingForm } from "./ShippingForm";
 
-export default function AdminShippingPage() {
-  return <ComingSoon title="Shipping" />;
+export const dynamic = "force-dynamic";
+
+export default async function AdminShippingPage() {
+  const settings = await getShippingSettings();
+
+  return (
+    <div>
+      <h1 className="mb-2 text-lg font-medium">Shipping</h1>
+      <p className="mb-8 text-sm text-foreground/50">
+        西马/东马分开计费，结账时按顾客选的州属自动计算。
+      </p>
+      <ShippingForm initial={settings} />
+    </div>
+  );
 }

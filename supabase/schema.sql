@@ -158,3 +158,20 @@ create table if not exists wishlist_items (
 );
 
 alter table wishlist_items enable row level security;
+
+-- 联系表单：任何访客都能提交（不需要登录），写入走 Server Action 里的
+-- service_role，不开公开写策略；后台在 Messages 页查看/标记已读。
+create table if not exists contact_messages (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  email text not null,
+  message text not null,
+  is_read boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+alter table contact_messages enable row level security;
+
+-- 运费设置：西马/东马分开计费，配置存进 site_settings 那张单行配置表
+-- （跟 theme/announcement/identity/pages 同样的模式），公开可读、写走 service_role。
+alter table site_settings add column if not exists shipping jsonb not null default '{}'::jsonb;
