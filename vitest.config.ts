@@ -22,6 +22,9 @@ export default defineConfig({
   },
   test: {
     environment: "node",
+    // e2e/ 下是 @playwright/test 的 *.spec.ts，用的是另一套 test runner
+    // （真实打浏览器），不能被 vitest 的默认 include 规则一起扫进来跑。
+    exclude: ["e2e/**", "node_modules/**"],
     env: {
       NEXT_PUBLIC_SUPABASE_URL: env.NEXT_PUBLIC_SUPABASE_URL,
       NEXT_PUBLIC_SUPABASE_ANON_KEY: env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
