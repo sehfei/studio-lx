@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { dbErrorMessage } from "@/lib/db-error";
+import { logAdminAction } from "@/lib/audit-log";
 import {
   BUTTON_STYLE_OPTIONS,
   contrastRatio,
@@ -65,7 +66,7 @@ async function persistTheme(theme: ThemeSettings): Promise<string | null> {
 }
 
 export async function undoLastSave(): Promise<ThemeFormState> {
-  await requirePermission("settings");
+  const admin = await requirePermission("settings");
 
   const { data, error: findError } = await supabaseAdmin
     .from("theme_settings")
@@ -88,6 +89,12 @@ export async function undoLastSave(): Promise<ThemeFormState> {
     .eq("id", 1);
   if (error) return { error: dbErrorMessage(error) };
 
+  await logAdminAction(admin, {
+    action: "settings.theme_undo",
+    targetType: "theme_settings",
+    summary: "撤销上一次主题保存",
+  });
+
   revalidatePath("/", "layout");
   return { success: "已撤销上一次保存" };
 }
@@ -96,7 +103,7 @@ export async function saveTheme(
   _prevState: ThemeFormState,
   formData: FormData,
 ): Promise<ThemeFormState> {
-  await requirePermission("settings");
+  const admin = await requirePermission("settings");
 
   const parsed = readColors(formData);
   if ("error" in parsed) return { error: parsed.error };
@@ -141,6 +148,12 @@ export async function saveTheme(
   const dbError = await persistTheme(theme);
   if (dbError) return { error: dbError };
 
+  await logAdminAction(admin, {
+    action: "settings.theme_save",
+    targetType: "theme_settings",
+    summary: "更新网站主题设置",
+  });
+
   return { success: "已保存，全站生效" };
 }
 
@@ -152,7 +165,7 @@ export async function saveAnnouncement(
   _prevState: AnnouncementFormState,
   formData: FormData,
 ): Promise<AnnouncementFormState> {
-  await requirePermission("settings");
+  const admin = await requirePermission("settings");
 
   const message = String(formData.get("message") ?? "").trim();
   const enabled = formData.get("enabled") === "on";
@@ -179,6 +192,12 @@ export async function saveAnnouncement(
     .from("announcement_settings")
     .upsert({ id: 1, announcement, updated_at: new Date().toISOString() });
   if (error) return { error: dbErrorMessage(error) };
+
+  await logAdminAction(admin, {
+    action: "settings.announcement_save",
+    targetType: "announcement_settings",
+    summary: `更新公告设置（${enabled ? "启用" : "关闭"}）`,
+  });
 
   revalidatePath("/", "layout");
   return { success: "已保存，全站生效" };
@@ -244,7 +263,7 @@ export async function saveIdentity(
   _prevState: IdentityFormState,
   formData: FormData,
 ): Promise<IdentityFormState> {
-  await requirePermission("settings");
+  const admin = await requirePermission("settings");
 
   const { data: current } = await supabaseAdmin
     .from("identity_settings")
@@ -298,6 +317,12 @@ export async function saveIdentity(
     .upsert({ id: 1, identity, updated_at: new Date().toISOString() });
   if (error) return { error: dbErrorMessage(error) };
 
+  await logAdminAction(admin, {
+    action: "settings.identity_save",
+    targetType: "identity_settings",
+    summary: "更新品牌与联系方式设置",
+  });
+
   revalidatePath("/", "layout");
   return { success: "已保存，全站生效" };
 }
@@ -312,7 +337,7 @@ export async function savePages(
   _prevState: PagesFormState,
   formData: FormData,
 ): Promise<PagesFormState> {
-  await requirePermission("settings");
+  const admin = await requirePermission("settings");
 
   const s = (name: string) => String(formData.get(name) ?? "").trim();
   const pages = {} as SitePages;
@@ -330,6 +355,12 @@ export async function savePages(
     .from("pages_settings")
     .upsert({ id: 1, pages, updated_at: new Date().toISOString() });
   if (error) return { error: dbErrorMessage(error) };
+
+  await logAdminAction(admin, {
+    action: "settings.pages_save",
+    targetType: "pages_settings",
+    summary: "更新页面内容设置",
+  });
 
   revalidatePath("/", "layout");
   return { success: "已保存，全站生效" };

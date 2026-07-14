@@ -26,6 +26,7 @@ export const zh: AdminDictionary = {
       shipping: "运费设置",
       paymentSettings: "支付设置",
       settings: "网站设置",
+      auditLog: "操作日志",
     },
   },
   settings: {

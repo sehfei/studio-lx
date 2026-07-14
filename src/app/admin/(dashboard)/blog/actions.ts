@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { requirePermission } from "@/lib/auth";
+import { logAdminAction } from "@/lib/audit-log";
 import { slugify } from "@/lib/slugify";
 import { dbErrorMessage } from "@/lib/db-error";
 
@@ -77,7 +78,7 @@ export async function createPost(
   _prevState: BlogFormState,
   formData: FormData,
 ): Promise<BlogFormState> {
-  await requirePermission("blog");
+  const admin = await requirePermission("blog");
   const values = readValues(formData);
 
   if (!values.title) {
@@ -110,6 +111,13 @@ export async function createPost(
     return { error: dbErrorMessage(error), values };
   }
 
+  await logAdminAction(admin, {
+    action: "blog.create",
+    targetType: "blog_post",
+    targetId: slug,
+    summary: `新增文章「${values.title}」`,
+  });
+
   revalidateBlog();
   redirect("/admin/blog");
 }
@@ -119,7 +127,7 @@ export async function updatePost(
   _prevState: BlogFormState,
   formData: FormData,
 ): Promise<BlogFormState> {
-  await requirePermission("blog");
+  const admin = await requirePermission("blog");
   const values = readValues(formData);
 
   if (!values.title) {
@@ -170,6 +178,13 @@ export async function updatePost(
 
   if (oldImageToRemove) await removeCoverImageByUrl(oldImageToRemove);
 
+  await logAdminAction(admin, {
+    action: "blog.update",
+    targetType: "blog_post",
+    targetId: slug,
+    summary: `更新文章「${values.title}」`,
+  });
+
   revalidateBlog();
   redirect("/admin/blog");
 }
@@ -177,7 +192,7 @@ export async function updatePost(
 export async function deletePost(
   id: string,
 ): Promise<{ error: string } | undefined> {
-  await requirePermission("blog");
+  const admin = await requirePermission("blog");
 
   const { data: existing, error: findError } = await supabaseAdmin
     .from("blog_posts")
@@ -194,5 +209,13 @@ export async function deletePost(
   if (existing.cover_image) {
     await removeCoverImageByUrl(existing.cover_image as string);
   }
+
+  await logAdminAction(admin, {
+    action: "blog.delete",
+    targetType: "blog_post",
+    targetId: id,
+    summary: `删除文章（id: ${id}）`,
+  });
+
   revalidateBlog();
 }

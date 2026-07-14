@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { requirePermission } from "@/lib/auth";
+import { logAdminAction } from "@/lib/audit-log";
 
 const BANNER_BUCKET = "site-assets";
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -108,7 +109,7 @@ export async function createBanner(
   _prevState: BannerFormState,
   formData: FormData,
 ): Promise<BannerFormState> {
-  await requirePermission("banners");
+  const admin = await requirePermission("banners");
   const values = readValues(formData);
 
   const dateError = validateDates(values);
@@ -136,6 +137,12 @@ export async function createBanner(
     return { error: error.message, values };
   }
 
+  await logAdminAction(admin, {
+    action: "banner.create",
+    targetType: "banner",
+    summary: `新增横幅「${values.title || "（无标题）"}」`,
+  });
+
   revalidateBanner();
   redirect("/admin/banners");
 }
@@ -145,7 +152,7 @@ export async function updateBanner(
   _prevState: BannerFormState,
   formData: FormData,
 ): Promise<BannerFormState> {
-  await requirePermission("banners");
+  const admin = await requirePermission("banners");
   const values = readValues(formData);
 
   const dateError = validateDates(values);
@@ -183,6 +190,13 @@ export async function updateBanner(
   // 更新成功后才删旧图
   if (oldImageToRemove) await removeBannerImageByUrl(oldImageToRemove);
 
+  await logAdminAction(admin, {
+    action: "banner.update",
+    targetType: "banner",
+    targetId: id,
+    summary: `更新横幅「${values.title || "（无标题）"}」`,
+  });
+
   revalidateBanner();
   redirect("/admin/banners");
 }
@@ -190,7 +204,7 @@ export async function updateBanner(
 export async function deleteBanner(
   id: string,
 ): Promise<{ error: string } | undefined> {
-  await requirePermission("banners");
+  const admin = await requirePermission("banners");
 
   const { data: existing, error: findError } = await supabaseAdmin
     .from("banners")
@@ -205,6 +219,14 @@ export async function deleteBanner(
   if (error) return { error: error.message };
 
   await removeBannerImageByUrl(existing.image_url as string);
+
+  await logAdminAction(admin, {
+    action: "banner.delete",
+    targetType: "banner",
+    targetId: id,
+    summary: `删除横幅（id: ${id}）`,
+  });
+
   revalidateBanner();
 }
 
@@ -213,11 +235,19 @@ export async function toggleBannerActive(
   id: string,
   isActive: boolean,
 ): Promise<{ error: string } | undefined> {
-  await requirePermission("banners");
+  const admin = await requirePermission("banners");
   const { error } = await supabaseAdmin
     .from("banners")
     .update({ is_active: isActive })
     .eq("id", id);
   if (error) return { error: error.message };
+
+  await logAdminAction(admin, {
+    action: "banner.toggle_active",
+    targetType: "banner",
+    targetId: id,
+    summary: `横幅${isActive ? "上架" : "下架"}（id: ${id}）`,
+  });
+
   revalidateBanner();
 }

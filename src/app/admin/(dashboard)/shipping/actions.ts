@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { dbErrorMessage } from "@/lib/db-error";
+import { logAdminAction } from "@/lib/audit-log";
 import type { ShippingSettings } from "@/lib/shipping";
 
 export type ShippingFormState = { error?: string; success?: string } | undefined;
@@ -12,7 +13,7 @@ export async function saveShippingSettings(
   _prevState: ShippingFormState,
   formData: FormData,
 ): Promise<ShippingFormState> {
-  await requirePermission("shipping");
+  const admin = await requirePermission("shipping");
 
   const westFee = Number(formData.get("westFee"));
   const eastFee = Number(formData.get("eastFee"));
@@ -41,6 +42,12 @@ export async function saveShippingSettings(
     .upsert({ id: 1, shipping, updated_at: new Date().toISOString() });
 
   if (error) return { error: dbErrorMessage(error) };
+
+  await logAdminAction(admin, {
+    action: "shipping_settings.save",
+    targetType: "shipping_settings",
+    summary: `更新运费设置（西马 RM${westFee} / 东马 RM${eastFee}）`,
+  });
 
   revalidatePath("/", "layout");
   revalidatePath("/admin/shipping");

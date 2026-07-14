@@ -5,6 +5,7 @@ import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { slugify } from "@/lib/slugify";
 import { dbErrorMessage } from "@/lib/db-error";
+import { logAdminAction } from "@/lib/audit-log";
 
 export type CategoryFormState = { error?: string } | undefined;
 
@@ -12,7 +13,7 @@ export async function createCategory(
   _prevState: CategoryFormState,
   formData: FormData,
 ): Promise<CategoryFormState> {
-  await requirePermission("categories");
+  const admin = await requirePermission("categories");
 
   const label = String(formData.get("label") ?? "").trim();
   const slugInput = String(formData.get("slug") ?? "").trim();
@@ -39,6 +40,13 @@ export async function createCategory(
     return { error: dbErrorMessage(error) };
   }
 
+  await logAdminAction(admin, {
+    action: "category.create",
+    targetType: "category",
+    targetId: slug,
+    summary: `新增分类「${label}」`,
+  });
+
   revalidatePath("/admin/categories");
   revalidatePath("/", "layout");
   return undefined;
@@ -48,7 +56,7 @@ export async function deleteCategory(
   id: string,
   slug: string,
 ): Promise<{ error?: string } | undefined> {
-  await requirePermission("categories");
+  const admin = await requirePermission("categories");
 
   const { count } = await supabaseAdmin
     .from("products")
@@ -66,6 +74,13 @@ export async function deleteCategory(
     .delete()
     .eq("id", id);
   if (error) return { error: dbErrorMessage(error) };
+
+  await logAdminAction(admin, {
+    action: "category.delete",
+    targetType: "category",
+    targetId: slug,
+    summary: `删除分类「${slug}」`,
+  });
 
   revalidatePath("/admin/categories");
   revalidatePath("/", "layout");

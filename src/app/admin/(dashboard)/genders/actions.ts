@@ -5,6 +5,7 @@ import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { slugify } from "@/lib/slugify";
 import { dbErrorMessage } from "@/lib/db-error";
+import { logAdminAction } from "@/lib/audit-log";
 
 export type GenderFormState = { error?: string } | undefined;
 
@@ -12,7 +13,7 @@ export async function createGender(
   _prevState: GenderFormState,
   formData: FormData,
 ): Promise<GenderFormState> {
-  await requirePermission("genders");
+  const admin = await requirePermission("genders");
 
   const label = String(formData.get("label") ?? "").trim();
   const slugInput = String(formData.get("slug") ?? "").trim();
@@ -39,6 +40,13 @@ export async function createGender(
     return { error: dbErrorMessage(error) };
   }
 
+  await logAdminAction(admin, {
+    action: "gender.create",
+    targetType: "gender",
+    targetId: slug,
+    summary: `新增性别分区「${label}」`,
+  });
+
   revalidatePath("/admin/genders");
   revalidatePath("/", "layout");
   return undefined;
@@ -48,7 +56,7 @@ export async function deleteGender(
   id: string,
   slug: string,
 ): Promise<{ error?: string } | undefined> {
-  await requirePermission("genders");
+  const admin = await requirePermission("genders");
 
   const { count } = await supabaseAdmin
     .from("products")
@@ -66,6 +74,13 @@ export async function deleteGender(
     .delete()
     .eq("id", id);
   if (error) return { error: dbErrorMessage(error) };
+
+  await logAdminAction(admin, {
+    action: "gender.delete",
+    targetType: "gender",
+    targetId: slug,
+    summary: `删除性别分区「${slug}」`,
+  });
 
   revalidatePath("/admin/genders");
   revalidatePath("/", "layout");

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { dbErrorMessage } from "@/lib/db-error";
+import { logAdminAction } from "@/lib/audit-log";
 
 export type CouponFormState = { error?: string } | undefined;
 
@@ -11,7 +12,7 @@ export async function createCoupon(
   _prevState: CouponFormState,
   formData: FormData,
 ): Promise<CouponFormState> {
-  await requirePermission("coupons");
+  const admin = await requirePermission("coupons");
 
   const code = String(formData.get("code") ?? "").trim().toUpperCase();
   const type = String(formData.get("type") ?? "");
@@ -57,6 +58,13 @@ export async function createCoupon(
     return { error: dbErrorMessage(error) };
   }
 
+  await logAdminAction(admin, {
+    action: "coupon.create",
+    targetType: "coupon",
+    targetId: code,
+    summary: `新增优惠码「${code}」`,
+  });
+
   revalidatePath("/admin/coupons");
   return undefined;
 }
@@ -65,20 +73,36 @@ export async function toggleCouponActive(
   id: string,
   isActive: boolean,
 ): Promise<{ error?: string } | undefined> {
-  await requirePermission("coupons");
+  const admin = await requirePermission("coupons");
   const { error } = await supabaseAdmin
     .from("coupons")
     .update({ is_active: isActive })
     .eq("id", id);
   if (error) return { error: error.message };
+
+  await logAdminAction(admin, {
+    action: "coupon.toggle_active",
+    targetType: "coupon",
+    targetId: id,
+    summary: `优惠码${isActive ? "启用" : "停用"}（id: ${id}）`,
+  });
+
   revalidatePath("/admin/coupons");
 }
 
 export async function deleteCoupon(
   id: string,
 ): Promise<{ error?: string } | undefined> {
-  await requirePermission("coupons");
+  const admin = await requirePermission("coupons");
   const { error } = await supabaseAdmin.from("coupons").delete().eq("id", id);
   if (error) return { error: error.message };
+
+  await logAdminAction(admin, {
+    action: "coupon.delete",
+    targetType: "coupon",
+    targetId: id,
+    summary: `删除优惠码（id: ${id}）`,
+  });
+
   revalidatePath("/admin/coupons");
 }

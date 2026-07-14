@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { dbErrorMessage } from "@/lib/db-error";
+import { logAdminAction } from "@/lib/audit-log";
 import type { PaymentSettings } from "@/lib/payment-settings";
 
 export type PaymentSettingsFormState =
@@ -14,7 +15,7 @@ export async function savePaymentSettings(
   _prevState: PaymentSettingsFormState,
   formData: FormData,
 ): Promise<PaymentSettingsFormState> {
-  await requirePermission("paymentSettings");
+  const admin = await requirePermission("paymentSettings");
 
   const payment: PaymentSettings = {
     bankName: String(formData.get("bankName") ?? "").trim(),
@@ -28,6 +29,12 @@ export async function savePaymentSettings(
     .upsert({ id: 1, payment, updated_at: new Date().toISOString() });
 
   if (error) return { error: dbErrorMessage(error) };
+
+  await logAdminAction(admin, {
+    action: "payment_settings.save",
+    targetType: "payment_settings",
+    summary: "更新收款设置",
+  });
 
   revalidatePath("/", "layout");
   revalidatePath("/admin/payment-settings");

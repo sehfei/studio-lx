@@ -25,6 +25,7 @@ export const en = {
       shipping: "Shipping",
       paymentSettings: "Payment Settings",
       settings: "Website Settings",
+      auditLog: "Audit Log",
     } as Record<string, string>,
   },
   settings: {

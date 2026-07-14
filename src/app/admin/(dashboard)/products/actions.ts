@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { slugify } from "@/lib/slugify";
 import { requirePermission } from "@/lib/auth";
+import { logAdminAction } from "@/lib/audit-log";
 import {
   productInputToRow,
   uniqueViolationMessage,
@@ -115,7 +116,7 @@ export async function createProduct(
   formData: FormData,
 ): Promise<ProductFormState> {
   // proxy 和 layout 挡不住直接调用 action，这里必须再验一次
-  await requirePermission("products");
+  const admin = await requirePermission("products");
 
   const values = formValues(formData);
   const [validCategories, validGenders] = await Promise.all([
@@ -159,6 +160,13 @@ export async function createProduct(
     await removeUploadedImages(imagePaths);
     return { error: uniqueViolationMessage(error) ?? error.message, values };
   }
+
+  await logAdminAction(admin, {
+    action: "product.create",
+    targetType: "product",
+    targetId: slug,
+    summary: `新增商品「${input.name}」(SKU: ${input.sku})`,
+  });
 
   revalidateCatalog(input.gender, input.category);
 
@@ -216,7 +224,7 @@ export async function updateProduct(
   _prevState: ProductFormState,
   formData: FormData,
 ): Promise<ProductFormState> {
-  await requirePermission("products");
+  const admin = await requirePermission("products");
 
   const values = formValues(formData);
   const [validCategories, validGenders] = await Promise.all([
@@ -280,6 +288,13 @@ export async function updateProduct(
   // 更新成功后才真正删掉被移除的旧图
   await removeUploadedImages(storagePathsFromUrls(removeImages));
 
+  await logAdminAction(admin, {
+    action: "product.update",
+    targetType: "product",
+    targetId: slug,
+    summary: `更新商品「${input.name}」(SKU: ${input.sku})`,
+  });
+
   // 新旧分类、新旧 slug 的页面都要刷新
   revalidateCatalog(existing.gender, existing.category, [existing.slug]);
   revalidateCatalog(input.gender, input.category, [slug]);
@@ -290,7 +305,7 @@ export async function updateProduct(
 export async function deleteProduct(
   id: string,
 ): Promise<{ error: string } | undefined> {
-  await requirePermission("products");
+  const admin = await requirePermission("products");
 
   const { data: existing, error: findError } = await supabaseAdmin
     .from("products")
@@ -309,6 +324,13 @@ export async function deleteProduct(
   await removeUploadedImages(
     storagePathsFromUrls((existing.images ?? []) as string[]),
   );
+
+  await logAdminAction(admin, {
+    action: "product.delete",
+    targetType: "product",
+    targetId: existing.slug,
+    summary: `删除商品（slug: ${existing.slug}）`,
+  });
 
   revalidateCatalog(existing.gender, existing.category, [existing.slug]);
 }

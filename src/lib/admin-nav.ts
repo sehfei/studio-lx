@@ -20,6 +20,7 @@ export const adminNavItems = [
   { key: "shipping", label: "Shipping", href: "/admin/shipping", staffAssignable: true },
   { key: "paymentSettings", label: "Payment Settings", href: "/admin/payment-settings", staffAssignable: true },
   { key: "settings", label: "Website Settings", href: "/admin/settings", staffAssignable: true },
+  { key: "auditLog", label: "Audit Log", href: "/admin/audit-log", staffAssignable: true },
 ] as const;
 
 export type AdminNavKey = (typeof adminNavItems)[number]["key"];

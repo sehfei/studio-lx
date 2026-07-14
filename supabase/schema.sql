@@ -399,3 +399,21 @@ create policy "Public can read product reviews"
   using (true);
 
 create index if not exists product_reviews_product_id_idx on product_reviews(product_id);
+
+-- 操作审计日志：记录后台每一次增删改操作（谁、什么时候、做了什么），
+-- 纯内部数据，不开公开读策略——跟 orders/wishlist_items 的私有约定一致，
+-- 只有 service_role（写入）和后台页面（也走 service_role 读取）能碰。
+create table if not exists audit_logs (
+  id uuid primary key default gen_random_uuid(),
+  actor_id uuid references auth.users(id) on delete set null,
+  actor_email text not null,
+  action text not null,
+  target_type text not null,
+  target_id text,
+  summary text not null,
+  created_at timestamptz not null default now()
+);
+
+alter table audit_logs enable row level security;
+
+create index if not exists audit_logs_created_at_idx on audit_logs(created_at desc);

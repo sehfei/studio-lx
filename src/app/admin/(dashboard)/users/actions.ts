@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { staffAssignableNavKeys } from "@/lib/admin-nav";
+import { logAdminAction } from "@/lib/audit-log";
 
 export type UserRole = "customer" | "staff" | "admin";
 
@@ -21,7 +22,7 @@ export async function createBackendUser(
   _prevState: CreateUserFormState,
   formData: FormData,
 ): Promise<CreateUserFormState> {
-  await requireAdmin();
+  const admin = await requireAdmin();
 
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
@@ -54,6 +55,12 @@ export async function createBackendUser(
     return { error: error.message };
   }
 
+  await logAdminAction(admin, {
+    action: "user.create",
+    targetType: "user",
+    summary: `创建后台账号 ${email}（角色：${role}）`,
+  });
+
   revalidatePath("/admin/users");
   return { success: `账号 ${email} 创建成功` };
 }
@@ -69,7 +76,7 @@ export async function setUserRole(
   role: UserRole,
   permissions: string[] = [],
 ): Promise<{ error?: string } | undefined> {
-  await requireAdmin();
+  const admin = await requireAdmin();
 
   const { data } = await supabaseAdmin.auth.admin.getUserById(userId);
   const wasAdmin = data.user?.app_metadata?.role === "admin";
@@ -93,6 +100,13 @@ export async function setUserRole(
     app_metadata,
   });
   if (error) return { error: error.message };
+
+  await logAdminAction(admin, {
+    action: "user.role_change",
+    targetType: "user",
+    targetId: userId,
+    summary: `修改用户角色为「${role}」（用户 ID: ${userId}）`,
+  });
 
   revalidatePath("/admin/users");
 }
