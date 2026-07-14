@@ -15,7 +15,14 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useCart } from "@/components/cart/CartContext";
 import type { CategoryRow } from "@/lib/categories";
 import type { GenderRow } from "@/lib/genders";
-import { SearchIcon, CartIcon, AccountIcon, WishlistIcon } from "@/components/ui/NavIcons";
+import {
+  SearchIcon,
+  CartIcon,
+  AccountIcon,
+  WishlistIcon,
+  MenuIcon,
+  CloseIcon,
+} from "@/components/ui/NavIcons";
 
 export function Navbar({
   logoUrl,
@@ -37,18 +44,22 @@ export function Navbar({
 
   return (
     <header className="sticky top-0 z-50 border-b border-border-subtle bg-background/95 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-8">
+      <div className="relative mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-8">
         <button
-          className="text-sm lg:hidden"
+          className="-m-2 p-2 hover:text-gold lg:hidden"
           onClick={() => setMobileOpen((v) => !v)}
-          aria-label={t.nav.menu}
+          aria-label={mobileOpen ? t.nav.close : t.nav.menu}
         >
-          {mobileOpen ? t.nav.close : t.nav.menu}
+          {mobileOpen ? (
+            <CloseIcon className="h-5 w-5" />
+          ) : (
+            <MenuIcon className="h-5 w-5" />
+          )}
         </button>
 
         <Link
           href="/"
-          className="flex items-center font-display text-xl tracking-[0.15em] uppercase"
+          className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center font-display text-xl tracking-[0.15em] uppercase lg:static lg:left-auto lg:top-auto lg:translate-x-0 lg:translate-y-0"
         >
           {logoUrl ? (
             <Image
@@ -60,7 +71,7 @@ export function Navbar({
               unoptimized
             />
           ) : (
-            siteConfig.name
+            "STUDIO.LX"
           )}
         </Link>
 
@@ -104,6 +115,7 @@ export function Navbar({
             <AccountIcon className="h-4 w-4" />
             <span>{t.nav.account}</span>
           </Link>
+          <span aria-hidden="true" className="h-4 w-px bg-border-subtle" />
           <LanguageSwitcher current={locale} />
         </div>
       </div>
