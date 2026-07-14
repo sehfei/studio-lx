@@ -69,6 +69,16 @@ export const en = {
     noReviews: "No reviews yet.",
     addToWishlist: "Add to Wishlist",
     inWishlist: "In Wishlist",
+    writeReview: "Write a Review",
+    ratingLabel: "Your Rating",
+    commentLabel: "Your Review",
+    submitReview: "Submit Review",
+    submittingReview: "Submitting",
+    alreadyReviewed: "You've already reviewed this product.",
+    verifiedPurchaseRequired:
+      "Only customers who purchased this product can leave a review.",
+    loginToReview: "Please log in to write a review.",
+    reviewCount: "reviews",
   },
   cart: {
     title: "Cart",

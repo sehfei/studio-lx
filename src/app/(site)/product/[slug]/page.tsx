@@ -6,8 +6,11 @@ import { discountPercent, displayBadge, getProductBySlug } from "@/lib/products"
 import { getI18n } from "@/lib/i18n/dictionaries";
 import { AddToCartForm } from "@/components/product/AddToCartForm";
 import { WishlistButton } from "@/components/product/WishlistButton";
+import { ReviewForm, type ViewerState } from "@/components/product/ReviewForm";
 import { getCustomer } from "@/lib/customer-auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { getProductReviews, reviewAggregate } from "@/lib/reviews";
+import { hasVerifiedPurchase } from "@/lib/verified-purchase";
 
 type Params = { slug: string };
 
@@ -39,15 +42,34 @@ export default async function ProductPage({
   if (!product) notFound();
 
   let initialInWishlist = false;
+  let viewerState: ViewerState = "logged-out";
   if (customer) {
-    const { data } = await supabaseAdmin
-      .from("wishlist_items")
-      .select("id")
-      .eq("customer_id", customer.id)
-      .eq("product_id", product.id)
-      .maybeSingle();
-    initialInWishlist = !!data;
+    const [{ data: wishlistRow }, verified, { data: ownReview }] =
+      await Promise.all([
+        supabaseAdmin
+          .from("wishlist_items")
+          .select("id")
+          .eq("customer_id", customer.id)
+          .eq("product_id", product.id)
+          .maybeSingle(),
+        hasVerifiedPurchase(customer.id, product.id),
+        supabaseAdmin
+          .from("product_reviews")
+          .select("id")
+          .eq("customer_id", customer.id)
+          .eq("product_id", product.id)
+          .maybeSingle(),
+      ]);
+    initialInWishlist = !!wishlistRow;
+    viewerState = ownReview
+      ? "already-reviewed"
+      : verified
+        ? "can-review"
+        : "not-verified";
   }
+
+  const reviews = await getProductReviews(product.id);
+  const { average, count } = reviewAggregate(reviews);
 
   const hasDiscount =
     typeof product.discountPrice === "number" &&
@@ -135,19 +157,38 @@ export default async function ProductPage({
       </div>
 
       <section className="mt-16 border-t border-border-subtle pt-10">
-        <h2 className="section-title mb-6">{t.product.reviews}</h2>
-        {product.reviews.length === 0 ? (
+        <h2 className="section-title mb-2">{t.product.reviews}</h2>
+        {count > 0 && (
+          <p className="mb-6 text-sm text-foreground/60">
+            {average.toFixed(1)} ★ ({count} {t.product.reviewCount})
+          </p>
+        )}
+        {reviews.length === 0 ? (
           <p className="text-sm text-foreground/50">{t.product.noReviews}</p>
         ) : (
           <ul className="space-y-4">
-            {product.reviews.map((review, i) => (
-              <li key={i} className="border border-border-subtle p-4 text-sm">
-                <p className="mb-1 font-medium">{review.author}</p>
+            {reviews.map((review) => (
+              <li key={review.id} className="border border-border-subtle p-4 text-sm">
+                <p className="mb-1 font-medium">
+                  {review.authorName}
+                  <span className="ml-2 text-gold">
+                    {"★".repeat(review.rating)}
+                    <span className="text-foreground/20">
+                      {"★".repeat(5 - review.rating)}
+                    </span>
+                  </span>
+                </p>
                 <p className="text-foreground/70">{review.comment}</p>
               </li>
             ))}
           </ul>
         )}
+        <ReviewForm
+          productId={product.id}
+          productSlug={slug}
+          viewerState={viewerState}
+          t={t}
+        />
       </section>
     </div>
   );

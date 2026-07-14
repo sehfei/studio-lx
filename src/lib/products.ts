@@ -22,7 +22,6 @@ export type Product = {
   category: Category;
   tags: Tag[];
   badgeText?: string;
-  reviews: { author: string; rating: number; comment: string }[];
 };
 
 export type ProductRow = {
@@ -71,7 +70,6 @@ export function mapRow(row: ProductRow): Product {
     category: row.category,
     tags: (row.tags ?? []) as Product["tags"],
     badgeText: row.badge_text ?? undefined,
-    reviews: [], // 评价表之后再接
   };
 }
 

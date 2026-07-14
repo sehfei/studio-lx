@@ -374,3 +374,28 @@ alter table orders add constraint orders_coupon_code_fkey
 -- 先别急着删旧表——部署新代码、确认后台六个板块都能正常读写之后，
 -- 再手动跑这一行清掉 site_settings（留个回滚窗口）：
 -- drop table site_settings;
+
+-- 商品评价：仅限已付款购买过该商品的顾客才能评价（下单未必等于确实买过，
+-- 用 orders.payment_status = 'paid' 而不是 status，因为这是纯手动收款站点，
+-- 付款确认就是「真实购买」的判定信号，等 status 变成 completed 才允许评价
+-- 会不必要地拖慢顾客能评价的时间）。
+-- 评价内容公开可读（跟 wishlist_items/orders 的"全走 service_role 私有"约定不同，
+-- 这里要给任何浏览商品页的访客看），写入仍然只走 Server Action 里的 service_role。
+create table if not exists product_reviews (
+  id uuid primary key default gen_random_uuid(),
+  product_id uuid not null references products(id) on delete cascade,
+  customer_id uuid not null references auth.users(id) on delete cascade,
+  rating integer not null check (rating between 1 and 5),
+  comment text not null,
+  author_name text not null,
+  created_at timestamptz not null default now(),
+  unique (customer_id, product_id)
+);
+
+alter table product_reviews enable row level security;
+
+create policy "Public can read product reviews"
+  on product_reviews for select
+  using (true);
+
+create index if not exists product_reviews_product_id_idx on product_reviews(product_id);
