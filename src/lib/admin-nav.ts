@@ -15,6 +15,7 @@ export const adminNavItems = [
   { key: "banners", label: "Banner Management", href: "/admin/banners", staffAssignable: true },
   { key: "blog", label: "Blog", href: "/admin/blog", staffAssignable: true },
   { key: "categories", label: "Category Management", href: "/admin/categories", staffAssignable: true },
+  { key: "genders", label: "Gender Management", href: "/admin/genders", staffAssignable: true },
   { key: "users", label: "User Management", href: "/admin/users", staffAssignable: false },
   { key: "shipping", label: "Shipping", href: "/admin/shipping", staffAssignable: true },
   { key: "paymentSettings", label: "Payment Settings", href: "/admin/payment-settings", staffAssignable: true },

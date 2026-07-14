@@ -27,6 +27,11 @@ async function getValidCategorySlugs(): Promise<string[]> {
   return (data ?? []).map((c) => c.slug);
 }
 
+async function getValidGenderSlugs(): Promise<string[]> {
+  const { data } = await supabaseAdmin.from("genders").select("slug");
+  return (data ?? []).map((g) => g.slug);
+}
+
 function splitList(value: string): string[] {
   return value
     .split(",")
@@ -113,9 +118,14 @@ export async function createProduct(
   await requirePermission("products");
 
   const values = formValues(formData);
+  const [validCategories, validGenders] = await Promise.all([
+    getValidCategorySlugs(),
+    getValidGenderSlugs(),
+  ]);
   const validated = validateProduct(
     formToRawInput(formData),
-    await getValidCategorySlugs(),
+    validCategories,
+    validGenders,
   );
   if (validated.error !== undefined) {
     return { error: validated.error, values };
@@ -209,9 +219,14 @@ export async function updateProduct(
   await requirePermission("products");
 
   const values = formValues(formData);
+  const [validCategories, validGenders] = await Promise.all([
+    getValidCategorySlugs(),
+    getValidGenderSlugs(),
+  ]);
   const validated = validateProduct(
     formToRawInput(formData),
-    await getValidCategorySlugs(),
+    validCategories,
+    validGenders,
   );
   if (validated.error !== undefined) {
     return { error: validated.error, values };

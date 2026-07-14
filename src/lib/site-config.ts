@@ -6,18 +6,7 @@ export const siteConfig = {
   url: "https://www.studiolx.example.com",
 };
 
-export type NavCategory = {
-  label: string;
-  slug: string;
-};
-
-// 性别是固定的两个顶层分区，不像分类那样后台可管理——
-// 分类现在是动态的，见 src/lib/categories.ts 的 getCategories()。
-export const genderCategories: NavCategory[] = [
-  { label: "Women", slug: "women" },
-  { label: "Men", slug: "men" },
-];
-
+// 性别现在也跟分类一样是后台可管理的，见 src/lib/genders.ts 的 getGenders()。
 export const featureCollections = [
   { label: "New Arrival", slug: "new-arrival" },
   { label: "Best Seller", slug: "best-seller" },

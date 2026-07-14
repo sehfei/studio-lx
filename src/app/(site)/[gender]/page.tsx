@@ -3,15 +3,16 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ProductGrid } from "@/components/ui/ProductGrid";
 import { getProductsByGender } from "@/lib/products";
-import { genderCategories } from "@/lib/site-config";
+import { getGenders } from "@/lib/genders";
 import { getCategories } from "@/lib/categories";
 import { getI18n } from "@/lib/i18n/dictionaries";
 import { categoryLabel } from "@/lib/i18n/nav-labels";
 
 type Params = { gender: string };
 
-function getGenderEntry(gender: string) {
-  return genderCategories.find((c) => c.slug === gender);
+async function getGenderEntry(gender: string) {
+  const genders = await getGenders();
+  return genders.find((g) => g.slug === gender);
 }
 
 export async function generateMetadata({
@@ -20,7 +21,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { gender } = await params;
-  const genderEntry = getGenderEntry(gender);
+  const genderEntry = await getGenderEntry(gender);
   return { title: genderEntry?.label ?? "Not Found" };
 }
 
@@ -30,11 +31,11 @@ export default async function GenderPage({
   params: Promise<Params>;
 }) {
   const { gender } = await params;
-  const genderEntry = getGenderEntry(gender);
+  const genderEntry = await getGenderEntry(gender);
   if (!genderEntry) notFound();
 
   const [products, categories, { t }] = await Promise.all([
-    getProductsByGender(gender as "women" | "men"),
+    getProductsByGender(gender),
     getCategories(),
     getI18n(),
   ]);

@@ -3,10 +3,11 @@
 import Image from "next/image";
 import { useActionState } from "react";
 import { createProduct, updateProduct } from "./actions";
-import { GENDERS, TAGS } from "@/lib/constants";
+import { TAGS } from "@/lib/constants";
 import { Spinner } from "@/components/ui/Spinner";
 import type { Product } from "@/lib/products";
 import type { CategoryRow } from "@/lib/categories";
+import type { GenderRow } from "@/lib/genders";
 
 // 展示名：首字母大写，连字符转空格（new-arrival -> New Arrival）
 function toLabel(value: string): string {
@@ -16,7 +17,6 @@ function toLabel(value: string): string {
     .join(" ");
 }
 
-const genders = GENDERS.map((value) => ({ value, label: toLabel(value) }));
 const tagOptions = TAGS.map((value) => ({ value, label: toLabel(value) }));
 
 const inputClass = "input-theme";
@@ -26,9 +26,11 @@ const labelClass = "mb-1 block text-xs tracking-widest text-foreground/50 upperc
 export function ProductForm({
   product,
   categories,
+  genders,
 }: {
   product?: Product;
   categories: CategoryRow[];
+  genders: GenderRow[];
 }) {
   const action = product ? updateProduct.bind(null, product.id) : createProduct;
   const [state, formAction, pending] = useActionState(action, undefined);
@@ -136,7 +138,7 @@ export function ProductForm({
               选择 Gender
             </option>
             {genders.map((g) => (
-              <option key={g.value} value={g.value}>
+              <option key={g.slug} value={g.slug}>
                 {g.label}
               </option>
             ))}

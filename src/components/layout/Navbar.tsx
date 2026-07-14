@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useState } from "react";
 import {
   featureCollections,
-  genderCategories,
   mainNavLinks,
   siteConfig,
 } from "@/lib/site-config";
@@ -15,17 +14,20 @@ import { categoryLabel } from "@/lib/i18n/nav-labels";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useCart } from "@/components/cart/CartContext";
 import type { CategoryRow } from "@/lib/categories";
+import type { GenderRow } from "@/lib/genders";
 
 export function Navbar({
   logoUrl,
   locale,
   t,
   categories,
+  genders,
 }: {
   logoUrl?: string;
   locale: Locale;
   t: Dictionary;
   categories: CategoryRow[];
+  genders: GenderRow[];
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { count: cartCount } = useCart();
@@ -89,7 +91,7 @@ export function Navbar({
 
       <nav className="hidden border-t border-border-subtle lg:block">
         <ul className="mx-auto flex max-w-7xl items-center justify-center gap-8 px-8 py-3 text-xs tracking-widest uppercase">
-          {genderCategories.map((cat) => (
+          {genders.map((cat) => (
             <li key={cat.slug} className="group relative">
               <Link href={`/${cat.slug}`} className="hover:text-gold">
                 {label(cat.slug, cat.label)}
@@ -127,7 +129,7 @@ export function Navbar({
       {mobileOpen && (
         <nav className="border-t border-border-subtle px-4 py-4 text-sm lg:hidden">
           <ul className="space-y-4">
-            {genderCategories.map((cat) => (
+            {genders.map((cat) => (
               <li key={cat.slug}>
                 <Link
                   href={`/${cat.slug}`}

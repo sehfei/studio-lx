@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ProductGrid } from "@/components/ui/ProductGrid";
 import { getProductsByGenderCategory } from "@/lib/products";
-import { genderCategories } from "@/lib/site-config";
+import { getGenders } from "@/lib/genders";
 import { getCategories } from "@/lib/categories";
 import { getI18n } from "@/lib/i18n/dictionaries";
 import { categoryLabel } from "@/lib/i18n/nav-labels";
@@ -10,8 +10,11 @@ import { categoryLabel } from "@/lib/i18n/nav-labels";
 type Params = { gender: string; category: string };
 
 async function resolve(gender: string, category: string) {
-  const genderEntry = genderCategories.find((c) => c.slug === gender);
-  const categories = await getCategories();
+  const [genders, categories] = await Promise.all([
+    getGenders(),
+    getCategories(),
+  ]);
+  const genderEntry = genders.find((g) => g.slug === gender);
   const categoryEntry = categories.find((c) => c.slug === category);
   return { genderEntry, categoryEntry };
 }
@@ -37,7 +40,7 @@ export default async function CategoryPage({
   if (!genderEntry || !categoryEntry) notFound();
 
   const [products, { t }] = await Promise.all([
-    getProductsByGenderCategory(gender as "women" | "men", category),
+    getProductsByGenderCategory(gender, category),
     getI18n(),
   ]);
 

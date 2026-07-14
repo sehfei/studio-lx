@@ -254,3 +254,30 @@ alter table orders add column if not exists discount_amount numeric(10, 2) not n
 -- 支付设置：手动收款模式下，给顾客看的收款信息（银行户口等），
 -- 存进 site_settings 那张单行配置表，跟 shipping/theme 同样的模式。
 alter table site_settings add column if not exists payment jsonb not null default '{}'::jsonb;
+
+-- 性别(女装/男装)管理：从写死在 constants.ts 的 GENDERS 常量改成后台可管理，
+-- 跟 categories 同样的模式（建表 + 用现有 2 个性别做种子，公开只读、写走 service_role）。
+create table if not exists genders (
+  id uuid primary key default gen_random_uuid(),
+  slug text unique not null,
+  label text not null,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now()
+);
+
+alter table genders enable row level security;
+
+create policy "Public can read genders"
+  on genders for select
+  using (true);
+
+insert into genders (slug, label, sort_order) values
+  ('women', 'Women', 1),
+  ('men', 'Men', 2)
+on conflict (slug) do nothing;
+
+-- products.gender 原本是写死的 CHECK 约束，改成引用 genders 表的外键。
+-- 现有商品数据的 gender 值都在上面种子数据范围内，外键能直接生效，不用改数据。
+alter table products drop constraint if exists products_gender_check;
+alter table products add constraint products_gender_fkey
+  foreign key (gender) references genders(slug) on update cascade;

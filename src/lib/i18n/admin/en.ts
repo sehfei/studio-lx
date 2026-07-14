@@ -12,6 +12,7 @@ export const en = {
       dashboard: "Dashboard",
       products: "Products",
       categories: "Categories",
+      genders: "Genders",
       banners: "Banners",
       blog: "Blog",
       inventory: "Inventory",

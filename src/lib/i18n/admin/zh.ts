@@ -13,6 +13,7 @@ export const zh: AdminDictionary = {
       dashboard: "仪表盘",
       products: "商品管理",
       categories: "分类管理",
+      genders: "性别管理",
       banners: "横幅管理",
       blog: "博客管理",
       inventory: "库存管理",

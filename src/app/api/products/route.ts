@@ -1,8 +1,9 @@
 import type { NextRequest } from "next/server";
 import { supabase } from "@/lib/supabase/client";
 import { mapRow, type ProductRow } from "@/lib/products";
-import { GENDERS, TAGS } from "@/lib/constants";
+import { TAGS } from "@/lib/constants";
 import { getCategories } from "@/lib/categories";
+import { getGenders } from "@/lib/genders";
 import { badRequest, ok, serverError } from "@/lib/api/response";
 
 const MAX_LIMIT = 50;
@@ -13,8 +14,11 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
 
   const gender = params.get("gender");
-  if (gender && !(GENDERS as readonly string[]).includes(gender)) {
-    return badRequest(`gender 只能是 ${GENDERS.join(" / ")}`);
+  if (gender) {
+    const validGenderSlugs = (await getGenders()).map((g) => g.slug);
+    if (!validGenderSlugs.includes(gender)) {
+      return badRequest(`gender 只能是 ${validGenderSlugs.join(" / ")}`);
+    }
   }
 
   const category = params.get("category");

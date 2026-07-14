@@ -7,18 +7,21 @@ import { getAnnouncement } from "@/lib/announcement";
 import { getIdentity } from "@/lib/identity";
 import { getI18n } from "@/lib/i18n/dictionaries";
 import { getCategories } from "@/lib/categories";
+import { getGenders } from "@/lib/genders";
 
 export default async function SiteLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [announcement, identity, { locale, t }, categories] = await Promise.all([
-    getAnnouncement(),
-    getIdentity(),
-    getI18n(),
-    getCategories(),
-  ]);
+  const [announcement, identity, { locale, t }, categories, genders] =
+    await Promise.all([
+      getAnnouncement(),
+      getIdentity(),
+      getI18n(),
+      getCategories(),
+      getGenders(),
+    ]);
 
   return (
     <CartProvider>
@@ -28,6 +31,7 @@ export default async function SiteLayout({
         locale={locale}
         t={t}
         categories={categories}
+        genders={genders}
       />
       <main className="flex-1">{children}</main>
       <Footer identity={identity} t={t} />

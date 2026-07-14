@@ -66,12 +66,14 @@ export async function PATCH(request: Request, { params }: RouteContext) {
       "badgeText" in body ? body.badgeText : (current.badgeText ?? null),
   };
 
-  const { data: categoryRows } = await supabaseAdmin
-    .from("categories")
-    .select("slug");
+  const [{ data: categoryRows }, { data: genderRows }] = await Promise.all([
+    supabaseAdmin.from("categories").select("slug"),
+    supabaseAdmin.from("genders").select("slug"),
+  ]);
   const validated = validateProduct(
     merged,
     (categoryRows ?? []).map((c) => c.slug),
+    (genderRows ?? []).map((g) => g.slug),
   );
   if (validated.error !== undefined) {
     return badRequest(validated.error);

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requirePermission } from "@/lib/auth";
 import { getProductById } from "@/lib/products";
 import { getCategories } from "@/lib/categories";
+import { getGenders } from "@/lib/genders";
 import { ProductForm } from "../../ProductForm";
 
 export const metadata: Metadata = { title: "Edit Product" };
@@ -14,16 +15,17 @@ export default async function EditProductPage({
 }) {
   await requirePermission("products");
   const { id } = await params;
-  const [product, categories] = await Promise.all([
+  const [product, categories, genders] = await Promise.all([
     getProductById(id),
     getCategories(),
+    getGenders(),
   ]);
   if (!product) notFound();
 
   return (
     <div>
       <h1 className="mb-8 text-lg font-medium">Edit Product</h1>
-      <ProductForm product={product} categories={categories} />
+      <ProductForm product={product} categories={categories} genders={genders} />
     </div>
   );
 }

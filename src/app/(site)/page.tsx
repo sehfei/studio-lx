@@ -4,13 +4,14 @@ import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
 import { ProductGrid } from "@/components/ui/ProductGrid";
 import { BannerCarousel } from "@/components/ui/BannerCarousel";
 import { getProductsByTag } from "@/lib/products";
-import { genderCategories } from "@/lib/site-config";
+import { getGenders } from "@/lib/genders";
 import { getIdentity } from "@/lib/identity";
 import { getActiveBanners } from "@/lib/banners";
 import { getI18n } from "@/lib/i18n/dictionaries";
+import { categoryLabel } from "@/lib/i18n/nav-labels";
 
 export default async function Home() {
-  const [newArrivals, bestSellers, promotions, identity, banners, { t }] =
+  const [newArrivals, bestSellers, promotions, identity, banners, { t }, genders] =
     await Promise.all([
       getProductsByTag("new-arrival"),
       getProductsByTag("best-seller"),
@@ -18,6 +19,7 @@ export default async function Home() {
       getIdentity(),
       getActiveBanners(),
       getI18n(),
+      getGenders(),
     ]);
   const hasHeroImage = Boolean(identity.heroImageUrl);
 
@@ -61,7 +63,7 @@ export default async function Home() {
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-8">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {genderCategories.map((cat) => (
+          {genders.map((cat) => (
             <Link
               key={cat.slug}
               href={`/${cat.slug}`}
@@ -73,7 +75,7 @@ export default async function Home() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/50 via-transparent to-transparent" />
               <p className="absolute inset-x-0 bottom-6 text-center font-display text-2xl tracking-widest text-background uppercase transition-colors duration-300 group-hover:text-gold">
-                {cat.slug === "women" ? t.categories.women : t.categories.men}
+                {categoryLabel(t, cat.slug, cat.label)}
               </p>
             </Link>
           ))}
