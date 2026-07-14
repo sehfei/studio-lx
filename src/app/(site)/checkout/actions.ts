@@ -6,6 +6,8 @@ import { getCustomer } from "@/lib/customer-auth";
 import { dbErrorMessage } from "@/lib/db-error";
 import { calculateShippingFee, getShippingSettings } from "@/lib/shipping";
 import { checkCoupon } from "@/lib/coupon";
+import { getPaymentSettings } from "@/lib/payment-settings";
+import { sendOrderConfirmationEmail } from "@/lib/email";
 
 // 结账现在要求登录：页面层 requireCustomer() 已经拦一次，
 // 这里再查一次当前登录用户，双重保险——防止有人绕过页面直接调这个 action。
@@ -236,6 +238,24 @@ export async function createOrder(
 
   revalidatePath("/admin/orders");
   revalidatePath("/admin/products");
+
+  // 结账要求登录，customer.email 是账号本身的邮箱，一定存在——
+  // 比依赖结账表单选填的 email 字段更可靠。发信失败不影响订单已经成立这件事，
+  // 跟上面优惠码核销失败"静默即可"是同一个原则。
+  if (customer.email) {
+    try {
+      const payment = await getPaymentSettings();
+      await sendOrderConfirmationEmail({
+        to: customer.email,
+        orderNumber: order.order_number,
+        total,
+        items: orderItems,
+        payment,
+      });
+    } catch (err) {
+      console.error("order confirmation email failed:", err);
+    }
+  }
 
   return { orderId: order.id, orderNumber: order.order_number };
 }
