@@ -19,25 +19,12 @@ export function LanguageSwitcher({ current }: { current: Locale }) {
 
   return (
     <div
-      className="flex items-center gap-1.5 rounded-full border border-border-subtle px-2.5 py-1 text-xs"
+      className="-m-2 flex items-center gap-1.5 p-2"
       aria-label="Language / 语言"
     >
-      {/* 地球图标：让人一眼看出这是语言切换 */}
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        className="h-3.5 w-3.5 shrink-0 text-foreground/60"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="12" r="9" />
-        <path d="M3 12h18" />
-        <path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18" />
-      </svg>
       {LOCALES.map((locale, i) => (
         <span key={locale} className="flex items-center gap-1.5">
-          {i > 0 && <span className="text-foreground/25">|</span>}
+          {i > 0 && <span className="text-foreground/25">/</span>}
           <button
             type="button"
             onClick={() => switchTo(locale)}

@@ -64,13 +64,13 @@ export function Navbar({
           )}
         </Link>
 
-        <div className="flex items-center gap-4 text-sm">
+        <div className="flex items-center gap-5 text-xs tracking-widest uppercase">
           <Link
             href="/search"
             aria-label={t.nav.search}
             className="-m-2 flex items-center gap-1.5 p-2 hover:text-gold"
           >
-            <SearchIcon className="h-[18px] w-[18px]" />
+            <SearchIcon className="h-4 w-4" />
             <span className="hidden sm:inline">{t.nav.search}</span>
           </Link>
           <Link
@@ -78,7 +78,7 @@ export function Navbar({
             aria-label={t.nav.wishlist}
             className="-m-2 hidden items-center gap-1.5 p-2 hover:text-gold sm:flex"
           >
-            <WishlistIcon className="h-[18px] w-[18px]" />
+            <WishlistIcon className="h-4 w-4" />
             <span>{t.nav.wishlist}</span>
           </Link>
           <Link
@@ -87,9 +87,9 @@ export function Navbar({
             className="-m-2 flex items-center gap-1.5 p-2 hover:text-gold"
           >
             <span className="relative inline-flex">
-              <CartIcon className="h-[18px] w-[18px]" />
+              <CartIcon className="h-4 w-4" />
               {cartCount > 0 && (
-                <span className="absolute -top-2 -right-3 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-medium text-background">
+                <span className="absolute -top-1.5 -right-2.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-medium normal-case text-background">
                   {cartCount}
                 </span>
               )}
@@ -101,7 +101,7 @@ export function Navbar({
             aria-label={t.nav.account}
             className="-m-2 hidden items-center gap-1.5 p-2 hover:text-gold sm:flex"
           >
-            <AccountIcon className="h-[18px] w-[18px]" />
+            <AccountIcon className="h-4 w-4" />
             <span>{t.nav.account}</span>
           </Link>
           <LanguageSwitcher current={locale} />
