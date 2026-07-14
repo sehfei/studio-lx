@@ -19,6 +19,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "new-arrival",
     "best-seller",
     "promotion",
+    "privacy",
+    "terms",
   ].map((route) => ({
     url: `${siteConfig.url}/${route}`,
     changeFrequency: "weekly" as const,

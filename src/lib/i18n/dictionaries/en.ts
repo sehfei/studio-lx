@@ -41,6 +41,8 @@ export const en = {
     orderTracking: "Order Tracking",
     myAccount: "My Account",
     shippingReturns: "Shipping & Returns",
+    privacyPolicy: "Privacy Policy",
+    termsOfService: "Terms of Service",
     rights: "All rights reserved.",
   },
   home: {

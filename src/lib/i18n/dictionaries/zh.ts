@@ -42,6 +42,8 @@ export const zh: Dictionary = {
     orderTracking: "订单查询",
     myAccount: "我的账户",
     shippingReturns: "运费与退换货",
+    privacyPolicy: "隐私政策",
+    termsOfService: "服务条款",
     rights: "版权所有。",
   },
   home: {

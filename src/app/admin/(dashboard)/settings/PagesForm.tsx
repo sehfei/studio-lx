@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import type { SitePages } from "@/lib/pages";
+import type { PageKey, SitePages } from "@/lib/pages";
 import { Spinner } from "@/components/ui/Spinner";
 import { savePages } from "./actions";
 
@@ -18,7 +18,7 @@ function PageEditor({
   hint,
   initial,
 }: {
-  keyName: "about" | "shipping";
+  keyName: PageKey;
   heading: string;
   hint: string;
   initial: SitePages[keyof SitePages];
@@ -97,6 +97,18 @@ export function PagesForm({ initial }: { initial: SitePages }) {
         heading="运费与退换货"
         hint="留空则显示内置默认文案。正文里换行会保留。"
         initial={initial.shipping}
+      />
+      <PageEditor
+        keyName="privacy"
+        heading="隐私政策"
+        hint="留空则显示内置默认文案（通用模板，正式使用前建议找律师确认马来西亚 PDPA 合规性）。正文里换行会保留。"
+        initial={initial.privacy}
+      />
+      <PageEditor
+        keyName="terms"
+        heading="服务条款"
+        hint="留空则显示内置默认文案（通用模板，正式使用前建议找律师确认）。正文里换行会保留。"
+        initial={initial.terms}
       />
 
       <button type="submit" className="btn-primary" disabled={pending}>

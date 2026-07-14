@@ -72,6 +72,12 @@ export function Footer({
             <li>
               <Link href="/account">{t.footer.myAccount}</Link>
             </li>
+            <li>
+              <Link href="/privacy">{t.footer.privacyPolicy}</Link>
+            </li>
+            <li>
+              <Link href="/terms">{t.footer.termsOfService}</Link>
+            </li>
           </ul>
         </div>
 

@@ -331,7 +331,7 @@ export type PagesFormState =
   | { error?: string; success?: string }
   | undefined;
 
-const PAGE_KEYS: PageKey[] = ["about", "shipping"];
+const PAGE_KEYS: PageKey[] = ["about", "shipping", "privacy", "terms"];
 
 export async function savePages(
   _prevState: PagesFormState,
