@@ -15,6 +15,7 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useCart } from "@/components/cart/CartContext";
 import type { CategoryRow } from "@/lib/categories";
 import type { GenderRow } from "@/lib/genders";
+import { SearchIcon, CartIcon, AccountIcon, WishlistIcon } from "@/components/ui/NavIcons";
 
 export function Navbar({
   logoUrl,
@@ -64,26 +65,44 @@ export function Navbar({
         </Link>
 
         <div className="flex items-center gap-4 text-sm">
-          <Link href="/search" aria-label={t.nav.search}>
-            {t.nav.search}
+          <Link
+            href="/search"
+            aria-label={t.nav.search}
+            className="-m-2 flex items-center gap-1.5 p-2 hover:text-gold"
+          >
+            <SearchIcon className="h-[18px] w-[18px]" />
+            <span className="hidden sm:inline">{t.nav.search}</span>
           </Link>
-          <Link href="/wishlist" aria-label={t.nav.wishlist} className="hidden sm:inline">
-            {t.nav.wishlist}
+          <Link
+            href="/wishlist"
+            aria-label={t.nav.wishlist}
+            className="-m-2 hidden items-center gap-1.5 p-2 hover:text-gold sm:flex"
+          >
+            <WishlistIcon className="h-[18px] w-[18px]" />
+            <span>{t.nav.wishlist}</span>
           </Link>
-          <Link href="/cart" aria-label={t.nav.cart} className="relative">
-            {t.nav.cart}
-            {cartCount > 0 && (
-              <span className="absolute -top-2 -right-3 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-medium text-background">
-                {cartCount}
-              </span>
-            )}
+          <Link
+            href="/cart"
+            aria-label={t.nav.cart}
+            className="-m-2 flex items-center gap-1.5 p-2 hover:text-gold"
+          >
+            <span className="relative inline-flex">
+              <CartIcon className="h-[18px] w-[18px]" />
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-3 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-medium text-background">
+                  {cartCount}
+                </span>
+              )}
+            </span>
+            <span className="hidden sm:inline">{t.nav.cart}</span>
           </Link>
           <Link
             href="/account"
             aria-label={t.nav.account}
-            className="hidden sm:inline"
+            className="-m-2 hidden items-center gap-1.5 p-2 hover:text-gold sm:flex"
           >
-            {t.nav.account}
+            <AccountIcon className="h-[18px] w-[18px]" />
+            <span>{t.nav.account}</span>
           </Link>
           <LanguageSwitcher current={locale} />
         </div>
