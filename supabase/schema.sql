@@ -281,3 +281,84 @@ on conflict (slug) do nothing;
 alter table products drop constraint if exists products_gender_check;
 alter table products add constraint products_gender_fkey
   foreign key (gender) references genders(slug) on update cascade;
+
+-- 拆分 site_settings 单行配置表为按功能独立的表：每张表仍然是单行(id=1)的
+-- 惯例，迁移成本最小，但换来真正的行级隔离——不同管理员同时保存不同板块时，
+-- 各自的行互不阻塞，不再只是依赖 Postgrest 按列 upsert 的语义。
+create table if not exists theme_settings (
+  id integer primary key check (id = 1),
+  theme jsonb not null default '{}'::jsonb,
+  previous_theme jsonb,
+  updated_at timestamptz not null default now()
+);
+alter table theme_settings enable row level security;
+create policy "Public can read theme settings" on theme_settings for select using (true);
+
+create table if not exists announcement_settings (
+  id integer primary key check (id = 1),
+  announcement jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+alter table announcement_settings enable row level security;
+create policy "Public can read announcement settings" on announcement_settings for select using (true);
+
+create table if not exists identity_settings (
+  id integer primary key check (id = 1),
+  identity jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+alter table identity_settings enable row level security;
+create policy "Public can read identity settings" on identity_settings for select using (true);
+
+create table if not exists pages_settings (
+  id integer primary key check (id = 1),
+  pages jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+alter table pages_settings enable row level security;
+create policy "Public can read pages settings" on pages_settings for select using (true);
+
+create table if not exists shipping_settings (
+  id integer primary key check (id = 1),
+  shipping jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+alter table shipping_settings enable row level security;
+create policy "Public can read shipping settings" on shipping_settings for select using (true);
+
+create table if not exists payment_settings (
+  id integer primary key check (id = 1),
+  payment jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+alter table payment_settings enable row level security;
+create policy "Public can read payment settings" on payment_settings for select using (true);
+
+-- 把旧 site_settings 单行里已经存在的真实配置搬过来，不能让新表从空的开始
+insert into theme_settings (id, theme, previous_theme, updated_at)
+  select 1, theme, previous_theme, updated_at from site_settings where id = 1
+  on conflict (id) do update set theme = excluded.theme, previous_theme = excluded.previous_theme, updated_at = excluded.updated_at;
+
+insert into announcement_settings (id, announcement, updated_at)
+  select 1, announcement, updated_at from site_settings where id = 1
+  on conflict (id) do update set announcement = excluded.announcement, updated_at = excluded.updated_at;
+
+insert into identity_settings (id, identity, updated_at)
+  select 1, identity, updated_at from site_settings where id = 1
+  on conflict (id) do update set identity = excluded.identity, updated_at = excluded.updated_at;
+
+insert into pages_settings (id, pages, updated_at)
+  select 1, pages, updated_at from site_settings where id = 1
+  on conflict (id) do update set pages = excluded.pages, updated_at = excluded.updated_at;
+
+insert into shipping_settings (id, shipping, updated_at)
+  select 1, shipping, updated_at from site_settings where id = 1
+  on conflict (id) do update set shipping = excluded.shipping, updated_at = excluded.updated_at;
+
+insert into payment_settings (id, payment, updated_at)
+  select 1, payment, updated_at from site_settings where id = 1
+  on conflict (id) do update set payment = excluded.payment, updated_at = excluded.updated_at;
+
+-- 先别急着删旧表——部署新代码、确认后台六个板块都能正常读写之后，
+-- 再手动跑这一行清掉 site_settings（留个回滚窗口）：
+-- drop table site_settings;

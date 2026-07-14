@@ -1,4 +1,5 @@
-import { fetchSiteSettingsRow } from "@/lib/site-settings";
+import { cache } from "react";
+import { supabase } from "@/lib/supabase/client";
 
 // 马来西亚 13 州 + 3 联邦直辖区，标记东马/西马，结账时按顾客选的州属算运费。
 // 沙巴、砂拉越、纳闽是东马，其余是西马。
@@ -59,15 +60,19 @@ export function mergeShippingSettings(partial: unknown): ShippingSettings {
   };
 }
 
-export async function getShippingSettings(): Promise<ShippingSettings> {
+export const getShippingSettings = cache(async (): Promise<ShippingSettings> => {
   try {
-    const row = await fetchSiteSettingsRow();
-    if (!row) return DEFAULT_SHIPPING_SETTINGS;
-    return mergeShippingSettings(row.shipping);
+    const { data, error } = await supabase
+      .from("shipping_settings")
+      .select("shipping")
+      .eq("id", 1)
+      .maybeSingle();
+    if (error || !data) return DEFAULT_SHIPPING_SETTINGS;
+    return mergeShippingSettings(data.shipping);
   } catch {
     return DEFAULT_SHIPPING_SETTINGS;
   }
-}
+});
 
 // 结账时算运费：州属对不上（不是马来西亚 13+3 之一）就当西马处理，
 // 免运费门槛达到就直接免运费

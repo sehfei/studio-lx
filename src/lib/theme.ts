@@ -1,6 +1,7 @@
-import { fetchSiteSettingsRow } from "@/lib/site-settings";
+import { cache } from "react";
+import { supabase } from "@/lib/supabase/client";
 
-// 主题设置：存在 Supabase site_settings 表（id=1 单行 JSON），
+// 主题设置：存在 Supabase theme_settings 表（id=1 单行 JSON），
 // 后台 Website Settings 修改，根布局注入 CSS 变量全站生效。
 // 表不存在或读取失败时静默回退到 DEFAULT_THEME，网站照常显示。
 
@@ -238,15 +239,19 @@ export function buttonStyleVars(
   }
 }
 
-export async function getTheme(): Promise<ThemeSettings> {
+export const getTheme = cache(async (): Promise<ThemeSettings> => {
   try {
-    const row = await fetchSiteSettingsRow();
-    if (!row) return DEFAULT_THEME;
-    return mergeTheme(row.theme);
+    const { data, error } = await supabase
+      .from("theme_settings")
+      .select("theme")
+      .eq("id", 1)
+      .maybeSingle();
+    if (error || !data) return DEFAULT_THEME;
+    return mergeTheme(data.theme);
   } catch {
     return DEFAULT_THEME;
   }
-}
+});
 
 // 转成注入 <html style> 的 CSS 变量
 export function themeToCssVars(theme: ThemeSettings): Record<string, string> {

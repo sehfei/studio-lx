@@ -1,4 +1,5 @@
-import { fetchSiteSettingsRow } from "@/lib/site-settings";
+import { cache } from "react";
+import { supabase } from "@/lib/supabase/client";
 
 export type AnnouncementSettings = {
   enabled: boolean;
@@ -27,12 +28,16 @@ function mergeAnnouncement(partial: unknown): AnnouncementSettings {
   };
 }
 
-export async function getAnnouncement(): Promise<AnnouncementSettings> {
+export const getAnnouncement = cache(async (): Promise<AnnouncementSettings> => {
   try {
-    const row = await fetchSiteSettingsRow();
-    if (!row) return DEFAULT_ANNOUNCEMENT;
-    return mergeAnnouncement(row.announcement);
+    const { data, error } = await supabase
+      .from("announcement_settings")
+      .select("announcement")
+      .eq("id", 1)
+      .maybeSingle();
+    if (error || !data) return DEFAULT_ANNOUNCEMENT;
+    return mergeAnnouncement(data.announcement);
   } catch {
     return DEFAULT_ANNOUNCEMENT;
   }
-}
+});

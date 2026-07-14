@@ -37,7 +37,7 @@ export async function saveShippingSettings(
   const shipping: ShippingSettings = { westFee, eastFee, freeShippingThreshold };
 
   const { error } = await supabaseAdmin
-    .from("site_settings")
+    .from("shipping_settings")
     .upsert({ id: 1, shipping, updated_at: new Date().toISOString() });
 
   if (error) return { error: dbErrorMessage(error) };

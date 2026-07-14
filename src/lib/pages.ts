@@ -1,8 +1,9 @@
-import { fetchSiteSettingsRow } from "@/lib/site-settings";
+import { cache } from "react";
+import { supabase } from "@/lib/supabase/client";
 import type { Locale } from "@/lib/i18n/config";
 
 // 可在后台编辑的内容页（关于我们、运费退换货）。每页存中英双语标题+正文，
-// 前台按当前语言选，为空时回退到内置默认文案。存在 site_settings.pages。
+// 前台按当前语言选，为空时回退到内置默认文案。存在 pages_settings.pages。
 
 export type PageContent = {
   titleEn: string;
@@ -46,15 +47,19 @@ function mergePages(partial: unknown): SitePages {
   return { about: one("about"), shipping: one("shipping") };
 }
 
-export async function getPages(): Promise<SitePages> {
+export const getPages = cache(async (): Promise<SitePages> => {
   try {
-    const row = await fetchSiteSettingsRow();
-    if (!row) return { about: { ...EMPTY }, shipping: { ...EMPTY } };
-    return mergePages(row.pages);
+    const { data, error } = await supabase
+      .from("pages_settings")
+      .select("pages")
+      .eq("id", 1)
+      .maybeSingle();
+    if (error || !data) return { about: { ...EMPTY }, shipping: { ...EMPTY } };
+    return mergePages(data.pages);
   } catch {
     return { about: { ...EMPTY }, shipping: { ...EMPTY } };
   }
-}
+});
 
 // 按当前语言取标题/正文，后台没填则回退默认文案
 export function resolvePage(

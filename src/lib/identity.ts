@@ -1,4 +1,5 @@
-import { fetchSiteSettingsRow } from "@/lib/site-settings";
+import { cache } from "react";
+import { supabase } from "@/lib/supabase/client";
 
 export type SiteIdentity = {
   logoUrl?: string;
@@ -32,12 +33,16 @@ function mergeIdentity(partial: unknown): SiteIdentity {
   };
 }
 
-export async function getIdentity(): Promise<SiteIdentity> {
+export const getIdentity = cache(async (): Promise<SiteIdentity> => {
   try {
-    const row = await fetchSiteSettingsRow();
-    if (!row) return DEFAULT_IDENTITY;
-    return mergeIdentity(row.identity);
+    const { data, error } = await supabase
+      .from("identity_settings")
+      .select("identity")
+      .eq("id", 1)
+      .maybeSingle();
+    if (error || !data) return DEFAULT_IDENTITY;
+    return mergeIdentity(data.identity);
   } catch {
     return DEFAULT_IDENTITY;
   }
-}
+});

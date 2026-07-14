@@ -46,12 +46,12 @@ function readColors(formData: FormData) {
 async function persistTheme(theme: ThemeSettings): Promise<string | null> {
   // 保存前先把当前存档挪到 previous_theme，实现一层「撤销上一次保存」
   const { data: current } = await supabaseAdmin
-    .from("site_settings")
+    .from("theme_settings")
     .select("theme")
     .eq("id", 1)
     .maybeSingle();
 
-  const { error } = await supabaseAdmin.from("site_settings").upsert({
+  const { error } = await supabaseAdmin.from("theme_settings").upsert({
     id: 1,
     theme,
     previous_theme: current?.theme ?? null,
@@ -68,7 +68,7 @@ export async function undoLastSave(): Promise<ThemeFormState> {
   await requirePermission("settings");
 
   const { data, error: findError } = await supabaseAdmin
-    .from("site_settings")
+    .from("theme_settings")
     .select("theme, previous_theme")
     .eq("id", 1)
     .maybeSingle();
@@ -79,7 +79,7 @@ export async function undoLastSave(): Promise<ThemeFormState> {
 
   // 和当前值互换，所以再点一次等于「重做」
   const { error } = await supabaseAdmin
-    .from("site_settings")
+    .from("theme_settings")
     .update({
       theme: data.previous_theme,
       previous_theme: data.theme,
@@ -176,7 +176,7 @@ export async function saveAnnouncement(
   };
 
   const { error } = await supabaseAdmin
-    .from("site_settings")
+    .from("announcement_settings")
     .upsert({ id: 1, announcement, updated_at: new Date().toISOString() });
   if (error) return { error: dbErrorMessage(error) };
 
@@ -247,7 +247,7 @@ export async function saveIdentity(
   await requirePermission("settings");
 
   const { data: current } = await supabaseAdmin
-    .from("site_settings")
+    .from("identity_settings")
     .select("identity")
     .eq("id", 1)
     .maybeSingle();
@@ -294,7 +294,7 @@ export async function saveIdentity(
   }
 
   const { error } = await supabaseAdmin
-    .from("site_settings")
+    .from("identity_settings")
     .upsert({ id: 1, identity, updated_at: new Date().toISOString() });
   if (error) return { error: dbErrorMessage(error) };
 
@@ -327,7 +327,7 @@ export async function savePages(
   }
 
   const { error } = await supabaseAdmin
-    .from("site_settings")
+    .from("pages_settings")
     .upsert({ id: 1, pages, updated_at: new Date().toISOString() });
   if (error) return { error: dbErrorMessage(error) };
 

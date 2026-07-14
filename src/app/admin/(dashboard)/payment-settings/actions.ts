@@ -24,7 +24,7 @@ export async function savePaymentSettings(
   };
 
   const { error } = await supabaseAdmin
-    .from("site_settings")
+    .from("payment_settings")
     .upsert({ id: 1, payment, updated_at: new Date().toISOString() });
 
   if (error) return { error: dbErrorMessage(error) };
