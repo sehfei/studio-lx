@@ -359,6 +359,18 @@ insert into payment_settings (id, payment, updated_at)
   select 1, payment, updated_at from site_settings where id = 1
   on conflict (id) do update set payment = excluded.payment, updated_at = excluded.updated_at;
 
+-- 4 项小加固：外键列补索引、分类外键补 cascade、优惠券补真外键。
+create index if not exists orders_customer_id_idx on orders(customer_id);
+create index if not exists order_items_order_id_idx on order_items(order_id);
+create index if not exists order_items_product_id_idx on order_items(product_id);
+
+alter table products drop constraint if exists products_category_fkey;
+alter table products add constraint products_category_fkey
+  foreign key (category) references categories(slug) on update cascade;
+
+alter table orders add constraint orders_coupon_code_fkey
+  foreign key (coupon_code) references coupons(code) on delete set null;
+
 -- 先别急着删旧表——部署新代码、确认后台六个板块都能正常读写之后，
 -- 再手动跑这一行清掉 site_settings（留个回滚窗口）：
 -- drop table site_settings;

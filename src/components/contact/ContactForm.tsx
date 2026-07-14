@@ -21,6 +21,15 @@ export function ContactForm({ t }: { t: Dictionary }) {
 
   return (
     <form action={formAction} className="mt-10 space-y-4">
+      {/* 蜜罐字段：真人看不到也不会填，爬虫/脚本经常无脑填所有输入框。
+          不用 type="hidden"，那种爬虫反而会跳过；用 CSS 藏起来才有效。 */}
+      <input
+        name="company"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="absolute -left-[9999px] h-0 w-0 opacity-0"
+      />
       <input
         name="name"
         required
