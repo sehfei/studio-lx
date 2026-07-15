@@ -32,9 +32,6 @@ export function AdminSidebar({
     <aside className="w-full shrink-0 border-b border-border-subtle lg:w-56 lg:border-r lg:border-b-0 lg:p-4">
       {/* 手机：顶部只有标题 + 汉堡按钮，分类列表收进下拉抽屉 */}
       <div className="flex items-center justify-between px-4 py-3 lg:hidden">
-        <p className="font-display text-lg tracking-widest uppercase">
-          {dict.title}
-        </p>
         <button
           type="button"
           className="-m-2 p-2 hover:text-gold"
@@ -48,6 +45,9 @@ export function AdminSidebar({
             <MenuIcon className="h-5 w-5" />
           )}
         </button>
+        <p className="font-display text-lg tracking-widest uppercase">
+          {dict.title}
+        </p>
       </div>
 
       {mobileOpen && (
