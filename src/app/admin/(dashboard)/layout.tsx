@@ -31,7 +31,12 @@ export default async function AdminLayout({
 
   return (
     <div className="flex min-h-dvh flex-col lg:flex-row">
-      <AdminSidebar dict={t.sidebar} visibleKeys={visibleKeys} />
+      <AdminSidebar
+        dict={t.sidebar}
+        visibleKeys={visibleKeys}
+        email={session?.email ?? ""}
+        locale={locale}
+      />
       <div className="min-w-0 flex-1 p-4 sm:p-8">
         <AdminHeader
           email={session?.email ?? ""}

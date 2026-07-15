@@ -16,7 +16,7 @@ export function AdminHeader({
   dict: AdminDictionary["sidebar"];
 }) {
   return (
-    <header className="mb-6 flex flex-wrap items-center justify-end gap-x-4 gap-y-2 border-b border-border-subtle pb-4 text-xs">
+    <header className="mb-6 hidden items-center justify-end gap-x-4 border-b border-border-subtle pb-4 text-xs lg:flex">
       <span className="mr-auto truncate text-foreground/50" title={email}>
         {email}
       </span>
