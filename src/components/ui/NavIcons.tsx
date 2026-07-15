@@ -155,6 +155,8 @@ export function WishlistIcon({ className = "h-5 w-5", filled = false }: IconProp
       fill={filled ? "currentColor" : "none"}
       stroke="currentColor"
       strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       className={className}
       aria-hidden="true"
     >

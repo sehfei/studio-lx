@@ -30,7 +30,10 @@ function Star({
         fill={filled ? "currentColor" : "none"}
         stroke="currentColor"
         strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
         className={`h-6 w-6 ${filled ? "text-gold" : "text-foreground/30"}`}
+        aria-hidden="true"
       >
         <path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9 2.6-5.3z" />
       </svg>
