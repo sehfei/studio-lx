@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { safeRedirectPath } from "@/lib/customer-auth";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export type RegisterFormState =
   | { error?: string; needsEmailConfirm?: boolean }
@@ -22,6 +23,13 @@ export async function signUpCustomer(
   }
   if (password.length < 6) {
     return { error: "密码至少需要 6 位" };
+  }
+
+  // 同一 IP 1 小时内最多注册 10 次，防止批量注册滥用
+  const ip = await getClientIp();
+  const { allowed } = await checkRateLimit(`register:${ip}`, 10, 3600);
+  if (!allowed) {
+    return { error: "注册请求过于频繁，请稍后再试" };
   }
 
   const supabase = await createSupabaseServerClient();

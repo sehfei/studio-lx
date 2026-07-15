@@ -8,6 +8,7 @@ import { calculateShippingFee, getShippingSettings } from "@/lib/shipping";
 import { checkCoupon } from "@/lib/coupon";
 import { getPaymentSettings } from "@/lib/payment-settings";
 import { sendOrderConfirmationEmail } from "@/lib/email";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 // 结账现在要求登录：页面层 requireCustomer() 已经拦一次，
 // 这里再查一次当前登录用户，双重保险——防止有人绕过页面直接调这个 action。
@@ -44,6 +45,13 @@ export async function previewCoupon(
   code: string,
   subtotal: number,
 ): Promise<CouponPreviewResult> {
+  // 同一 IP 1 分钟最多试 20 次，防止拿这个接口暴力猜优惠码
+  const ip = await getClientIp();
+  const { allowed } = await checkRateLimit(`coupon-preview:${ip}`, 20, 60);
+  if (!allowed) {
+    return { ok: false, error: "尝试过于频繁，请稍后再试" };
+  }
+
   const result = await checkCoupon(code, subtotal);
   if (!result.ok) return { ok: false, error: result.error };
   const description =
@@ -74,6 +82,12 @@ export async function createOrder(
   const customer = await getCustomer();
   if (!customer) {
     return { error: "请先登录才能结账" };
+  }
+
+  // 同一账号 1 小时最多下 20 次订单，防止刷单/滥用
+  const { allowed } = await checkRateLimit(`checkout:${customer.id}`, 20, 3600);
+  if (!allowed) {
+    return { error: "下单过于频繁，请稍后再试" };
   }
 
   if (!input.items || input.items.length === 0) {

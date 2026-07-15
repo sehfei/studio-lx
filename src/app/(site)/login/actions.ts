@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { safeRedirectPath } from "@/lib/customer-auth";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export type LoginFormState = { error?: string } | undefined;
 
@@ -16,6 +17,16 @@ export async function signInCustomer(
 
   if (!email || !password) {
     return { error: "请输入邮箱和密码" };
+  }
+
+  // 同一邮箱 15 分钟内最多试 5 次，防止暴力破解密码
+  const { allowed } = await checkRateLimit(
+    `login:customer:${email.toLowerCase()}`,
+    5,
+    900,
+  );
+  if (!allowed) {
+    return { error: "尝试次数过多，请 15 分钟后再试" };
   }
 
   const supabase = await createSupabaseServerClient();

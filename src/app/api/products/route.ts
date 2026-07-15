@@ -4,13 +4,18 @@ import { mapRow, type ProductRow } from "@/lib/products";
 import { TAGS } from "@/lib/constants";
 import { getCategories } from "@/lib/categories";
 import { getGenders } from "@/lib/genders";
-import { badRequest, ok, serverError } from "@/lib/api/response";
+import { badRequest, ok, serverError, tooManyRequests } from "@/lib/api/response";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const MAX_LIMIT = 50;
 
 // GET /api/products?gender=&category=&tag=&page=&limit=
 // 公开只读接口，走 anon key（受 RLS 限制，只能查）
 export async function GET(request: NextRequest) {
+  const ip = await getClientIp();
+  const { allowed } = await checkRateLimit(`api:products:${ip}`, 60, 60);
+  if (!allowed) return tooManyRequests();
+
   const params = request.nextUrl.searchParams;
 
   const gender = params.get("gender");

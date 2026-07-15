@@ -8,12 +8,22 @@ import {
   uniqueViolationMessage,
   validateProduct,
 } from "@/lib/validation/product";
-import { badRequest, fail, ok, unauthorized } from "@/lib/api/response";
+import {
+  badRequest,
+  fail,
+  ok,
+  tooManyRequests,
+  unauthorized,
+} from "@/lib/api/response";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 // POST /api/admin/products 创建商品（JSON body，images 传已上传好的 URL 数组）
 export async function POST(request: Request) {
   const user = await requirePermissionApi("products");
   if (!user) return unauthorized();
+
+  const { allowed } = await checkRateLimit(`api:admin:${user.id}`, 60, 60);
+  if (!allowed) return tooManyRequests();
 
   let body: Record<string, unknown>;
   try {

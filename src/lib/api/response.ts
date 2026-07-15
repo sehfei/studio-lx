@@ -23,3 +23,6 @@ export const badRequest = (message: string) =>
 
 export const serverError = (message = "服务器内部错误") =>
   fail(500, "internal_error", message);
+
+export const tooManyRequests = (message = "请求过于频繁，请稍后再试") =>
+  fail(429, "rate_limited", message);

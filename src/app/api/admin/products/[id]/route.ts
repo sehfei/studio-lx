@@ -12,8 +12,10 @@ import {
   fail,
   notFound,
   ok,
+  tooManyRequests,
   unauthorized,
 } from "@/lib/api/response";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -31,6 +33,9 @@ async function findRow(id: string): Promise<ProductRow | null> {
 export async function PATCH(request: Request, { params }: RouteContext) {
   const user = await requirePermissionApi("products");
   if (!user) return unauthorized();
+
+  const { allowed } = await checkRateLimit(`api:admin:${user.id}`, 60, 60);
+  if (!allowed) return tooManyRequests();
 
   const { id } = await params;
 
@@ -106,6 +111,9 @@ export async function PATCH(request: Request, { params }: RouteContext) {
 export async function DELETE(_request: Request, { params }: RouteContext) {
   const user = await requirePermissionApi("products");
   if (!user) return unauthorized();
+
+  const { allowed } = await checkRateLimit(`api:admin:${user.id}`, 60, 60);
+  if (!allowed) return tooManyRequests();
 
   const { id } = await params;
 
