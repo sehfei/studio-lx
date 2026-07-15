@@ -1,5 +1,6 @@
 import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { AdminTable } from "@/components/admin/AdminTable";
 
 export const dynamic = "force-dynamic";
 
@@ -72,30 +73,22 @@ export default async function AdminSalesReportPage() {
       </div>
 
       <h2 className="eyebrow mb-4">畅销商品（按销量）</h2>
-      {topProducts.length === 0 ? (
-        <p className="text-sm text-foreground/50">还没有销售数据。</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-sm">
-            <thead>
-              <tr className="border-b border-border-subtle text-left text-xs tracking-widest text-foreground/50 uppercase">
-                <th className="py-3">Product</th>
-                <th className="py-3">Quantity Sold</th>
-                <th className="py-3">Revenue</th>
-              </tr>
-            </thead>
-            <tbody>
-              {topProducts.map(([name, stat]) => (
-                <tr key={name} className="border-b border-border-subtle">
-                  <td className="py-3">{name}</td>
-                  <td className="py-3">{stat.quantity}</td>
-                  <td className="py-3">RM {stat.revenue.toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <AdminTable
+        emptyText="还没有销售数据。"
+        columns={[
+          { key: "product", label: "Product" },
+          { key: "quantity", label: "Quantity Sold" },
+          { key: "revenue", label: "Revenue" },
+        ]}
+        rows={topProducts.map(([name, stat]) => ({
+          key: name,
+          cells: {
+            product: name,
+            quantity: stat.quantity,
+            revenue: `RM ${stat.revenue.toFixed(2)}`,
+          },
+        }))}
+      />
       <p className="mt-6 text-xs text-foreground/40">
         统计数据来自 Supabase 订单表，实时计算。
       </p>

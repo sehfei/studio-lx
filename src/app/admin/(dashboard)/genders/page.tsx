@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getGenders } from "@/lib/genders";
 import { AddGenderForm } from "./AddGenderForm";
 import { DeleteGenderButton } from "./DeleteGenderButton";
+import { AdminTable } from "@/components/admin/AdminTable";
 
 export const dynamic = "force-dynamic";
 
@@ -30,36 +31,28 @@ export default async function AdminGendersPage() {
         <AddGenderForm />
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-sm">
-          <thead>
-            <tr className="border-b border-border-subtle text-left text-xs tracking-widest text-foreground/50 uppercase">
-              <th className="py-3">Label</th>
-              <th className="py-3">Slug</th>
-              <th className="py-3">Sort</th>
-              <th className="py-3">Products</th>
-              <th className="py-3">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {genders.map((g) => (
-              <tr key={g.id} className="border-b border-border-subtle">
-                <td className="py-3">{g.label}</td>
-                <td className="py-3 text-foreground/60">{g.slug}</td>
-                <td className="py-3 text-foreground/60">{g.sort_order}</td>
-                <td className="py-3">{countBySlug.get(g.slug) ?? 0}</td>
-                <td className="py-3">
-                  <DeleteGenderButton
-                    id={g.id}
-                    slug={g.slug}
-                    label={g.label}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <AdminTable
+        emptyText="还没有分区。"
+        columns={[
+          { key: "label", label: "Label" },
+          { key: "slug", label: "Slug", cellClassName: "text-foreground/60" },
+          { key: "sort", label: "Sort", cellClassName: "text-foreground/60" },
+          { key: "products", label: "Products" },
+          { key: "actions", label: "操作" },
+        ]}
+        rows={genders.map((g) => ({
+          key: g.id,
+          cells: {
+            label: g.label,
+            slug: g.slug,
+            sort: g.sort_order,
+            products: countBySlug.get(g.slug) ?? 0,
+            actions: (
+              <DeleteGenderButton id={g.id} slug={g.slug} label={g.label} />
+            ),
+          },
+        }))}
+      />
     </div>
   );
 }

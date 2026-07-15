@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getCategories } from "@/lib/categories";
 import { AddCategoryForm } from "./AddCategoryForm";
 import { DeleteCategoryButton } from "./DeleteCategoryButton";
+import { AdminTable } from "@/components/admin/AdminTable";
 
 export const dynamic = "force-dynamic";
 
@@ -30,36 +31,28 @@ export default async function AdminCategoriesPage() {
         <AddCategoryForm />
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-sm">
-          <thead>
-            <tr className="border-b border-border-subtle text-left text-xs tracking-widest text-foreground/50 uppercase">
-              <th className="py-3">Label</th>
-              <th className="py-3">Slug</th>
-              <th className="py-3">Sort</th>
-              <th className="py-3">Products</th>
-              <th className="py-3">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {categories.map((c) => (
-              <tr key={c.id} className="border-b border-border-subtle">
-                <td className="py-3">{c.label}</td>
-                <td className="py-3 text-foreground/60">{c.slug}</td>
-                <td className="py-3 text-foreground/60">{c.sort_order}</td>
-                <td className="py-3">{countBySlug.get(c.slug) ?? 0}</td>
-                <td className="py-3">
-                  <DeleteCategoryButton
-                    id={c.id}
-                    slug={c.slug}
-                    label={c.label}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <AdminTable
+        emptyText="还没有分类。"
+        columns={[
+          { key: "label", label: "Label" },
+          { key: "slug", label: "Slug", cellClassName: "text-foreground/60" },
+          { key: "sort", label: "Sort", cellClassName: "text-foreground/60" },
+          { key: "products", label: "Products" },
+          { key: "actions", label: "操作" },
+        ]}
+        rows={categories.map((c) => ({
+          key: c.id,
+          cells: {
+            label: c.label,
+            slug: c.slug,
+            sort: c.sort_order,
+            products: countBySlug.get(c.slug) ?? 0,
+            actions: (
+              <DeleteCategoryButton id={c.id} slug={c.slug} label={c.label} />
+            ),
+          },
+        }))}
+      />
     </div>
   );
 }

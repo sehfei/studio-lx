@@ -4,6 +4,7 @@ import { getAdminI18n } from "@/lib/i18n/admin";
 import { UserRoleEditor } from "./UserRoleEditor";
 import { AddUserForm } from "./AddUserForm";
 import type { UserRole } from "./actions";
+import { AdminTable } from "@/components/admin/AdminTable";
 
 export const dynamic = "force-dynamic";
 
@@ -28,79 +29,73 @@ export default async function AdminUsersPage() {
         <AddUserForm navDict={t.sidebar.nav} />
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-sm">
-          <thead>
-            <tr className="border-b border-border-subtle text-left text-xs tracking-widest text-foreground/50 uppercase">
-              <th className="py-3">Email</th>
-              <th className="py-3">Role</th>
-              <th className="py-3">Created</th>
-              <th className="py-3">Last Sign In</th>
-              <th className="py-3">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u) => {
-              const role: UserRole =
-                u.app_metadata?.role === "admin"
-                  ? "admin"
-                  : u.app_metadata?.role === "staff"
-                    ? "staff"
-                    : "customer";
-              const permissions = Array.isArray(u.app_metadata?.permissions)
-                ? (u.app_metadata.permissions as string[])
-                : [];
-              const isSelf = u.id === currentUser.id;
-              return (
-                <tr key={u.id} className="border-b border-border-subtle">
-                  <td className="py-3">
-                    {u.email}
-                    {isSelf && (
-                      <span className="ml-2 text-xs text-foreground/40">
-                        (你)
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-3">
-                    <span
-                      className={
-                        role === "admin"
-                          ? "text-gold"
-                          : role === "staff"
-                            ? "text-foreground/70"
-                            : "text-foreground/50"
-                      }
-                    >
-                      {role === "admin"
-                        ? "Admin"
-                        : role === "staff"
-                          ? `Staff (${permissions.length})`
-                          : "Customer"}
+      <AdminTable
+        emptyText="还没有账号。"
+        columns={[
+          { key: "email", label: "Email" },
+          { key: "role", label: "Role" },
+          { key: "created", label: "Created", cellClassName: "text-foreground/60" },
+          { key: "lastSignIn", label: "Last Sign In", cellClassName: "text-foreground/60" },
+          { key: "actions", label: "操作" },
+        ]}
+        rows={users.map((u) => {
+          const role: UserRole =
+            u.app_metadata?.role === "admin"
+              ? "admin"
+              : u.app_metadata?.role === "staff"
+                ? "staff"
+                : "customer";
+          const permissions = Array.isArray(u.app_metadata?.permissions)
+            ? (u.app_metadata.permissions as string[])
+            : [];
+          const isSelf = u.id === currentUser.id;
+          return {
+            key: u.id,
+            cells: {
+              email: (
+                <>
+                  {u.email}
+                  {isSelf && (
+                    <span className="ml-2 text-xs text-foreground/40">
+                      (你)
                     </span>
-                  </td>
-                  <td className="py-3 text-foreground/60">
-                    {new Date(u.created_at).toLocaleDateString("en-MY")}
-                  </td>
-                  <td className="py-3 text-foreground/60">
-                    {u.last_sign_in_at
-                      ? new Date(u.last_sign_in_at).toLocaleDateString("en-MY")
-                      : "—"}
-                  </td>
-                  <td className="py-3">
-                    <UserRoleEditor
-                      userId={u.id}
-                      role={role}
-                      permissions={permissions}
-                      isSelf={isSelf}
-                      navDict={t.sidebar.nav}
-                    />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                  )}
+                </>
+              ),
+              role: (
+                <span
+                  className={
+                    role === "admin"
+                      ? "text-gold"
+                      : role === "staff"
+                        ? "text-foreground/70"
+                        : "text-foreground/50"
+                  }
+                >
+                  {role === "admin"
+                    ? "Admin"
+                    : role === "staff"
+                      ? `Staff (${permissions.length})`
+                      : "Customer"}
+                </span>
+              ),
+              created: new Date(u.created_at).toLocaleDateString("en-MY"),
+              lastSignIn: u.last_sign_in_at
+                ? new Date(u.last_sign_in_at).toLocaleDateString("en-MY")
+                : "—",
+              actions: (
+                <UserRoleEditor
+                  userId={u.id}
+                  role={role}
+                  permissions={permissions}
+                  isSelf={isSelf}
+                  navDict={t.sidebar.nav}
+                />
+              ),
+            },
+          };
+        })}
+      />
     </div>
   );
 }

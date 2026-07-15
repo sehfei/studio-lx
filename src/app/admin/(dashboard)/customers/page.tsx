@@ -1,5 +1,6 @@
 import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { AdminTable } from "@/components/admin/AdminTable";
 
 export const dynamic = "force-dynamic";
 
@@ -44,36 +45,26 @@ export default async function AdminCustomersPage() {
     <div>
       <h1 className="mb-8 text-lg font-medium">Customers</h1>
 
-      {rows.length === 0 ? (
-        <p className="text-sm text-foreground/50">还没有顾客注册。</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-sm">
-            <thead>
-              <tr className="border-b border-border-subtle text-left text-xs tracking-widest text-foreground/50 uppercase">
-                <th className="py-3">Name</th>
-                <th className="py-3">Email</th>
-                <th className="py-3">Joined</th>
-                <th className="py-3">Orders</th>
-                <th className="py-3">Total Spend</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} className="border-b border-border-subtle">
-                  <td className="py-3">{r.name}</td>
-                  <td className="py-3 text-foreground/60">{r.email}</td>
-                  <td className="py-3 text-foreground/60">
-                    {new Date(r.createdAt).toLocaleDateString("en-MY")}
-                  </td>
-                  <td className="py-3">{r.orderCount}</td>
-                  <td className="py-3">RM {r.totalSpend.toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <AdminTable
+        emptyText="还没有顾客注册。"
+        columns={[
+          { key: "name", label: "Name" },
+          { key: "email", label: "Email", cellClassName: "text-foreground/60" },
+          { key: "joined", label: "Joined", cellClassName: "text-foreground/60" },
+          { key: "orders", label: "Orders" },
+          { key: "totalSpend", label: "Total Spend" },
+        ]}
+        rows={rows.map((r) => ({
+          key: r.id,
+          cells: {
+            name: r.name,
+            email: r.email,
+            joined: new Date(r.createdAt).toLocaleDateString("en-MY"),
+            orders: r.orderCount,
+            totalSpend: `RM ${r.totalSpend.toFixed(2)}`,
+          },
+        }))}
+      />
       <p className="mt-6 text-xs text-foreground/40">
         客户数据来自 Supabase Auth，消费统计来自订单数据。
       </p>
