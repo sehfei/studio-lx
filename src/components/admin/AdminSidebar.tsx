@@ -8,7 +8,13 @@ import type { AdminDictionary } from "@/lib/i18n/admin";
 import type { Locale } from "@/lib/i18n/config";
 import { signOut } from "@/app/admin/login/actions";
 import { AdminLanguageSwitcher } from "@/components/admin/AdminLanguageSwitcher";
-import { MenuIcon, CloseIcon } from "@/components/ui/NavIcons";
+import {
+  MenuIcon,
+  CloseIcon,
+  AccountIcon,
+  HomeIcon,
+  LogoutIcon,
+} from "@/components/ui/NavIcons";
 
 export function AdminSidebar({
   dict,
@@ -32,22 +38,53 @@ export function AdminSidebar({
     <aside className="w-full shrink-0 border-b border-border-subtle lg:w-56 lg:border-r lg:border-b-0 lg:p-4">
       {/* 手机：顶部只有标题 + 汉堡按钮，分类列表收进下拉抽屉 */}
       <div className="flex items-center justify-between px-4 py-3 lg:hidden">
-        <button
-          type="button"
-          className="-m-2 p-2 hover:text-gold"
-          onClick={() => setMobileOpen((v) => !v)}
-          aria-label={dict.title}
-          aria-expanded={mobileOpen}
-        >
-          {mobileOpen ? (
-            <CloseIcon className="h-5 w-5" />
-          ) : (
-            <MenuIcon className="h-5 w-5" />
-          )}
-        </button>
-        <p className="font-display text-lg tracking-widest uppercase">
-          {dict.title}
-        </p>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            className="-m-2 p-2 hover:text-gold"
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label={dict.title}
+            aria-expanded={mobileOpen}
+          >
+            {mobileOpen ? (
+              <CloseIcon className="h-5 w-5" />
+            ) : (
+              <MenuIcon className="h-5 w-5" />
+            )}
+          </button>
+          <p className="font-display text-lg tracking-widest uppercase">
+            {dict.title}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-1">
+          <span
+            className="-m-2 p-2 text-foreground/60"
+            title={email}
+            aria-label={email}
+          >
+            <AccountIcon className="h-5 w-5" />
+          </span>
+          <Link
+            href="/"
+            className="-m-2 p-2 hover:text-gold"
+            aria-label={dict.backToSite}
+            title={dict.backToSite}
+          >
+            <HomeIcon className="h-5 w-5" />
+          </Link>
+          <AdminLanguageSwitcher current={locale} compact />
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="-m-2 p-2 hover:text-gold"
+              aria-label={dict.signOut}
+              title={dict.signOut}
+            >
+              <LogoutIcon className="h-5 w-5" />
+            </button>
+          </form>
+        </div>
       </div>
 
       {mobileOpen && (
@@ -69,34 +106,6 @@ export function AdminSidebar({
               </li>
             ))}
           </ul>
-
-          <div className="mt-4 space-y-1 border-t border-border-subtle pt-4 text-sm">
-            <p
-              className="truncate rounded px-3 py-2 text-xs text-foreground/40"
-              title={email}
-            >
-              {email}
-            </p>
-            <Link
-              href="/"
-              onClick={() => setMobileOpen(false)}
-              className="block rounded px-3 py-3 text-foreground/70 hover:bg-foreground/5"
-            >
-              {dict.backToSite}
-            </Link>
-            <div className="flex items-center justify-between rounded px-3 py-3">
-              <span className="text-foreground/70">{dict.language}</span>
-              <AdminLanguageSwitcher current={locale} />
-            </div>
-            <form action={signOut}>
-              <button
-                type="submit"
-                className="block w-full rounded px-3 py-3 text-left text-foreground/70 hover:bg-foreground/5"
-              >
-                {dict.signOut}
-              </button>
-            </form>
-          </div>
         </div>
       )}
 

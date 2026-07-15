@@ -4,10 +4,19 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { LOCALES, LOCALE_LABELS, type Locale } from "@/lib/i18n/config";
 import { setAdminLocale } from "@/lib/i18n/actions";
+import { GlobeIcon } from "@/components/ui/NavIcons";
 
 // 后台语言切换按钮。逻辑同前台 LanguageSwitcher，但调用 setAdminLocale
 // （写 admin_locale cookie），只影响后台。
-export function AdminLanguageSwitcher({ current }: { current: Locale }) {
+// compact：地球图标按钮，点一下切到另一种语言，给手机顶部窄空间用；
+// 桌面版空间够，走下面的完整双语言按钮。
+export function AdminLanguageSwitcher({
+  current,
+  compact = false,
+}: {
+  current: Locale;
+  compact?: boolean;
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
@@ -18,6 +27,21 @@ export function AdminLanguageSwitcher({ current }: { current: Locale }) {
       router.refresh();
     });
   };
+
+  if (compact) {
+    const other = LOCALES.find((l) => l !== current) ?? current;
+    return (
+      <button
+        type="button"
+        onClick={() => switchTo(other)}
+        disabled={pending}
+        aria-label={`${LOCALE_LABELS[current]} → ${LOCALE_LABELS[other]}`}
+        className="-m-2 p-2 hover:text-gold"
+      >
+        <GlobeIcon className="h-5 w-5" />
+      </button>
+    );
+  }
 
   return (
     <div className="flex items-center gap-1 text-xs" aria-label="Language">
