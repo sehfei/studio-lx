@@ -42,7 +42,6 @@ export default async function Home() {
                 alt=""
                 fill
                 priority
-                unoptimized
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-foreground/40" />

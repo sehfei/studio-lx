@@ -28,7 +28,6 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
         alt={active.title || ""}
         fill
         priority
-        unoptimized
         className="object-cover"
       />
       {hasText && <div className="absolute inset-0 bg-foreground/35" />}
