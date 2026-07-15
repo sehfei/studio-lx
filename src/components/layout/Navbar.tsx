@@ -75,7 +75,7 @@ export function Navbar({
           )}
         </Link>
 
-        <div className="flex items-center gap-5 text-xs tracking-widest uppercase">
+        <div className="flex items-center gap-3 text-xs tracking-widest uppercase sm:gap-5">
           <Link
             href="/search"
             aria-label={t.nav.search}
@@ -87,10 +87,10 @@ export function Navbar({
           <Link
             href="/wishlist"
             aria-label={t.nav.wishlist}
-            className="-m-2 hidden items-center gap-1.5 p-2 hover:text-gold sm:flex"
+            className="-m-2 flex items-center gap-1.5 p-2 hover:text-gold"
           >
             <WishlistIcon className="h-4 w-4" />
-            <span>{t.nav.wishlist}</span>
+            <span className="hidden sm:inline">{t.nav.wishlist}</span>
           </Link>
           <Link
             href="/cart"
@@ -115,8 +115,13 @@ export function Navbar({
             <AccountIcon className="h-4 w-4" />
             <span>{t.nav.account}</span>
           </Link>
-          <span aria-hidden="true" className="h-4 w-px bg-border-subtle" />
-          <LanguageSwitcher current={locale} />
+          <span
+            aria-hidden="true"
+            className="hidden h-4 w-px bg-border-subtle sm:block"
+          />
+          <div className="hidden sm:block">
+            <LanguageSwitcher current={locale} />
+          </div>
         </div>
       </div>
 
@@ -194,6 +199,18 @@ export function Navbar({
               </li>
             ))}
           </ul>
+
+          <div className="mt-6 flex items-center justify-between border-t border-border-subtle pt-4">
+            <Link
+              href="/account"
+              className="flex items-center gap-1.5"
+              onClick={() => setMobileOpen(false)}
+            >
+              <AccountIcon className="h-4 w-4" />
+              <span>{t.nav.account}</span>
+            </Link>
+            <LanguageSwitcher current={locale} />
+          </div>
         </nav>
       )}
     </header>
