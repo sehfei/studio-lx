@@ -1,11 +1,14 @@
 import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { MarkReadButton } from "./MarkReadButton";
+import { getAdminI18n } from "@/lib/i18n/admin";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminMessagesPage() {
   await requirePermission("messages");
+  const { t } = await getAdminI18n();
+  const dict = t.pages.messages;
   const { data: messages } = await supabaseAdmin
     .from("contact_messages")
     .select("*")
@@ -15,13 +18,15 @@ export default async function AdminMessagesPage() {
 
   return (
     <div>
-      <h1 className="mb-2 text-lg font-medium">Messages</h1>
+      <h1 className="mb-2 text-lg font-medium">{dict.title}</h1>
       <p className="mb-8 text-sm text-foreground/50">
-        联系表单收到的留言{unreadCount > 0 ? `，${unreadCount} 条未读` : ""}。
+        {unreadCount > 0
+          ? dict.descUnread.replace("{n}", String(unreadCount))
+          : dict.descAllRead}
       </p>
 
       {!messages || messages.length === 0 ? (
-        <p className="text-sm text-foreground/50">还没有收到留言。</p>
+        <p className="text-sm text-foreground/50">{dict.empty}</p>
       ) : (
         <ul className="divide-y divide-border-subtle border-t border-b border-border-subtle">
           {messages.map((m) => (
@@ -34,7 +39,7 @@ export default async function AdminMessagesPage() {
                   </span>
                   {!m.is_read && (
                     <span className="ml-2 bg-gold px-1.5 py-0.5 text-xs text-background">
-                      未读
+                      {dict.unread}
                     </span>
                   )}
                 </div>

@@ -77,12 +77,45 @@ export const BUTTON_STYLE_OPTIONS = [
 
 export type ButtonStyleId = (typeof BUTTON_STYLE_OPTIONS)[number]["id"];
 
+// 按钮尺寸：影响 .btn-primary/.btn-outline 的内边距、最小高度、字号。
+// 后台某些页面（比如 Products 列表头部的 + Add Product）用的是同一套按钮类，
+// 紧凑档专门给这类小的「新增一行」按钮用，不用另外开一套样式。
+export const BUTTON_SIZE_OPTIONS = [
+  {
+    id: "compact",
+    label: "紧凑",
+    minH: "2.25rem",
+    paddingX: "1rem",
+    paddingY: "0.5rem",
+    fontSize: "0.75rem",
+  },
+  {
+    id: "normal",
+    label: "标准（默认）",
+    minH: "2.75rem",
+    paddingX: "1.5rem",
+    paddingY: "0.75rem",
+    fontSize: "0.875rem",
+  },
+  {
+    id: "spacious",
+    label: "宽松",
+    minH: "3.25rem",
+    paddingX: "2rem",
+    paddingY: "1rem",
+    fontSize: "0.875rem",
+  },
+] as const;
+
+export type ButtonSizeId = (typeof BUTTON_SIZE_OPTIONS)[number]["id"];
+
 export type ThemeSettings = {
   colors: ThemeColors;
   fontPreset: FontPresetId;
   radius: number;
   density: DensityId;
   buttonStyle: ButtonStyleId;
+  buttonSize: ButtonSizeId;
 };
 
 export const DEFAULT_THEME: ThemeSettings = {
@@ -99,6 +132,7 @@ export const DEFAULT_THEME: ThemeSettings = {
   radius: 0,
   density: "normal",
   buttonStyle: "filled",
+  buttonSize: "normal",
 };
 
 // 预设配色方案：只覆盖 colors，字体/圆角/间距/按钮风格保留用户当前选择。
@@ -202,6 +236,9 @@ export function mergeTheme(partial: unknown): ThemeSettings {
     buttonStyle: BUTTON_STYLE_OPTIONS.some((b) => b.id === p.buttonStyle)
       ? (p.buttonStyle as ButtonStyleId)
       : DEFAULT_THEME.buttonStyle,
+    buttonSize: BUTTON_SIZE_OPTIONS.some((b) => b.id === p.buttonSize)
+      ? (p.buttonSize as ButtonSizeId)
+      : DEFAULT_THEME.buttonSize,
   };
 }
 
@@ -239,6 +276,21 @@ export function buttonStyleVars(
   }
 }
 
+// 按钮尺寸 -> CSS 变量，同 buttonStyleVars，主题注入和后台预览共用。
+export function buttonSizeVars(
+  buttonSize: ButtonSizeId,
+): Record<string, string> {
+  const size =
+    BUTTON_SIZE_OPTIONS.find((b) => b.id === buttonSize) ??
+    BUTTON_SIZE_OPTIONS[1];
+  return {
+    "--btn-min-h": size.minH,
+    "--btn-px": size.paddingX,
+    "--btn-py": size.paddingY,
+    "--btn-text": size.fontSize,
+  };
+}
+
 export const getTheme = cache(async (): Promise<ThemeSettings> => {
   try {
     const { data, error } = await supabase
@@ -273,6 +325,7 @@ export function themeToCssVars(theme: ThemeSettings): Record<string, string> {
     "--font-display-active": `var(${font.displayVar})`,
     "--font-sans-active": `var(${font.sansVar})`,
     ...buttonStyleVars(theme.buttonStyle),
+    ...buttonSizeVars(theme.buttonSize),
   };
 }
 

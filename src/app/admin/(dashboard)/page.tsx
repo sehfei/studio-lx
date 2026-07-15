@@ -1,9 +1,12 @@
 import { getAllProducts } from "@/lib/products";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { getAdminI18n } from "@/lib/i18n/admin";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
+  const { t } = await getAdminI18n();
+  const dict = t.pages.dashboard;
   const [products, { data: orders }, { data: userList }] = await Promise.all([
     getAllProducts(),
     supabaseAdmin.from("orders").select("total, payment_status"),
@@ -18,15 +21,15 @@ export default async function AdminDashboardPage() {
     .reduce((sum, o) => sum + Number(o.total), 0);
 
   const stats = [
-    { label: "Total Products", value: products.length },
-    { label: "Orders", value: (orders ?? []).length },
-    { label: "Customers", value: customerCount },
-    { label: "Revenue (RM)", value: revenue.toFixed(2) },
+    { label: dict.totalProducts, value: products.length },
+    { label: dict.orders, value: (orders ?? []).length },
+    { label: dict.customers, value: customerCount },
+    { label: dict.revenue, value: revenue.toFixed(2) },
   ];
 
   return (
     <div>
-      <h1 className="mb-8 text-lg font-medium">Dashboard</h1>
+      <h1 className="mb-8 text-lg font-medium">{dict.title}</h1>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {stats.map((stat) => (
           <div

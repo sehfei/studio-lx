@@ -4,30 +4,33 @@ import { requirePermission } from "@/lib/auth";
 import { getAllProducts } from "@/lib/products";
 import { DeleteProductButton } from "./DeleteProductButton";
 import { AdminTable } from "@/components/admin/AdminTable";
+import { getAdminI18n } from "@/lib/i18n/admin";
 
 export default async function AdminProductsPage() {
   await requirePermission("products");
+  const { t } = await getAdminI18n();
+  const dict = t.pages.products;
   const products = await getAllProducts();
 
   return (
     <div>
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-lg font-medium">Products</h1>
+        <h1 className="text-lg font-medium">{dict.title}</h1>
         <Link href="/admin/products/new" className="btn-primary">
-          + Add Product
+          {dict.addButton}
         </Link>
       </div>
 
       <AdminTable
-        emptyText="还没有商品。"
+        emptyText={dict.empty}
         columns={[
-          { key: "image", label: "Image" },
-          { key: "name", label: "Name" },
-          { key: "sku", label: "SKU", cellClassName: "text-foreground/60" },
-          { key: "brand", label: "Brand", cellClassName: "text-foreground/60" },
-          { key: "price", label: "Price" },
-          { key: "stock", label: "Stock" },
-          { key: "actions", label: "操作" },
+          { key: "image", label: dict.columns.image },
+          { key: "name", label: dict.columns.name },
+          { key: "sku", label: dict.columns.sku, cellClassName: "text-foreground/60" },
+          { key: "brand", label: dict.columns.brand, cellClassName: "text-foreground/60" },
+          { key: "price", label: dict.columns.price },
+          { key: "stock", label: dict.columns.stock },
+          { key: "actions", label: dict.columns.actions },
         ]}
         rows={products.map((p) => ({
           key: p.id,
@@ -55,7 +58,7 @@ export default async function AdminProductsPage() {
                   href={`/admin/products/${p.id}/edit`}
                   className="text-xs text-foreground/60 hover:text-gold hover:underline"
                 >
-                  编辑
+                  {dict.edit}
                 </Link>
                 <DeleteProductButton id={p.id} name={p.name} />
               </div>
@@ -63,7 +66,7 @@ export default async function AdminProductsPage() {
           },
         }))}
       />
-      <p className="mt-6 text-xs text-foreground/40">商品数据来自 Supabase。</p>
+      <p className="mt-6 text-xs text-foreground/40">{dict.footer}</p>
     </div>
   );
 }

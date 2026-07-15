@@ -6,6 +6,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { dbErrorMessage } from "@/lib/db-error";
 import { logAdminAction } from "@/lib/audit-log";
 import {
+  BUTTON_SIZE_OPTIONS,
   BUTTON_STYLE_OPTIONS,
   contrastRatio,
   DENSITY_OPTIONS,
@@ -137,12 +138,18 @@ export async function saveTheme(
     return { error: "按钮风格无效" };
   }
 
+  const buttonSize = String(formData.get("buttonSize") ?? "");
+  if (!BUTTON_SIZE_OPTIONS.some((b) => b.id === buttonSize)) {
+    return { error: "按钮大小无效" };
+  }
+
   const theme: ThemeSettings = {
     colors,
     fontPreset: fontPreset as ThemeSettings["fontPreset"],
     radius,
     density: density as ThemeSettings["density"],
     buttonStyle: buttonStyle as ThemeSettings["buttonStyle"],
+    buttonSize: buttonSize as ThemeSettings["buttonSize"],
   };
 
   const dbError = await persistTheme(theme);

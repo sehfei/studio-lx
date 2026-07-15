@@ -11,6 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminUsersPage() {
   const currentUser = await requireAdmin();
   const { t } = await getAdminI18n();
+  const dict = t.pages.users;
 
   const { data } = await supabaseAdmin.auth.admin.listUsers();
   const users = (data?.users ?? []).sort(
@@ -19,24 +20,22 @@ export default async function AdminUsersPage() {
 
   return (
     <div>
-      <h1 className="mb-2 text-lg font-medium">User Management</h1>
-      <p className="mb-8 text-sm text-foreground/50">
-        管理谁能登录后台、员工(Staff)能看到哪些页面。顾客自助注册的账号默认没有后台权限。
-      </p>
+      <h1 className="mb-2 text-lg font-medium">{dict.title}</h1>
+      <p className="mb-8 text-sm text-foreground/50">{dict.desc}</p>
 
       <div className="mb-8 border border-border-subtle p-4">
-        <p className="eyebrow mb-3">添加新账号</p>
+        <p className="eyebrow mb-3">{dict.addNew}</p>
         <AddUserForm navDict={t.sidebar.nav} />
       </div>
 
       <AdminTable
-        emptyText="还没有账号。"
+        emptyText={dict.empty}
         columns={[
-          { key: "email", label: "Email" },
-          { key: "role", label: "Role" },
-          { key: "created", label: "Created", cellClassName: "text-foreground/60" },
-          { key: "lastSignIn", label: "Last Sign In", cellClassName: "text-foreground/60" },
-          { key: "actions", label: "操作" },
+          { key: "email", label: dict.columns.email },
+          { key: "role", label: dict.columns.role },
+          { key: "created", label: dict.columns.created, cellClassName: "text-foreground/60" },
+          { key: "lastSignIn", label: dict.columns.lastSignIn, cellClassName: "text-foreground/60" },
+          { key: "actions", label: dict.columns.actions },
         ]}
         rows={users.map((u) => {
           const role: UserRole =
@@ -57,7 +56,7 @@ export default async function AdminUsersPage() {
                   {u.email}
                   {isSelf && (
                     <span className="ml-2 text-xs text-foreground/40">
-                      (你)
+                      {dict.selfSuffix}
                     </span>
                   )}
                 </>
@@ -73,10 +72,10 @@ export default async function AdminUsersPage() {
                   }
                 >
                   {role === "admin"
-                    ? "Admin"
+                    ? dict.roleAdmin
                     : role === "staff"
-                      ? `Staff (${permissions.length})`
-                      : "Customer"}
+                      ? dict.roleStaff.replace("{n}", String(permissions.length))
+                      : dict.roleCustomer}
                 </span>
               ),
               created: new Date(u.created_at).toLocaleDateString("en-MY"),

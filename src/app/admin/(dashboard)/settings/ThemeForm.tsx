@@ -2,7 +2,9 @@
 
 import { useActionState, useState, useTransition } from "react";
 import {
+  BUTTON_SIZE_OPTIONS,
   BUTTON_STYLE_OPTIONS,
+  buttonSizeVars,
   buttonStyleVars,
   DEFAULT_THEME,
   DENSITY_OPTIONS,
@@ -139,6 +141,7 @@ export function ThemeForm({
     "--font-display-active": `var(${font.displayVar})`,
     "--font-sans-active": `var(${font.sansVar})`,
     ...buttonStyleVars(theme.buttonStyle),
+    ...buttonSizeVars(theme.buttonSize),
   } as React.CSSProperties;
 
   return (
@@ -311,6 +314,17 @@ export function ThemeForm({
             value={theme.buttonStyle}
             onChange={(v) => setTheme((t) => ({ ...t, buttonStyle: v }))}
             renderLabel={(v) => dict.buttonStyles[v] ?? v}
+          />
+        </div>
+
+        <div className={cardClass}>
+          <SectionHeading>{dict.buttonSize}</SectionHeading>
+          <Segmented
+            name="buttonSize"
+            options={BUTTON_SIZE_OPTIONS.map((b) => b.id)}
+            value={theme.buttonSize}
+            onChange={(v) => setTheme((t) => ({ ...t, buttonSize: v }))}
+            renderLabel={(v) => dict.buttonSizes[v] ?? v}
           />
         </div>
 

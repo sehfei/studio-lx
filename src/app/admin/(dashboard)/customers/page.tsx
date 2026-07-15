@@ -1,11 +1,14 @@
 import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { AdminTable } from "@/components/admin/AdminTable";
+import { getAdminI18n } from "@/lib/i18n/admin";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCustomersPage() {
   await requirePermission("customers");
+  const { t } = await getAdminI18n();
+  const dict = t.pages.customers;
   const { data: userList } = await supabaseAdmin.auth.admin.listUsers();
   const customers = (userList?.users ?? []).filter(
     (u) => u.app_metadata?.role !== "admin",
@@ -43,16 +46,16 @@ export default async function AdminCustomersPage() {
 
   return (
     <div>
-      <h1 className="mb-8 text-lg font-medium">Customers</h1>
+      <h1 className="mb-8 text-lg font-medium">{dict.title}</h1>
 
       <AdminTable
-        emptyText="还没有顾客注册。"
+        emptyText={dict.empty}
         columns={[
-          { key: "name", label: "Name" },
-          { key: "email", label: "Email", cellClassName: "text-foreground/60" },
-          { key: "joined", label: "Joined", cellClassName: "text-foreground/60" },
-          { key: "orders", label: "Orders" },
-          { key: "totalSpend", label: "Total Spend" },
+          { key: "name", label: dict.columns.name },
+          { key: "email", label: dict.columns.email, cellClassName: "text-foreground/60" },
+          { key: "joined", label: dict.columns.joined, cellClassName: "text-foreground/60" },
+          { key: "orders", label: dict.columns.orders },
+          { key: "totalSpend", label: dict.columns.totalSpend },
         ]}
         rows={rows.map((r) => ({
           key: r.id,
@@ -65,9 +68,7 @@ export default async function AdminCustomersPage() {
           },
         }))}
       />
-      <p className="mt-6 text-xs text-foreground/40">
-        客户数据来自 Supabase Auth，消费统计来自订单数据。
-      </p>
+      <p className="mt-6 text-xs text-foreground/40">{dict.footer}</p>
     </div>
   );
 }

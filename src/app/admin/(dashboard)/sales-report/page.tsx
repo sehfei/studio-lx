@@ -1,11 +1,14 @@
 import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { AdminTable } from "@/components/admin/AdminTable";
+import { getAdminI18n } from "@/lib/i18n/admin";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminSalesReportPage() {
   await requirePermission("salesReport");
+  const { t } = await getAdminI18n();
+  const dict = t.pages.salesReport;
   const { data: orders } = await supabaseAdmin
     .from("orders")
     .select("total, status, payment_status, created_at");
@@ -39,18 +42,18 @@ export default async function AdminSalesReportPage() {
 
   return (
     <div>
-      <h1 className="mb-8 text-lg font-medium">Sales Report</h1>
+      <h1 className="mb-8 text-lg font-medium">{dict.title}</h1>
 
       <div className="mb-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
         <div className="border border-border-subtle p-4">
           <p className="text-xs tracking-widest text-foreground/50 uppercase">
-            Total Orders
+            {dict.totalOrders}
           </p>
           <p className="mt-2 text-2xl font-display">{allOrders.length}</p>
         </div>
         <div className="border border-gold/30 p-4">
           <p className="text-xs tracking-widest text-foreground/50 uppercase">
-            Revenue (Paid)
+            {dict.revenuePaid}
           </p>
           <p className="mt-2 text-2xl font-display text-gold">
             RM {revenue.toFixed(2)}
@@ -58,13 +61,13 @@ export default async function AdminSalesReportPage() {
         </div>
         <div className="border border-border-subtle p-4">
           <p className="text-xs tracking-widest text-foreground/50 uppercase">
-            Paid Orders
+            {dict.paidOrders}
           </p>
           <p className="mt-2 text-2xl font-display">{paidOrders.length}</p>
         </div>
         <div className="border border-destructive/30 p-4">
           <p className="text-xs tracking-widest text-foreground/50 uppercase">
-            Cancelled
+            {dict.cancelled}
           </p>
           <p className="mt-2 text-2xl font-display text-destructive">
             {cancelledCount}
@@ -72,13 +75,13 @@ export default async function AdminSalesReportPage() {
         </div>
       </div>
 
-      <h2 className="eyebrow mb-4">畅销商品（按销量）</h2>
+      <h2 className="eyebrow mb-4">{dict.topProducts}</h2>
       <AdminTable
-        emptyText="还没有销售数据。"
+        emptyText={dict.empty}
         columns={[
-          { key: "product", label: "Product" },
-          { key: "quantity", label: "Quantity Sold" },
-          { key: "revenue", label: "Revenue" },
+          { key: "product", label: dict.columns.product },
+          { key: "quantity", label: dict.columns.quantitySold },
+          { key: "revenue", label: dict.columns.revenue },
         ]}
         rows={topProducts.map(([name, stat]) => ({
           key: name,
@@ -89,9 +92,7 @@ export default async function AdminSalesReportPage() {
           },
         }))}
       />
-      <p className="mt-6 text-xs text-foreground/40">
-        统计数据来自 Supabase 订单表，实时计算。
-      </p>
+      <p className="mt-6 text-xs text-foreground/40">{dict.footer}</p>
     </div>
   );
 }

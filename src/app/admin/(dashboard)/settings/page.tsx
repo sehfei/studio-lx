@@ -35,25 +35,31 @@ export default async function AdminSettingsPage() {
       </div>
 
       <div className="border-t border-border-subtle pt-8">
-        <h2 className="mb-2 text-lg font-medium">品牌与联系方式</h2>
+        <h2 className="mb-2 text-lg font-medium">
+          {t.settings.identitySectionTitle}
+        </h2>
         <p className="mb-8 text-sm text-foreground/50">
-          Logo、Favicon、首页 Hero 图片、WhatsApp 号码、社交媒体链接、访问统计。
+          {t.settings.identitySectionDesc}
         </p>
         <IdentityForm initial={identity} />
       </div>
 
       <div className="border-t border-border-subtle pt-8">
-        <h2 className="mb-2 text-lg font-medium">页面内容</h2>
+        <h2 className="mb-2 text-lg font-medium">
+          {t.settings.pagesSectionTitle}
+        </h2>
         <p className="mb-8 text-sm text-foreground/50">
-          编辑「关于我们」和「运费与退换货」页面的中英文内容。留空则显示内置默认文案。
+          {t.settings.pagesSectionDesc}
         </p>
         <PagesForm initial={pages} />
       </div>
 
       <div className="border-t border-border-subtle pt-8">
-        <h2 className="mb-2 text-lg font-medium">公告栏</h2>
+        <h2 className="mb-2 text-lg font-medium">
+          {t.settings.announcementSectionTitle}
+        </h2>
         <p className="mb-8 text-sm text-foreground/50">
-          在网站顶部显示一条通栏公告，顾客可以关闭，内容更新后关闭过的顾客会重新看到。
+          {t.settings.announcementSectionDesc}
         </p>
         <AnnouncementForm initial={announcement} />
       </div>

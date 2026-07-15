@@ -2,11 +2,14 @@ import Link from "next/link";
 import { requirePermission } from "@/lib/auth";
 import { getAllProducts } from "@/lib/products";
 import { AdminTable } from "@/components/admin/AdminTable";
+import { getAdminI18n } from "@/lib/i18n/admin";
 
 const LOW_STOCK_THRESHOLD = 5;
 
 export default async function AdminInventoryPage() {
   await requirePermission("inventory");
+  const { t } = await getAdminI18n();
+  const dict = t.pages.inventory;
   const products = await getAllProducts();
   const sorted = [...products].sort((a, b) => a.stock - b.stock);
 
@@ -17,18 +20,18 @@ export default async function AdminInventoryPage() {
 
   return (
     <div>
-      <h1 className="mb-8 text-lg font-medium">Inventory</h1>
+      <h1 className="mb-8 text-lg font-medium">{dict.title}</h1>
 
       <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
         <div className="border border-border-subtle p-4">
           <p className="text-xs tracking-widest text-foreground/50 uppercase">
-            Total Products
+            {dict.totalProducts}
           </p>
           <p className="mt-2 text-2xl font-display">{products.length}</p>
         </div>
         <div className="border border-destructive/30 p-4">
           <p className="text-xs tracking-widest text-foreground/50 uppercase">
-            Out of Stock
+            {dict.outOfStock}
           </p>
           <p className="mt-2 text-2xl font-display text-destructive">
             {outOfStockCount}
@@ -36,7 +39,7 @@ export default async function AdminInventoryPage() {
         </div>
         <div className="border border-gold/30 p-4">
           <p className="text-xs tracking-widest text-foreground/50 uppercase">
-            Low Stock (≤{LOW_STOCK_THRESHOLD})
+            {dict.lowStock.replace("{n}", String(LOW_STOCK_THRESHOLD))}
           </p>
           <p className="mt-2 text-2xl font-display text-gold">
             {lowStockCount}
@@ -45,13 +48,13 @@ export default async function AdminInventoryPage() {
       </div>
 
       <AdminTable
-        emptyText="还没有商品。"
+        emptyText={dict.empty}
         columns={[
-          { key: "name", label: "Name" },
-          { key: "sku", label: "SKU", cellClassName: "text-foreground/60" },
-          { key: "stock", label: "Stock" },
-          { key: "status", label: "Status" },
-          { key: "actions", label: "操作" },
+          { key: "name", label: dict.columns.name },
+          { key: "sku", label: dict.columns.sku, cellClassName: "text-foreground/60" },
+          { key: "stock", label: dict.columns.stock },
+          { key: "status", label: dict.columns.status },
+          { key: "actions", label: dict.columns.actions },
         ]}
         rows={sorted.map((p) => ({
           key: p.id,
@@ -61,18 +64,18 @@ export default async function AdminInventoryPage() {
             stock: p.stock,
             status:
               p.stock <= 0 ? (
-                <span className="text-destructive">缺货</span>
+                <span className="text-destructive">{dict.statusOutOfStock}</span>
               ) : p.stock <= LOW_STOCK_THRESHOLD ? (
-                <span className="text-gold">库存偏低</span>
+                <span className="text-gold">{dict.statusLowStock}</span>
               ) : (
-                <span className="text-foreground/50">正常</span>
+                <span className="text-foreground/50">{dict.statusNormal}</span>
               ),
             actions: (
               <Link
                 href={`/admin/products/${p.id}/edit`}
                 className="text-xs text-foreground/60 hover:text-gold hover:underline"
               >
-                编辑
+                {dict.edit}
               </Link>
             ),
           },

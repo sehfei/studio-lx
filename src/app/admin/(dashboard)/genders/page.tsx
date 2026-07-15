@@ -4,11 +4,14 @@ import { getGenders } from "@/lib/genders";
 import { AddGenderForm } from "./AddGenderForm";
 import { DeleteGenderButton } from "./DeleteGenderButton";
 import { AdminTable } from "@/components/admin/AdminTable";
+import { getAdminI18n } from "@/lib/i18n/admin";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminGendersPage() {
   await requirePermission("genders");
+  const { t } = await getAdminI18n();
+  const dict = t.pages.genders;
   const genders = await getGenders();
 
   const { data: products } = await supabaseAdmin
@@ -21,24 +24,22 @@ export default async function AdminGendersPage() {
 
   return (
     <div>
-      <h1 className="mb-2 text-lg font-medium">Gender Management</h1>
-      <p className="mb-8 text-sm text-foreground/50">
-        商品性别分区，比如女装/男装。有商品在用的分区不能删除。
-      </p>
+      <h1 className="mb-2 text-lg font-medium">{dict.title}</h1>
+      <p className="mb-8 text-sm text-foreground/50">{dict.desc}</p>
 
       <div className="mb-8 border border-border-subtle p-4">
-        <p className="eyebrow mb-3">添加新分区</p>
+        <p className="eyebrow mb-3">{dict.addNew}</p>
         <AddGenderForm />
       </div>
 
       <AdminTable
-        emptyText="还没有分区。"
+        emptyText={dict.empty}
         columns={[
-          { key: "label", label: "Label" },
-          { key: "slug", label: "Slug", cellClassName: "text-foreground/60" },
-          { key: "sort", label: "Sort", cellClassName: "text-foreground/60" },
-          { key: "products", label: "Products" },
-          { key: "actions", label: "操作" },
+          { key: "label", label: dict.columns.label },
+          { key: "slug", label: dict.columns.slug, cellClassName: "text-foreground/60" },
+          { key: "sort", label: dict.columns.sort, cellClassName: "text-foreground/60" },
+          { key: "products", label: dict.columns.products },
+          { key: "actions", label: dict.columns.actions },
         ]}
         rows={genders.map((g) => ({
           key: g.id,

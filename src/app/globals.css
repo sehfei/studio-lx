@@ -16,6 +16,10 @@
   --btn-bg: var(--primary);
   --btn-fg: var(--background);
   --btn-border: var(--primary);
+  --btn-min-h: 2.75rem;
+  --btn-px: 1.5rem;
+  --btn-py: 0.75rem;
+  --btn-text: 0.875rem;
 }
 
 /* Tailwind v4 uses --spacing as the base multiplier for every spacing
@@ -47,7 +51,10 @@ body {
 
 @layer components {
   .btn-primary {
-    @apply inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 px-6 py-3 text-sm tracking-widest uppercase transition-colors;
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 tracking-widest uppercase transition-colors;
+    min-height: var(--btn-min-h);
+    padding: var(--btn-py) var(--btn-px);
+    font-size: var(--btn-text);
     background: var(--btn-bg);
     color: var(--btn-fg);
     border: 1px solid var(--btn-border);
@@ -64,7 +71,10 @@ body {
     cursor: not-allowed;
   }
   .btn-outline {
-    @apply inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 border border-foreground px-6 py-3 text-sm tracking-widest text-foreground uppercase transition-colors hover:border-gold hover:text-gold;
+    @apply inline-flex cursor-pointer items-center justify-center gap-2 border border-foreground tracking-widest text-foreground uppercase transition-colors hover:border-gold hover:text-gold;
+    min-height: var(--btn-min-h);
+    padding: var(--btn-py) var(--btn-px);
+    font-size: var(--btn-text);
     border-radius: var(--radius);
   }
   .section-title {
