@@ -11,6 +11,8 @@ import { getCustomer } from "@/lib/customer-auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getProductReviews, reviewAggregate } from "@/lib/reviews";
 import { hasVerifiedPurchase } from "@/lib/verified-purchase";
+import { siteConfig } from "@/lib/site-config";
+import { safeJsonLd } from "@/lib/json-ld";
 
 type Params = { slug: string };
 
@@ -77,8 +79,41 @@ export default async function ProductPage({
   const badge = displayBadge(product, t.product.outOfStock);
   const outOfStock = product.stock <= 0;
 
+  // schema.org Product 结构化数据，让 Google 搜索结果能显示价格/库存/评分
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    sku: product.sku,
+    image: product.images.map((img) => img.url),
+    brand: { "@type": "Brand", name: product.brand },
+    offers: {
+      "@type": "Offer",
+      url: `${siteConfig.url}/product/${slug}`,
+      priceCurrency: "MYR",
+      price: hasDiscount ? product.discountPrice : product.price,
+      availability: outOfStock
+        ? "https://schema.org/OutOfStock"
+        : "https://schema.org/InStock",
+    },
+    ...(count > 0
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: average.toFixed(1),
+            reviewCount: count,
+          },
+        }
+      : {}),
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(productSchema) }}
+      />
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
         <div className="grid grid-cols-2 gap-3">
           <div className="relative col-span-2">
