@@ -70,24 +70,28 @@ export function AdminSidebar({
             ))}
           </ul>
 
-          <div className="mt-4 space-y-3 border-t border-border-subtle pt-4 text-xs">
-            <p className="truncate text-foreground/50" title={email}>
+          <div className="mt-4 space-y-1 border-t border-border-subtle pt-4 text-sm">
+            <p
+              className="truncate rounded px-3 py-2 text-xs text-foreground/40"
+              title={email}
+            >
               {email}
             </p>
-            <div className="flex items-center justify-between">
-              <Link
-                href="/"
-                onClick={() => setMobileOpen(false)}
-                className="text-foreground/50 hover:text-gold"
-              >
-                {dict.backToSite}
-              </Link>
+            <Link
+              href="/"
+              onClick={() => setMobileOpen(false)}
+              className="block rounded px-3 py-3 text-foreground/70 hover:bg-foreground/5"
+            >
+              {dict.backToSite}
+            </Link>
+            <div className="flex items-center justify-between rounded px-3 py-3">
+              <span className="text-foreground/70">{dict.language}</span>
               <AdminLanguageSwitcher current={locale} />
             </div>
             <form action={signOut}>
               <button
                 type="submit"
-                className="text-foreground/50 hover:text-gold"
+                className="block w-full rounded px-3 py-3 text-left text-foreground/70 hover:bg-foreground/5"
               >
                 {dict.signOut}
               </button>
