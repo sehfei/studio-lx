@@ -5,7 +5,10 @@ import { ProductImage } from "@/components/ui/ProductImage";
 import { getPublishedPosts } from "@/lib/blog";
 import { getI18n } from "@/lib/i18n/dictionaries";
 
-export const metadata: Metadata = { title: "Blog" };
+export const metadata: Metadata = {
+  title: "Blog",
+  alternates: { canonical: "/blog" },
+};
 
 export default async function BlogPage() {
   const [posts, { t }] = await Promise.all([getPublishedPosts(), getI18n()]);

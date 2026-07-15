@@ -3,7 +3,10 @@ import { ProductGrid } from "@/components/ui/ProductGrid";
 import { getProductsByTag } from "@/lib/products";
 import { getI18n } from "@/lib/i18n/dictionaries";
 
-export const metadata: Metadata = { title: "Promotion" };
+export const metadata: Metadata = {
+  title: "Promotion",
+  alternates: { canonical: "/promotion" },
+};
 
 export default async function PromotionPage() {
   const [products, { t }] = await Promise.all([

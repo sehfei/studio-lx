@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { getI18n } from "@/lib/i18n/dictionaries";
 
-export const metadata: Metadata = { title: "FAQ" };
+export const metadata: Metadata = {
+  title: "FAQ",
+  alternates: { canonical: "/faq" },
+};
 
 export default async function FaqPage() {
   const { t } = await getI18n();

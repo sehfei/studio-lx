@@ -22,7 +22,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { gender } = await params;
   const genderEntry = await getGenderEntry(gender);
-  return { title: genderEntry?.label ?? "Not Found" };
+  if (!genderEntry) return { title: "Not Found" };
+  return {
+    title: genderEntry.label,
+    alternates: { canonical: `/${gender}` },
+  };
 }
 
 export default async function GenderPage({

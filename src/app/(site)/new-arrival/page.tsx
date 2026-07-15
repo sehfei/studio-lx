@@ -3,7 +3,10 @@ import { ProductGrid } from "@/components/ui/ProductGrid";
 import { getProductsByTag } from "@/lib/products";
 import { getI18n } from "@/lib/i18n/dictionaries";
 
-export const metadata: Metadata = { title: "New Arrival" };
+export const metadata: Metadata = {
+  title: "New Arrival",
+  alternates: { canonical: "/new-arrival" },
+};
 
 export default async function NewArrivalPage() {
   const [products, { t }] = await Promise.all([

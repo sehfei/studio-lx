@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
 import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
 import { ProductGrid } from "@/components/ui/ProductGrid";
 import { BannerCarousel } from "@/components/ui/BannerCarousel";
@@ -9,6 +10,10 @@ import { getIdentity } from "@/lib/identity";
 import { getActiveBanners } from "@/lib/banners";
 import { getI18n } from "@/lib/i18n/dictionaries";
 import { categoryLabel } from "@/lib/i18n/nav-labels";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default async function Home() {
   const [newArrivals, bestSellers, promotions, identity, banners, { t }, genders] =

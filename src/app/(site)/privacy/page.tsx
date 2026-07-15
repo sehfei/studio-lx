@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { getPages, resolvePage } from "@/lib/pages";
 import { getLocale } from "@/lib/i18n/dictionaries";
 
-export const metadata: Metadata = { title: "Privacy Policy" };
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  alternates: { canonical: "/privacy" },
+};
 
 export default async function PrivacyPage() {
   const [pages, locale] = await Promise.all([getPages(), getLocale()]);

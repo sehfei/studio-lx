@@ -27,7 +27,10 @@ export async function generateMetadata({
   const { gender, category } = await params;
   const { genderEntry, categoryEntry } = await resolve(gender, category);
   if (!genderEntry || !categoryEntry) return { title: "Not Found" };
-  return { title: `${genderEntry.label} ${categoryEntry.label}` };
+  return {
+    title: `${genderEntry.label} ${categoryEntry.label}`,
+    alternates: { canonical: `/${gender}/${category}` },
+  };
 }
 
 export default async function CategoryPage({

@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { getPages, resolvePage } from "@/lib/pages";
 import { getLocale } from "@/lib/i18n/dictionaries";
 
-export const metadata: Metadata = { title: "About Us" };
+export const metadata: Metadata = {
+  title: "About Us",
+  alternates: { canonical: "/about" },
+};
 
 export default async function AboutPage() {
   const [pages, locale] = await Promise.all([getPages(), getLocale()]);

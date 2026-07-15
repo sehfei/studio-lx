@@ -3,7 +3,10 @@ import { getIdentity } from "@/lib/identity";
 import { getI18n } from "@/lib/i18n/dictionaries";
 import { ContactForm } from "@/components/contact/ContactForm";
 
-export const metadata: Metadata = { title: "Contact Us" };
+export const metadata: Metadata = {
+  title: "Contact Us",
+  alternates: { canonical: "/contact" },
+};
 
 export default async function ContactPage() {
   const [identity, { t }] = await Promise.all([getIdentity(), getI18n()]);
