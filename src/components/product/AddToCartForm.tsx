@@ -59,10 +59,11 @@ export function AddToCartForm({
                 key={c}
                 type="button"
                 onClick={() => setColor(c)}
-                className={`border px-4 py-2 text-sm ${
+                aria-pressed={c === color}
+                className={`border px-4 py-2.5 text-sm transition-colors ${
                   c === color
-                    ? "border-gold text-gold"
-                    : "border-border-subtle hover:border-gold hover:text-gold"
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border-subtle text-foreground/70 hover:border-gold hover:text-gold"
                 }`}
               >
                 {c}
@@ -81,10 +82,11 @@ export function AddToCartForm({
                 key={s}
                 type="button"
                 onClick={() => setSize(s)}
-                className={`border px-4 py-2 text-sm ${
+                aria-pressed={s === size}
+                className={`border px-4 py-2.5 text-sm transition-colors ${
                   s === size
-                    ? "border-gold text-gold"
-                    : "border-border-subtle hover:border-gold hover:text-gold"
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border-subtle text-foreground/70 hover:border-gold hover:text-gold"
                 }`}
               >
                 {s}
