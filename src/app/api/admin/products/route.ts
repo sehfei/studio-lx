@@ -36,14 +36,17 @@ export async function POST(request: Request) {
     return badRequest("请求体必须是合法 JSON");
   }
 
-  const [{ data: categoryRows }, { data: genderRows }] = await Promise.all([
-    supabaseAdmin.from("categories").select("slug"),
-    supabaseAdmin.from("genders").select("slug"),
-  ]);
+  const [{ data: categoryRows }, { data: genderRows }, { data: subcategoryRows }] =
+    await Promise.all([
+      supabaseAdmin.from("categories").select("slug"),
+      supabaseAdmin.from("genders").select("slug"),
+      supabaseAdmin.from("subcategories").select("slug, category"),
+    ]);
   const validated = validateProduct(
     body,
     (categoryRows ?? []).map((c) => c.slug),
     (genderRows ?? []).map((g) => g.slug),
+    subcategoryRows ?? [],
   );
   if (validated.error !== undefined) {
     return badRequest(validated.error);

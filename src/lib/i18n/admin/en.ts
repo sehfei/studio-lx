@@ -12,6 +12,7 @@ export const en = {
       dashboard: "Dashboard",
       products: "Products",
       categories: "Categories",
+      subcategories: "Sub-Categories",
       genders: "Genders",
       banners: "Banners",
       blog: "Blog",
@@ -218,6 +219,20 @@ export const en = {
       desc: "Product categories, shared across genders. Categories with products can't be deleted.",
       addNew: "Add a new category",
       empty: "No categories yet.",
+      columns: {
+        label: "Label",
+        slug: "Slug",
+        sort: "Sort",
+        products: "Products",
+        actions: "Actions",
+      },
+    },
+    subcategories: {
+      title: "Sub-Category Management",
+      desc: "Group products within a category (e.g. brands under Clothing: MIUMIU, LV, GUCCI). Sub-categories with products can't be deleted.",
+      addNew: "Add a new sub-category",
+      empty: "No sub-categories yet.",
+      noCategoriesYet: "Add a category first, then come back to add sub-categories under it.",
       columns: {
         label: "Label",
         slug: "Slug",

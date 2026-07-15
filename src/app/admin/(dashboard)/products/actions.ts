@@ -34,6 +34,15 @@ async function getValidGenderSlugs(): Promise<string[]> {
   return (data ?? []).map((g) => g.slug);
 }
 
+async function getValidSubcategories(): Promise<
+  { slug: string; category: string }[]
+> {
+  const { data } = await supabaseAdmin
+    .from("subcategories")
+    .select("slug, category");
+  return data ?? [];
+}
+
 function splitList(value: string): string[] {
   return value
     .split(",")
@@ -122,14 +131,17 @@ export async function createProduct(
   const admin = await requirePermission("products");
 
   const values = formValues(formData);
-  const [validCategories, validGenders] = await Promise.all([
-    getValidCategorySlugs(),
-    getValidGenderSlugs(),
-  ]);
+  const [validCategories, validGenders, validSubcategories] =
+    await Promise.all([
+      getValidCategorySlugs(),
+      getValidGenderSlugs(),
+      getValidSubcategories(),
+    ]);
   const validated = validateProduct(
     formToRawInput(formData),
     validCategories,
     validGenders,
+    validSubcategories,
   );
   if (validated.error !== undefined) {
     return { error: validated.error, values };
@@ -194,6 +206,7 @@ function formToRawInput(formData: FormData) {
     stock: formData.get("stock"),
     gender: formData.get("gender"),
     category: formData.get("category"),
+    subcategory: formData.get("subcategory"),
     colors: splitList(String(formData.get("colors") ?? "")),
     sizes: splitList(String(formData.get("sizes") ?? "")),
     material: formData.get("material"),
@@ -218,6 +231,7 @@ function formValues(formData: FormData): ProductFormValues {
     stock: s("stock"),
     gender: s("gender"),
     category: s("category"),
+    subcategory: s("subcategory"),
     colors: s("colors"),
     sizes: s("sizes"),
     material: s("material"),
@@ -236,14 +250,17 @@ export async function updateProduct(
   const admin = await requirePermission("products");
 
   const values = formValues(formData);
-  const [validCategories, validGenders] = await Promise.all([
-    getValidCategorySlugs(),
-    getValidGenderSlugs(),
-  ]);
+  const [validCategories, validGenders, validSubcategories] =
+    await Promise.all([
+      getValidCategorySlugs(),
+      getValidGenderSlugs(),
+      getValidSubcategories(),
+    ]);
   const validated = validateProduct(
     formToRawInput(formData),
     validCategories,
     validGenders,
+    validSubcategories,
   );
   if (validated.error !== undefined) {
     return { error: validated.error, values };

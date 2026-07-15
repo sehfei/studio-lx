@@ -19,6 +19,7 @@ export type ProductInput = {
   shippingInfo: string;
   gender: Gender;
   category: Category;
+  subcategory: string | null;
   tags: string[];
   badgeText: string | null;
 };
@@ -40,6 +41,7 @@ export type ProductFormValues = {
   stock: string;
   gender: string;
   category: string;
+  subcategory: string;
   colors: string;
   sizes: string;
   material: string;
@@ -65,10 +67,12 @@ function toStrArray(value: unknown): string[] {
 // validGenders/validCategories 是调用方先查好的性别表/分类表 slug 列表
 // （性别和分类现在都是后台可管理的，不再是编译期固定的几个值，
 // 校验时必须传入当前真实存在的值）。
+// validSubcategories 带上各自属于哪个 category，用来校验"子分类必须属于当前选的分类"。
 export function validateProduct(
   raw: RawProductInput,
   validCategories: readonly string[],
   validGenders: readonly string[],
+  validSubcategories: readonly { slug: string; category: string }[] = [],
 ): { data: ProductInput; error?: undefined } | { data?: undefined; error: string } {
   const name = toStr(raw.name);
   const sku = toStr(raw.sku);
@@ -104,6 +108,19 @@ export function validateProduct(
     return { error: "请选择 Category" };
   }
 
+  const subcategoryRaw = toStr(raw.subcategory);
+  let subcategory: string | null = null;
+  if (subcategoryRaw) {
+    const match = validSubcategories.find((s) => s.slug === subcategoryRaw);
+    if (!match) {
+      return { error: "子分类无效" };
+    }
+    if (match.category !== category) {
+      return { error: "子分类和所选分类不匹配" };
+    }
+    subcategory = subcategoryRaw;
+  }
+
   const tags = toStrArray(raw.tags);
   const invalidTag = tags.find((t) => !TAGS.includes(t as (typeof TAGS)[number]));
   if (invalidTag) {
@@ -133,6 +150,7 @@ export function validateProduct(
       shippingInfo: toStr(raw.shippingInfo),
       gender,
       category,
+      subcategory,
       tags,
       badgeText: badgeTextRaw || null,
     },
@@ -187,6 +205,7 @@ export function productInputToRow(
     shipping_info: input.shippingInfo,
     gender: input.gender,
     category: input.category,
+    subcategory: input.subcategory,
     tags: input.tags,
     badge_text: input.badgeText,
   };

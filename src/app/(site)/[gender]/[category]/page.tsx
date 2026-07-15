@@ -1,9 +1,11 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ProductGrid } from "@/components/ui/ProductGrid";
 import { getProductsByGenderCategory } from "@/lib/products";
 import { getGenders } from "@/lib/genders";
 import { getCategories } from "@/lib/categories";
+import { getSubcategoriesByCategory } from "@/lib/subcategories";
 import { getI18n } from "@/lib/i18n/dictionaries";
 import { categoryLabel } from "@/lib/i18n/nav-labels";
 
@@ -42,8 +44,9 @@ export default async function CategoryPage({
   const { genderEntry, categoryEntry } = await resolve(gender, category);
   if (!genderEntry || !categoryEntry) notFound();
 
-  const [products, { t }] = await Promise.all([
+  const [products, subcategories, { t }] = await Promise.all([
     getProductsByGenderCategory(gender, category),
+    getSubcategoriesByCategory(category),
     getI18n(),
   ]);
 
@@ -53,6 +56,19 @@ export default async function CategoryPage({
         {categoryLabel(t, genderEntry.slug, genderEntry.label)} /{" "}
         {categoryLabel(t, categoryEntry.slug, categoryEntry.label)}
       </h1>
+      {subcategories.length > 0 && (
+        <div className="mb-10 flex flex-wrap gap-3 text-xs tracking-widest uppercase">
+          {subcategories.map((sub) => (
+            <Link
+              key={sub.slug}
+              href={`/${gender}/${category}/${sub.slug}`}
+              className="border border-border-subtle px-4 py-2 hover:border-gold hover:text-gold"
+            >
+              {sub.label}
+            </Link>
+          ))}
+        </div>
+      )}
       <ProductGrid
         products={products}
         emptyText={t.home.emptyProducts}

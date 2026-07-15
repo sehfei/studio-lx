@@ -13,6 +13,7 @@ export const zh: AdminDictionary = {
       dashboard: "仪表盘",
       products: "商品管理",
       categories: "分类管理",
+      subcategories: "子分类管理",
       genders: "性别管理",
       banners: "横幅管理",
       blog: "博客管理",
@@ -217,6 +218,20 @@ export const zh: AdminDictionary = {
       desc: "商品分类，男装女装通用。有商品在用的分类不能删除。",
       addNew: "添加新分类",
       empty: "还没有分类。",
+      columns: {
+        label: "名称",
+        slug: "Slug",
+        sort: "排序",
+        products: "商品数",
+        actions: "操作",
+      },
+    },
+    subcategories: {
+      title: "子分类管理",
+      desc: "在分类下面再分一层（比如 Clothing 下面按品牌分：MIUMIU、LV、GUCCI）。有商品在用的子分类不能删除。",
+      addNew: "添加新子分类",
+      empty: "还没有子分类。",
+      noCategoriesYet: "先添加一个分类，再回来给它加子分类。",
       columns: {
         label: "名称",
         slug: "Slug",

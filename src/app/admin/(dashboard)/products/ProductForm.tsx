@@ -8,6 +8,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import type { Product } from "@/lib/products";
 import type { CategoryRow } from "@/lib/categories";
 import type { GenderRow } from "@/lib/genders";
+import type { SubcategoryRow } from "@/lib/subcategories";
 
 // 展示名：首字母大写，连字符转空格（new-arrival -> New Arrival）
 function toLabel(value: string): string {
@@ -27,15 +28,25 @@ export function ProductForm({
   product,
   categories,
   genders,
+  subcategories,
 }: {
   product?: Product;
   categories: CategoryRow[];
   genders: GenderRow[];
+  subcategories: SubcategoryRow[];
 }) {
   const action = product ? updateProduct.bind(null, product.id) : createProduct;
   const [state, formAction, pending] = useActionState(action, undefined);
   // 提交报错时用返回的原始值回填，避免 React 19 重置表单清空所填内容
   const v = state?.values;
+
+  // 子分类下拉跟着当前选的分类联动过滤，所以 category 要是受控的
+  const [selectedCategory, setSelectedCategory] = useState(
+    v ? v.category : (product?.category ?? ""),
+  );
+  const availableSubcategories = subcategories.filter(
+    (s) => s.category === selectedCategory,
+  );
 
   // 新选中的图片文件：本地预览 + 逐张填 alt 文字，提交时跟文件顺序一一对应
   const [newImages, setNewImages] = useState<
@@ -165,7 +176,8 @@ export function ProductForm({
             name="category"
             required
             className={inputClass}
-            defaultValue={v ? v.category : (product?.category ?? "")}
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
           >
             <option value="" disabled>
               选择 Category
@@ -173,6 +185,26 @@ export function ProductForm({
             {categories.map((c) => (
               <option key={c.slug} value={c.slug}>
                 {c.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className={labelClass}>Sub-Category（可选）</label>
+          <select
+            name="subcategory"
+            className={inputClass}
+            defaultValue={v ? v.subcategory : (product?.subcategory ?? "")}
+            disabled={availableSubcategories.length === 0}
+          >
+            <option value="">
+              {availableSubcategories.length === 0
+                ? "该分类还没有子分类"
+                : "不选（不归到任何子分类）"}
+            </option>
+            {availableSubcategories.map((s) => (
+              <option key={s.slug} value={s.slug}>
+                {s.label}
               </option>
             ))}
           </select>

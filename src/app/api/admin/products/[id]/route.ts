@@ -71,19 +71,24 @@ export async function PATCH(request: Request, { params }: RouteContext) {
     shippingInfo: body.shippingInfo ?? current.shippingInfo,
     gender: body.gender ?? current.gender,
     category: body.category ?? current.category,
+    subcategory:
+      "subcategory" in body ? body.subcategory : (current.subcategory ?? null),
     tags: body.tags ?? current.tags,
     badgeText:
       "badgeText" in body ? body.badgeText : (current.badgeText ?? null),
   };
 
-  const [{ data: categoryRows }, { data: genderRows }] = await Promise.all([
-    supabaseAdmin.from("categories").select("slug"),
-    supabaseAdmin.from("genders").select("slug"),
-  ]);
+  const [{ data: categoryRows }, { data: genderRows }, { data: subcategoryRows }] =
+    await Promise.all([
+      supabaseAdmin.from("categories").select("slug"),
+      supabaseAdmin.from("genders").select("slug"),
+      supabaseAdmin.from("subcategories").select("slug, category"),
+    ]);
   const validated = validateProduct(
     merged,
     (categoryRows ?? []).map((c) => c.slug),
     (genderRows ?? []).map((g) => g.slug),
+    subcategoryRows ?? [],
   );
   if (validated.error !== undefined) {
     return badRequest(validated.error);

@@ -2,13 +2,15 @@ import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/site-config";
 import { getCategories } from "@/lib/categories";
 import { getGenders } from "@/lib/genders";
+import { getSubcategories } from "@/lib/subcategories";
 import { getAllProducts } from "@/lib/products";
 import { getPublishedPosts } from "@/lib/blog";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [categories, genders] = await Promise.all([
+  const [categories, genders, subcategories] = await Promise.all([
     getCategories(),
     getGenders(),
+    getSubcategories(),
   ]);
   const staticRoutes = [
     "",
@@ -29,11 +31,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const categoryRoutes = genders.flatMap((cat) => [
     { url: `${siteConfig.url}/${cat.slug}`, changeFrequency: "weekly" as const, priority: 0.8 },
-    ...categories.map((child) => ({
-      url: `${siteConfig.url}/${cat.slug}/${child.slug}`,
-      changeFrequency: "weekly" as const,
-      priority: 0.6,
-    })),
+    ...categories.flatMap((child) => [
+      {
+        url: `${siteConfig.url}/${cat.slug}/${child.slug}`,
+        changeFrequency: "weekly" as const,
+        priority: 0.6,
+      },
+      ...subcategories
+        .filter((sub) => sub.category === child.slug)
+        .map((sub) => ({
+          url: `${siteConfig.url}/${cat.slug}/${child.slug}/${sub.slug}`,
+          changeFrequency: "weekly" as const,
+          priority: 0.5,
+        })),
+    ]),
   ]);
 
   const products = await getAllProducts();

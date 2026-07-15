@@ -25,6 +25,7 @@ export type Product = {
   shippingInfo: string;
   gender: Gender;
   category: Category;
+  subcategory?: string;
   tags: Tag[];
   badgeText?: string;
 };
@@ -48,6 +49,7 @@ export type ProductRow = {
   shipping_info: string | null;
   gender: Product["gender"];
   category: Product["category"];
+  subcategory: string | null;
   tags: string[] | null;
   badge_text: string | null;
 };
@@ -73,6 +75,7 @@ export function mapRow(row: ProductRow): Product {
     shippingInfo: row.shipping_info ?? "",
     gender: row.gender,
     category: row.category,
+    subcategory: row.subcategory ?? undefined,
     tags: (row.tags ?? []) as Product["tags"],
     badgeText: row.badge_text ?? undefined,
   };
@@ -163,6 +166,21 @@ export async function getProductsByGenderCategory(
     .select("*")
     .eq("gender", gender)
     .eq("category", category);
+  if (error) throw error;
+  return (data ?? []).map(mapRow);
+}
+
+export async function getProductsByGenderCategorySubcategory(
+  gender: Product["gender"],
+  category: Product["category"],
+  subcategory: string,
+): Promise<Product[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("gender", gender)
+    .eq("category", category)
+    .eq("subcategory", subcategory);
   if (error) throw error;
   return (data ?? []).map(mapRow);
 }
