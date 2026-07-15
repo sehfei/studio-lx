@@ -84,11 +84,23 @@ export default async function ProductPage({
           <div className="relative col-span-2">
             {badge && <ProductBadge text={badge.text} variant={badge.variant} />}
             <div className={outOfStock ? "opacity-60 grayscale" : ""}>
-              <ProductImage src={product.images[0]} label={product.name} />
+              <ProductImage
+                src={product.images[0]?.url}
+                alt={product.images[0]?.alt}
+                label={product.name}
+              />
             </div>
           </div>
-          <ProductImage src={product.images[1]} label={product.name} />
-          <ProductImage src={product.images[2]} label={product.name} />
+          <ProductImage
+            src={product.images[1]?.url}
+            alt={product.images[1]?.alt}
+            label={product.name}
+          />
+          <ProductImage
+            src={product.images[2]?.url}
+            alt={product.images[2]?.alt}
+            label={product.name}
+          />
         </div>
 
         <div>

@@ -1,4 +1,5 @@
 import { TAGS, type Category, type Gender } from "@/lib/constants";
+import type { ProductImage } from "@/lib/products";
 
 // 商品写入的共享校验：admin Server Action 和 /api/admin/products 都走这里，
 // 保证两个入口的规则一致。
@@ -138,11 +139,36 @@ export function validateProduct(
   };
 }
 
+// JSON API 的 images 输入：支持纯网址字符串（alt 用 fallbackAlt 兜底）或 { url, alt } 对象
+export function parseImagesInput(raw: unknown, fallbackAlt: string): ProductImage[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((img): ProductImage | null => {
+      if (typeof img === "string" && img.trim()) {
+        return { url: img.trim(), alt: fallbackAlt };
+      }
+      if (
+        img &&
+        typeof img === "object" &&
+        typeof (img as { url?: unknown }).url === "string"
+      ) {
+        const url = (img as { url: string }).url.trim();
+        if (!url) return null;
+        const altRaw = (img as { alt?: unknown }).alt;
+        const alt =
+          typeof altRaw === "string" && altRaw.trim() ? altRaw.trim() : fallbackAlt;
+        return { url, alt };
+      }
+      return null;
+    })
+    .filter((img): img is ProductImage => img !== null);
+}
+
 // 转成 products 表的插入行（snake_case）
 export function productInputToRow(
   input: ProductInput,
   slug: string,
-  imageUrls: string[],
+  images: ProductImage[],
 ) {
   return {
     slug,
@@ -153,7 +179,7 @@ export function productInputToRow(
     price: input.price,
     discount_price: input.discountPrice,
     stock: input.stock,
-    images: imageUrls,
+    images,
     colors: input.colors,
     sizes: input.sizes,
     material: input.material,

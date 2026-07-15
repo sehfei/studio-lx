@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { createProduct, updateProduct } from "./actions";
 import { TAGS } from "@/lib/constants";
 import { Spinner } from "@/components/ui/Spinner";
@@ -36,6 +36,21 @@ export function ProductForm({
   const [state, formAction, pending] = useActionState(action, undefined);
   // 提交报错时用返回的原始值回填，避免 React 19 重置表单清空所填内容
   const v = state?.values;
+
+  // 新选中的图片文件：本地预览 + 逐张填 alt 文字，提交时跟文件顺序一一对应
+  const [newImages, setNewImages] = useState<
+    { file: File; previewUrl: string; alt: string }[]
+  >([]);
+  const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    setNewImages(
+      files.map((file) => ({
+        file,
+        previewUrl: URL.createObjectURL(file),
+        alt: "",
+      })),
+    );
+  };
 
   return (
     <form action={formAction} className="max-w-2xl space-y-6">
@@ -202,18 +217,26 @@ export function ProductForm({
 
       {product && product.images.length > 0 && (
         <div>
-          <label className={labelClass}>现有图片（勾选后保存即删除）</label>
+          <label className={labelClass}>现有图片</label>
           <div className="flex flex-wrap gap-4">
-            {product.images.map((url) => (
-              <label key={url} className="block cursor-pointer text-center">
+            {product.images.map((img) => (
+              <div key={img.url} className="w-28 text-center">
                 <span className="relative block h-24 w-24 overflow-hidden border border-border-subtle">
-                  <Image src={url} alt="" fill className="object-cover" />
+                  <Image src={img.url} alt="" fill className="object-cover" />
                 </span>
-                <span className="mt-1 flex items-center justify-center gap-1 text-xs text-destructive">
-                  <input type="checkbox" name="removeImages" value={url} />
+                <input type="hidden" name="existingImageUrl" value={img.url} />
+                <input
+                  type="text"
+                  name="existingImageAlt"
+                  defaultValue={img.alt}
+                  placeholder="Alt text（图片描述）"
+                  className="mt-1 w-full border border-border-subtle px-1 py-1 text-xs"
+                />
+                <label className="mt-1 flex items-center justify-center gap-1 text-xs text-destructive">
+                  <input type="checkbox" name="removeImages" value={img.url} />
                   删除
-                </span>
-              </label>
+                </label>
+              </div>
             ))}
           </div>
         </div>
@@ -228,8 +251,41 @@ export function ProductForm({
           name="images"
           accept="image/jpeg,image/png,image/webp,image/gif"
           multiple
+          onChange={handleFilesChange}
           className={`${inputClass} file:mr-4 file:border-0 file:bg-foreground file:px-3 file:py-1.5 file:text-xs file:text-background`}
         />
+        <p className="mt-1 text-xs text-foreground/40">
+          每张图片建议填写 alt text（描述图片内容，比如"黑色羊毛大衣正面图"），对 SEO 和无障碍访问都有帮助。留空则用商品名称代替。
+        </p>
+        {newImages.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-4">
+            {newImages.map((img, i) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <div key={i} className="w-28 text-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={img.previewUrl}
+                  alt=""
+                  className="h-24 w-24 border border-border-subtle object-cover"
+                />
+                <input
+                  type="text"
+                  name="newImageAlts"
+                  value={img.alt}
+                  onChange={(e) =>
+                    setNewImages((prev) =>
+                      prev.map((p, idx) =>
+                        idx === i ? { ...p, alt: e.target.value } : p,
+                      ),
+                    )
+                  }
+                  placeholder="Alt text（图片描述）"
+                  className="mt-1 w-full border border-border-subtle px-1 py-1 text-xs"
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div>

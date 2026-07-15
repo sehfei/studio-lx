@@ -1,6 +1,11 @@
 import { supabase } from "@/lib/supabase/client";
 import type { Category, Gender, Tag } from "@/lib/constants";
 
+export type ProductImage = {
+  url: string;
+  alt: string;
+};
+
 export type Product = {
   id: string;
   slug: string;
@@ -11,7 +16,7 @@ export type Product = {
   price: number;
   discountPrice?: number;
   stock: number;
-  images: string[];
+  images: ProductImage[];
   video?: string;
   colors: string[];
   sizes: string[];
@@ -34,7 +39,7 @@ export type ProductRow = {
   price: number;
   discount_price: number | null;
   stock: number;
-  images: string[] | null;
+  images: ProductImage[] | null;
   video: string | null;
   colors: string[] | null;
   sizes: string[] | null;

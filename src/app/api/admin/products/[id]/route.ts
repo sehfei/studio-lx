@@ -2,6 +2,7 @@ import { requirePermissionApi } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { mapRow, type ProductRow } from "@/lib/products";
 import {
+  parseImagesInput,
   productInputToRow,
   uniqueViolationMessage,
   validateProduct,
@@ -79,8 +80,8 @@ export async function PATCH(request: Request, { params }: RouteContext) {
     return badRequest(validated.error);
   }
 
-  const images = Array.isArray(body.images)
-    ? body.images.map(String).filter(Boolean)
+  const images = "images" in body
+    ? parseImagesInput(body.images, merged.name as string)
     : current.images;
 
   const row = productInputToRow(validated.data, current.slug, images);

@@ -38,8 +38,8 @@ export default async function AdminProductsPage() {
             image: p.images[0] ? (
               <div className="relative h-12 w-12 overflow-hidden border border-border-subtle">
                 <Image
-                  src={p.images[0]}
-                  alt={p.name}
+                  src={p.images[0].url}
+                  alt={p.images[0].alt}
                   fill
                   className="object-cover"
                 />

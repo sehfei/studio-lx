@@ -21,7 +21,11 @@ export function ProductCard({
       <div className="relative">
         {badge && <ProductBadge text={badge.text} variant={badge.variant} />}
         <div className={outOfStock ? "opacity-60 grayscale" : ""}>
-          <ProductImage src={product.images[0]} label={product.name} />
+          <ProductImage
+            src={product.images[0]?.url}
+            alt={product.images[0]?.alt}
+            label={product.name}
+          />
         </div>
       </div>
       <div className="mt-3 space-y-1">

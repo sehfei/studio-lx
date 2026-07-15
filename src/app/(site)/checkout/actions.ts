@@ -134,7 +134,8 @@ export async function createOrder(
       product_id: product.id,
       product_name: product.name,
       product_sku: product.sku,
-      product_image: product.images?.[0] ?? null,
+      product_image:
+        (product.images as { url: string }[] | null)?.[0]?.url ?? null,
       color: item.color || null,
       size: item.size || null,
       unit_price: unitPrice,

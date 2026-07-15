@@ -30,7 +30,7 @@ export function AddToCartForm({
     productId: product.id,
     slug: product.slug,
     name: product.name,
-    image: product.images[0],
+    image: product.images[0]?.url,
     price: unitPrice,
     color,
     size,

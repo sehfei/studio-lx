@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { slugify } from "@/lib/slugify";
 import { mapRow } from "@/lib/products";
 import {
+  parseImagesInput,
   productInputToRow,
   uniqueViolationMessage,
   validateProduct,
@@ -38,9 +39,7 @@ export async function POST(request: Request) {
   const slugInput = typeof body.slug === "string" ? body.slug.trim() : "";
   const slug = slugify(slugInput || input.name);
 
-  const images = Array.isArray(body.images)
-    ? body.images.map(String).filter(Boolean)
-    : [];
+  const images = parseImagesInput(body.images, input.name);
 
   const { data, error } = await supabaseAdmin
     .from("products")

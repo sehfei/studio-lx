@@ -13,6 +13,7 @@ import {
   type ProductFormState,
   type ProductFormValues,
 } from "@/lib/validation/product";
+import type { ProductImage } from "@/lib/products";
 
 const IMAGE_BUCKET = "product-images";
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -42,17 +43,19 @@ function splitList(value: string): string[] {
 
 async function uploadProductImages(
   files: File[],
+  alts: string[],
+  fallbackAlt: string,
   slug: string,
-): Promise<{ urls: string[]; paths: string[]; error?: string }> {
-  const urls: string[] = [];
+): Promise<{ images: ProductImage[]; paths: string[]; error?: string }> {
+  const images: ProductImage[] = [];
   const paths: string[] = [];
 
-  for (const file of files) {
+  for (const [i, file] of files.entries()) {
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-      return { urls, paths, error: `${file.name}：只支持 JPEG / PNG / WEBP / GIF 图片` };
+      return { images, paths, error: `${file.name}：只支持 JPEG / PNG / WEBP / GIF 图片` };
     }
     if (file.size > MAX_IMAGE_SIZE) {
-      return { urls, paths, error: `${file.name}：文件不能超过 5MB` };
+      return { images, paths, error: `${file.name}：文件不能超过 5MB` };
     }
 
     const ext = file.name.includes(".")
@@ -65,15 +68,15 @@ async function uploadProductImages(
       .upload(path, file, { contentType: file.type });
 
     if (error) {
-      return { urls, paths, error: `图片上传失败：${error.message}` };
+      return { images, paths, error: `图片上传失败：${error.message}` };
     }
 
     paths.push(path);
     const { data } = supabaseAdmin.storage.from(IMAGE_BUCKET).getPublicUrl(path);
-    urls.push(data.publicUrl);
+    images.push({ url: data.publicUrl, alt: (alts[i] ?? "").trim() || fallbackAlt });
   }
 
-  return { urls, paths };
+  return { images, paths };
 }
 
 // 上传后 insert 失败时清掉已传的图片，避免 storage 里留孤儿文件
@@ -139,22 +142,28 @@ export async function createProduct(
   const imageFiles = formData
     .getAll("images")
     .filter((f): f is File => f instanceof File && f.size > 0);
+  const imageAlts = formData.getAll("newImageAlts").map(String);
 
-  let imageUrls: string[] = [];
+  let images: ProductImage[] = [];
   let imagePaths: string[] = [];
   if (imageFiles.length > 0) {
-    const result = await uploadProductImages(imageFiles, slug);
+    const result = await uploadProductImages(
+      imageFiles,
+      imageAlts,
+      input.name,
+      slug,
+    );
     if (result.error) {
       await removeUploadedImages(result.paths);
       return { error: result.error, values };
     }
-    imageUrls = result.urls;
+    images = result.images;
     imagePaths = result.paths;
   }
 
   const { error } = await supabaseAdmin
     .from("products")
-    .insert(productInputToRow(input, slug, imageUrls));
+    .insert(productInputToRow(input, slug, images));
 
   if (error) {
     await removeUploadedImages(imagePaths);
@@ -253,31 +262,43 @@ export async function updateProduct(
   const slugInput = String(formData.get("slug") ?? "").trim();
   const slug = slugify(slugInput || input.name);
 
-  // 勾选删除的旧图 + 新上传的图，合成最终图片列表
+  // 勾选删除的旧图 + 改过的 alt 文字 + 新上传的图，合成最终图片列表
   const removeImages = formData.getAll("removeImages").map(String);
-  const keptImages = ((existing.images ?? []) as string[]).filter(
-    (url) => !removeImages.includes(url),
-  );
+  const existingUrls = formData.getAll("existingImageUrl").map(String);
+  const existingAlts = formData.getAll("existingImageAlt").map(String);
+  const altByUrl = new Map(existingUrls.map((url, i) => [url, existingAlts[i] ?? ""]));
+  const keptImages = ((existing.images ?? []) as ProductImage[])
+    .filter((img) => !removeImages.includes(img.url))
+    .map((img) => ({
+      url: img.url,
+      alt: altByUrl.get(img.url)?.trim() || img.alt,
+    }));
 
   const imageFiles = formData
     .getAll("images")
     .filter((f): f is File => f instanceof File && f.size > 0);
+  const imageAlts = formData.getAll("newImageAlts").map(String);
 
-  let newUrls: string[] = [];
+  let newImages: ProductImage[] = [];
   let newPaths: string[] = [];
   if (imageFiles.length > 0) {
-    const result = await uploadProductImages(imageFiles, slug);
+    const result = await uploadProductImages(
+      imageFiles,
+      imageAlts,
+      input.name,
+      slug,
+    );
     if (result.error) {
       await removeUploadedImages(result.paths);
       return { error: result.error, values };
     }
-    newUrls = result.urls;
+    newImages = result.images;
     newPaths = result.paths;
   }
 
   const { error } = await supabaseAdmin
     .from("products")
-    .update(productInputToRow(input, slug, [...keptImages, ...newUrls]))
+    .update(productInputToRow(input, slug, [...keptImages, ...newImages]))
     .eq("id", id);
 
   if (error) {
@@ -322,7 +343,9 @@ export async function deleteProduct(
   }
 
   await removeUploadedImages(
-    storagePathsFromUrls((existing.images ?? []) as string[]),
+    storagePathsFromUrls(
+      ((existing.images ?? []) as ProductImage[]).map((img) => img.url),
+    ),
   );
 
   await logAdminAction(admin, {
