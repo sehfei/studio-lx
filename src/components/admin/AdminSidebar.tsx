@@ -57,31 +57,31 @@ export function AdminSidebar({
           </p>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-6">
           <span
-            className="-m-2 p-2 text-foreground/60"
+            className="-m-3 p-3 text-foreground/60"
             title={email}
             aria-label={email}
           >
-            <AccountIcon className="h-5 w-5" />
+            <AccountIcon className="h-6 w-6" />
           </span>
           <Link
             href="/"
-            className="-m-2 p-2 hover:text-gold"
+            className="-m-3 p-3 hover:text-gold"
             aria-label={dict.backToSite}
             title={dict.backToSite}
           >
-            <HomeIcon className="h-5 w-5" />
+            <HomeIcon className="h-6 w-6" />
           </Link>
           <AdminLanguageSwitcher current={locale} compact />
           <form action={signOut}>
             <button
               type="submit"
-              className="-m-2 p-2 hover:text-gold"
+              className="-m-3 p-3 hover:text-gold"
               aria-label={dict.signOut}
               title={dict.signOut}
             >
-              <LogoutIcon className="h-5 w-5" />
+              <LogoutIcon className="h-6 w-6" />
             </button>
           </form>
         </div>

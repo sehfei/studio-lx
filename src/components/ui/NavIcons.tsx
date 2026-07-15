@@ -104,8 +104,7 @@ export function HomeIcon({ className = "h-5 w-5" }: IconProps) {
       className={className}
       aria-hidden="true"
     >
-      <path d="M4 11.5 12 4l8 7.5" />
-      <path d="M6 10.5V20h5v-5h2v5h5v-9.5" />
+      <path d="M4.5 11.5c0-.9.4-1.7 1.1-2.3l5.6-4.7c.5-.4 1.2-.4 1.6 0l5.6 4.7c.7.6 1.1 1.4 1.1 2.3V18a2 2 0 0 1-2 2H6.5a2 2 0 0 1-2-2v-6.5Z" />
     </svg>
   );
 }
@@ -122,9 +121,9 @@ export function GlobeIcon({ className = "h-5 w-5" }: IconProps) {
       className={className}
       aria-hidden="true"
     >
-      <circle cx="12" cy="12" r="8.5" />
-      <path d="M3.5 12h17" />
-      <path d="M12 3.5c2.5 2.3 4 5.3 4 8.5s-1.5 6.2-4 8.5c-2.5-2.3-4-5.3-4-8.5s1.5-6.2 4-8.5Z" />
+      <circle cx="12" cy="12" r="8" />
+      <path d="M12 4c2 3.3 2 12.7 0 16" />
+      <path d="M5 10.5h14" />
     </svg>
   );
 }
@@ -141,9 +140,8 @@ export function LogoutIcon({ className = "h-5 w-5" }: IconProps) {
       className={className}
       aria-hidden="true"
     >
-      <path d="M14 4H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6" />
-      <path d="M10 12h10" />
-      <path d="M17 8l4 4-4 4" />
+      <path d="M17 6.5a8 8 0 1 0 0 11" />
+      <path d="M14.5 9l3 3-3 3" />
     </svg>
   );
 }

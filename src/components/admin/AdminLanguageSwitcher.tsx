@@ -36,9 +36,9 @@ export function AdminLanguageSwitcher({
         onClick={() => switchTo(other)}
         disabled={pending}
         aria-label={`${LOCALE_LABELS[current]} → ${LOCALE_LABELS[other]}`}
-        className="-m-2 p-2 hover:text-gold"
+        className="-m-3 p-3 hover:text-gold"
       >
-        <GlobeIcon className="h-5 w-5" />
+        <GlobeIcon className="h-6 w-6" />
       </button>
     );
   }
