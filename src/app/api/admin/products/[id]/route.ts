@@ -10,12 +10,14 @@ import {
 import {
   badRequest,
   fail,
+  forbiddenOrigin,
   notFound,
   ok,
   tooManyRequests,
   unauthorized,
 } from "@/lib/api/response";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { isCrossOriginRequest } from "@/lib/api/origin-check";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -33,6 +35,8 @@ async function findRow(id: string): Promise<ProductRow | null> {
 export async function PATCH(request: Request, { params }: RouteContext) {
   const user = await requirePermissionApi("products");
   if (!user) return unauthorized();
+
+  if (isCrossOriginRequest(request)) return forbiddenOrigin();
 
   const { allowed } = await checkRateLimit(`api:admin:${user.id}`, 60, 60);
   if (!allowed) return tooManyRequests();
@@ -108,9 +112,11 @@ export async function PATCH(request: Request, { params }: RouteContext) {
 }
 
 // DELETE /api/admin/products/[id]
-export async function DELETE(_request: Request, { params }: RouteContext) {
+export async function DELETE(request: Request, { params }: RouteContext) {
   const user = await requirePermissionApi("products");
   if (!user) return unauthorized();
+
+  if (isCrossOriginRequest(request)) return forbiddenOrigin();
 
   const { allowed } = await checkRateLimit(`api:admin:${user.id}`, 60, 60);
   if (!allowed) return tooManyRequests();

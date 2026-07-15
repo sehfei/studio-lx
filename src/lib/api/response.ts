@@ -26,3 +26,6 @@ export const serverError = (message = "服务器内部错误") =>
 
 export const tooManyRequests = (message = "请求过于频繁，请稍后再试") =>
   fail(429, "rate_limited", message);
+
+export const forbiddenOrigin = () =>
+  fail(403, "cross_origin_denied", "请求来源不受信任");

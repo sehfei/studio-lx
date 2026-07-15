@@ -11,16 +11,20 @@ import {
 import {
   badRequest,
   fail,
+  forbiddenOrigin,
   ok,
   tooManyRequests,
   unauthorized,
 } from "@/lib/api/response";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { isCrossOriginRequest } from "@/lib/api/origin-check";
 
 // POST /api/admin/products 创建商品（JSON body，images 传已上传好的 URL 数组）
 export async function POST(request: Request) {
   const user = await requirePermissionApi("products");
   if (!user) return unauthorized();
+
+  if (isCrossOriginRequest(request)) return forbiddenOrigin();
 
   const { allowed } = await checkRateLimit(`api:admin:${user.id}`, 60, 60);
   if (!allowed) return tooManyRequests();
