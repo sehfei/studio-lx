@@ -49,6 +49,14 @@ body {
   font-family: var(--font-sans);
 }
 
+/* Browser default focus rings are blue, clashing with the black/gold
+   theme everywhere. Keep a visible ring (accessibility requirement)
+   but recolor it to the theme accent instead of removing it. */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
 @layer components {
   .btn-primary {
     @apply inline-flex cursor-pointer items-center justify-center gap-2 tracking-widest uppercase transition-colors;
