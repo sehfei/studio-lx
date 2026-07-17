@@ -66,6 +66,7 @@ export const zh: AdminDictionary = {
     previewLoading: "加载中",
     previewCard: "卡片 / 输入框圆角效果",
     previewError: "这是错误提示的颜色示例",
+    previewIcons: "导航图标（悬停颜色 = 强调色）",
     themePresets: {
       "noir-gold": "黑金（默认）",
       champagne: "香槟米白",

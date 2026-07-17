@@ -66,6 +66,7 @@ export const en = {
     previewLoading: "Loading",
     previewCard: "Card / input corner radius",
     previewError: "This is the error message color",
+    previewIcons: "Nav icons (accent = hover color)",
     themePresets: {
       "noir-gold": "Noir Gold (default)",
       champagne: "Champagne",

@@ -14,6 +14,12 @@ import {
   type ThemeSettings,
 } from "@/lib/theme";
 import { Spinner } from "@/components/ui/Spinner";
+import {
+  SearchIcon,
+  WishlistIcon,
+  CartIcon,
+  AccountIcon,
+} from "@/components/ui/NavIcons";
 import type { AdminDictionary } from "@/lib/i18n/admin";
 import { saveTheme, undoLastSave } from "./actions";
 
@@ -411,6 +417,25 @@ export function ThemeForm({
             <p className="text-xs" style={{ color: "var(--destructive)" }}>
               {dict.previewError}
             </p>
+            <div>
+              <p className="mb-2 text-xs" style={{ color: "var(--muted)" }}>
+                {dict.previewIcons}
+              </p>
+              <div className="flex items-center gap-4">
+                <span className="hover:text-gold">
+                  <SearchIcon className="h-4 w-4" />
+                </span>
+                <span className="hover:text-gold">
+                  <WishlistIcon className="h-4 w-4" />
+                </span>
+                <span className="hover:text-gold">
+                  <CartIcon className="h-4 w-4" />
+                </span>
+                <span className="hover:text-gold">
+                  <AccountIcon className="h-4 w-4" />
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
