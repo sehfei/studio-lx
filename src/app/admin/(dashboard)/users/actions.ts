@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { staffAssignableNavKeys } from "@/lib/admin-nav";
 import { logAdminAction } from "@/lib/audit-log";
+import { listAllUsers } from "@/lib/supabase/list-all-users";
 
 export type UserRole = "customer" | "staff" | "admin";
 
@@ -67,9 +68,8 @@ export async function createBackendUser(
 }
 
 async function countAdmins(): Promise<number> {
-  const { data } = await supabaseAdmin.auth.admin.listUsers();
-  return (data?.users ?? []).filter((u) => u.app_metadata?.role === "admin")
-    .length;
+  const users = await listAllUsers();
+  return users.filter((u) => u.app_metadata?.role === "admin").length;
 }
 
 export async function setUserRole(

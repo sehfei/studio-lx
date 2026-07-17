@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth";
-import { supabaseAdmin } from "@/lib/supabase/admin";
+import { listAllUsers } from "@/lib/supabase/list-all-users";
 import { getAdminI18n } from "@/lib/i18n/admin";
 import { UserRoleEditor } from "./UserRoleEditor";
 import { AddUserForm } from "./AddUserForm";
@@ -13,8 +13,8 @@ export default async function AdminUsersPage() {
   const { t } = await getAdminI18n();
   const dict = t.pages.users;
 
-  const { data } = await supabaseAdmin.auth.admin.listUsers();
-  const users = (data?.users ?? []).sort(
+  const allUsers = await listAllUsers();
+  const users = allUsers.sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
   );
 

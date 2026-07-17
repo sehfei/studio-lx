@@ -1,5 +1,6 @@
 import { getAllProducts } from "@/lib/products";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { listAllUsers } from "@/lib/supabase/list-all-users";
 import { getAdminI18n } from "@/lib/i18n/admin";
 
 export const dynamic = "force-dynamic";
@@ -7,13 +8,13 @@ export const dynamic = "force-dynamic";
 export default async function AdminDashboardPage() {
   const { t } = await getAdminI18n();
   const dict = t.pages.dashboard;
-  const [products, { data: orders }, { data: userList }] = await Promise.all([
+  const [products, { data: orders }, users] = await Promise.all([
     getAllProducts(),
     supabaseAdmin.from("orders").select("total, payment_status"),
-    supabaseAdmin.auth.admin.listUsers(),
+    listAllUsers(),
   ]);
 
-  const customerCount = (userList?.users ?? []).filter(
+  const customerCount = users.filter(
     (u) => u.app_metadata?.role !== "admin",
   ).length;
   const revenue = (orders ?? [])

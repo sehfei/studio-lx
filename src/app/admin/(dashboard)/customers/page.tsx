@@ -1,5 +1,6 @@
 import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { listAllUsers } from "@/lib/supabase/list-all-users";
 import { AdminTable } from "@/components/admin/AdminTable";
 import { getAdminI18n } from "@/lib/i18n/admin";
 
@@ -9,10 +10,8 @@ export default async function AdminCustomersPage() {
   await requirePermission("customers");
   const { t } = await getAdminI18n();
   const dict = t.pages.customers;
-  const { data: userList } = await supabaseAdmin.auth.admin.listUsers();
-  const customers = (userList?.users ?? []).filter(
-    (u) => u.app_metadata?.role !== "admin",
-  );
+  const users = await listAllUsers();
+  const customers = users.filter((u) => u.app_metadata?.role !== "admin");
 
   const { data: orders } = await supabaseAdmin
     .from("orders")
