@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getCustomer } from "@/lib/customer-auth";
 import { hasVerifiedPurchase } from "@/lib/verified-purchase";
 import { dbErrorMessage } from "@/lib/db-error";
+import { getI18n } from "@/lib/i18n/dictionaries";
 
 export type SubmitReviewResult = {
   error?: string;
@@ -20,6 +21,7 @@ export async function submitReview(
   productSlug: string,
   formData: FormData,
 ): Promise<SubmitReviewResult> {
+  const { t } = await getI18n();
   const customer = await getCustomer();
   if (!customer) {
     return { requiresLogin: true };
@@ -28,17 +30,17 @@ export async function submitReview(
   // 服务端重新验证购买，不信任客户端已经算好的 viewerState
   const verified = await hasVerifiedPurchase(customer.id, productId);
   if (!verified) {
-    return { error: "只有购买过该商品的顾客才能评价" };
+    return { error: t.product.verifiedPurchaseRequired };
   }
 
   const rating = Number(formData.get("rating"));
   const comment = String(formData.get("comment") ?? "").trim();
 
   if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-    return { error: "请选择 1-5 星评分" };
+    return { error: t.product.selectRating };
   }
   if (!comment) {
-    return { error: "请填写评价内容" };
+    return { error: t.product.fillReviewComment };
   }
 
   const name = customer.user_metadata?.name as string | undefined;
@@ -54,7 +56,7 @@ export async function submitReview(
 
   if (error) {
     if (error.code === "23505") {
-      return { error: "已经评价过这个商品" };
+      return { error: t.product.alreadyReviewed };
     }
     return { error: dbErrorMessage(error) };
   }

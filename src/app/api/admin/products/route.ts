@@ -18,6 +18,7 @@ import {
 } from "@/lib/api/response";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { isCrossOriginRequest } from "@/lib/api/origin-check";
+import { getAdminI18n } from "@/lib/i18n/admin";
 
 // POST /api/admin/products 创建商品（JSON body，images 传已上传好的 URL 数组）
 export async function POST(request: Request) {
@@ -28,6 +29,8 @@ export async function POST(request: Request) {
 
   const { allowed } = await checkRateLimit(`api:admin:${user.id}`, 60, 60);
   if (!allowed) return tooManyRequests();
+
+  const { t } = await getAdminI18n();
 
   let body: Record<string, unknown>;
   try {
@@ -46,6 +49,7 @@ export async function POST(request: Request) {
     body,
     (categoryRows ?? []).map((c) => c.slug),
     (genderRows ?? []).map((g) => g.slug),
+    t.pages.products.validation,
     subcategoryRows ?? [],
   );
   if (validated.error !== undefined) {
@@ -65,7 +69,7 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
-    const conflict = uniqueViolationMessage(error);
+    const conflict = uniqueViolationMessage(error, t.pages.products.validation);
     if (conflict) return fail(409, "conflict", conflict);
     return fail(500, "internal_error", error.message);
   }

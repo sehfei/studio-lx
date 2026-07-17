@@ -2,6 +2,7 @@
 
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { dbErrorMessage } from "@/lib/db-error";
+import { getI18n } from "@/lib/i18n/dictionaries";
 
 export type ContactFormState = { error?: string; success?: boolean } | undefined;
 
@@ -15,12 +16,13 @@ export async function submitContactMessage(
     return { success: true };
   }
 
+  const { t } = await getI18n();
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const message = String(formData.get("message") ?? "").trim();
 
   if (!name || !email || !message) {
-    return { error: "请填写完整信息" };
+    return { error: t.common.fillAllFields };
   }
 
   const { error } = await supabaseAdmin

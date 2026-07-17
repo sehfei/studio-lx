@@ -18,6 +18,7 @@ import {
 } from "@/lib/api/response";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { isCrossOriginRequest } from "@/lib/api/origin-check";
+import { getAdminI18n } from "@/lib/i18n/admin";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -42,6 +43,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   if (!allowed) return tooManyRequests();
 
   const { id } = await params;
+  const { t } = await getAdminI18n();
 
   let body: Record<string, unknown>;
   try {
@@ -51,7 +53,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   }
 
   const existing = await findRow(id);
-  if (!existing) return notFound("商品不存在");
+  if (!existing) return notFound(t.pages.products.notFound);
 
   const current = mapRow(existing);
   const merged = {
@@ -88,6 +90,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
     merged,
     (categoryRows ?? []).map((c) => c.slug),
     (genderRows ?? []).map((g) => g.slug),
+    t.pages.products.validation,
     subcategoryRows ?? [],
   );
   if (validated.error !== undefined) {
@@ -108,7 +111,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
     .single();
 
   if (error) {
-    const conflict = uniqueViolationMessage(error);
+    const conflict = uniqueViolationMessage(error, t.pages.products.validation);
     if (conflict) return fail(409, "conflict", conflict);
     return fail(500, "internal_error", error.message);
   }
@@ -127,9 +130,10 @@ export async function DELETE(request: Request, { params }: RouteContext) {
   if (!allowed) return tooManyRequests();
 
   const { id } = await params;
+  const { t } = await getAdminI18n();
 
   const existing = await findRow(id);
-  if (!existing) return notFound("商品不存在");
+  if (!existing) return notFound(t.pages.products.notFound);
 
   const { error } = await supabaseAdmin.from("products").delete().eq("id", id);
   if (error) {

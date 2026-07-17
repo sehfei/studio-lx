@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 export type CouponRow = {
   id: string;
@@ -21,6 +22,7 @@ export type CouponCheckResult =
 export async function checkCoupon(
   code: string,
   subtotal: number,
+  t: Dictionary,
 ): Promise<CouponCheckResult> {
   const { data: coupon, error } = await supabaseAdmin
     .from("coupons")
@@ -29,21 +31,24 @@ export async function checkCoupon(
     .maybeSingle();
 
   if (error || !coupon) {
-    return { ok: false, error: "优惠码不存在" };
+    return { ok: false, error: t.checkout.couponNotFound };
   }
   if (!coupon.is_active) {
-    return { ok: false, error: "优惠码已停用" };
+    return { ok: false, error: t.checkout.couponDisabled };
   }
   if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
-    return { ok: false, error: "优惠码已过期" };
+    return { ok: false, error: t.checkout.couponExpired };
   }
   if (coupon.max_uses !== null && coupon.used_count >= coupon.max_uses) {
-    return { ok: false, error: "优惠码已达使用上限" };
+    return { ok: false, error: t.checkout.couponMaxUsesReached };
   }
   if (coupon.min_spend !== null && subtotal < Number(coupon.min_spend)) {
     return {
       ok: false,
-      error: `订单金额需满 RM ${Number(coupon.min_spend).toFixed(2)} 才能使用此优惠码`,
+      error: t.checkout.couponMinSpend.replace(
+        "{amount}",
+        Number(coupon.min_spend).toFixed(2),
+      ),
     };
   }
 

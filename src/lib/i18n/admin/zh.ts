@@ -165,6 +165,7 @@ export const zh: AdminDictionary = {
     cannotEditSelf: "不能修改自己",
     backendError: "后台出错了",
     retry: "重试",
+    loading: "加载中",
   },
   pages: {
     customers: {
@@ -185,6 +186,7 @@ export const zh: AdminDictionary = {
       edit: "编辑",
       empty: "还没有商品。",
       confirmDelete: "确定删除「{name}」？商品和图片都会被删除，不可恢复",
+      notFound: "商品不存在",
       newPageTitle: "新增商品",
       editPageTitle: "编辑商品",
       form: {
@@ -216,8 +218,23 @@ export const zh: AdminDictionary = {
         badgeLabel: "Badge（可选，显示在商品图左上角）",
         shippingInfoLabel: "运费说明",
         tagsLabel: "标签",
-        createButton: "Create Product",
-        saveButton: "Save Changes",
+        createButton: "创建商品",
+        saveButton: "保存修改",
+      },
+      validation: {
+        requiredFields: "商品名称、SKU、品牌为必填",
+        invalidPrice: "价格必须是大于 0 的数字",
+        invalidDiscountPrice: "折扣价必须是大于 0 的数字",
+        discountPriceTooHigh: "折扣价必须低于原价",
+        selectGender: "请选择 Gender",
+        selectCategory: "请选择 Category",
+        invalidSubcategory: "子分类无效",
+        subcategoryMismatch: "子分类和所选分类不匹配",
+        invalidTag: "无效的标签：{tag}",
+        badgeTextTooLong: "Badge 文字最多 20 个字符",
+        slugExists: "Slug 已存在，请换一个商品名称或手动指定 Slug",
+        skuExists: "SKU 已存在，请检查是否重复录入",
+        genericConflict: "商品信息与已有商品冲突（唯一性约束）",
       },
       columns: {
         image: "图片",
@@ -395,8 +412,8 @@ export const zh: AdminDictionary = {
         coverImageLabel: "封面图",
         coverImageHint: "（可选，JPEG/PNG/WEBP，最大 5MB）",
         publishedLabel: "已发布（取消勾选 = 存为草稿，前台不显示）",
-        createButton: "Create Post",
-        saveButton: "Save Changes",
+        createButton: "创建文章",
+        saveButton: "保存修改",
       },
       columns: {
         title: "标题",

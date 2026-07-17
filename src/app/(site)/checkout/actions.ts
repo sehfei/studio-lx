@@ -9,6 +9,7 @@ import { checkCoupon } from "@/lib/coupon";
 import { getPaymentSettings } from "@/lib/payment-settings";
 import { sendOrderConfirmationEmail } from "@/lib/email";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { getI18n } from "@/lib/i18n/dictionaries";
 
 // 结账现在要求登录：页面层 requireCustomer() 已经拦一次，
 // 这里再查一次当前登录用户，双重保险——防止有人绕过页面直接调这个 action。
@@ -45,19 +46,26 @@ export async function previewCoupon(
   code: string,
   subtotal: number,
 ): Promise<CouponPreviewResult> {
+  const { t } = await getI18n();
   // 同一 IP 1 分钟最多试 20 次，防止拿这个接口暴力猜优惠码
   const ip = await getClientIp();
   const { allowed } = await checkRateLimit(`coupon-preview:${ip}`, 20, 60);
   if (!allowed) {
-    return { ok: false, error: "尝试过于频繁，请稍后再试" };
+    return { ok: false, error: t.common.tooManyAttempts };
   }
 
-  const result = await checkCoupon(code, subtotal);
+  const result = await checkCoupon(code, subtotal, t);
   if (!result.ok) return { ok: false, error: result.error };
   const description =
     result.coupon.type === "percentage"
-      ? `${result.coupon.value}% 折扣`
-      : `减 RM ${result.coupon.value.toFixed(2)}`;
+      ? t.checkout.couponPercentOff.replace(
+          "{value}",
+          String(result.coupon.value),
+        )
+      : t.checkout.couponFixedOff.replace(
+          "{value}",
+          result.coupon.value.toFixed(2),
+        );
   return { ok: true, discount: result.discount, description };
 }
 
@@ -79,19 +87,20 @@ function generateOrderNumber(): string {
 export async function createOrder(
   input: CheckoutInput,
 ): Promise<CheckoutResult> {
+  const { t } = await getI18n();
   const customer = await getCustomer();
   if (!customer) {
-    return { error: "请先登录才能结账" };
+    return { error: t.checkout.pleaseLoginFirst };
   }
 
   // 同一账号 1 小时最多下 20 次订单，防止刷单/滥用
   const { allowed } = await checkRateLimit(`checkout:${customer.id}`, 20, 3600);
   if (!allowed) {
-    return { error: "下单过于频繁，请稍后再试" };
+    return { error: t.checkout.tooManyOrders };
   }
 
   if (!input.items || input.items.length === 0) {
-    return { error: "购物车是空的" };
+    return { error: t.checkout.emptyCart };
   }
   if (
     !input.name.trim() ||
@@ -101,7 +110,7 @@ export async function createOrder(
     !input.state.trim() ||
     !input.postcode.trim()
   ) {
-    return { error: "请填写完整的收货信息" };
+    return { error: t.checkout.fillShippingInfo };
   }
 
   const productIds = input.items.map((i) => i.productId);
@@ -111,7 +120,12 @@ export async function createOrder(
     .in("id", productIds);
 
   if (fetchError) {
-    return { error: "商品信息查询失败：" + dbErrorMessage(fetchError) };
+    return {
+      error: t.checkout.productFetchFailed.replace(
+        "{error}",
+        dbErrorMessage(fetchError),
+      ),
+    };
   }
 
   const productMap = new Map((products ?? []).map((p) => [p.id, p]));
@@ -131,13 +145,17 @@ export async function createOrder(
   for (const item of input.items) {
     const product = productMap.get(item.productId);
     if (!product) {
-      return { error: `商品不存在或已下架` };
+      return { error: t.checkout.productUnavailable };
     }
     if (item.quantity < 1) {
-      return { error: `${product.name} 数量无效` };
+      return { error: t.checkout.invalidQuantity.replace("{name}", product.name) };
     }
     if (product.stock < item.quantity) {
-      return { error: `${product.name} 库存不足，仅剩 ${product.stock} 件` };
+      return {
+        error: t.checkout.insufficientStock
+          .replace("{name}", product.name)
+          .replace("{stock}", String(product.stock)),
+      };
     }
     const unitPrice =
       typeof product.discount_price === "number" &&
@@ -173,7 +191,7 @@ export async function createOrder(
   let discountAmount = 0;
   let couponCode: string | null = null;
   if (input.couponCode?.trim()) {
-    const couponResult = await checkCoupon(input.couponCode, subtotal);
+    const couponResult = await checkCoupon(input.couponCode, subtotal, t);
     if (!couponResult.ok) {
       return { error: couponResult.error };
     }
@@ -212,8 +230,11 @@ export async function createOrder(
   if (orderError || !order) {
     return {
       error: orderError
-        ? "订单创建失败：" + dbErrorMessage(orderError)
-        : "订单创建失败：未知错误",
+        ? t.checkout.orderCreateFailed.replace(
+            "{error}",
+            dbErrorMessage(orderError),
+          )
+        : t.checkout.orderCreateFailedUnknown,
     };
   }
 
@@ -224,7 +245,12 @@ export async function createOrder(
   if (itemsError) {
     // 订单行插入失败就回滚订单本身，避免留下没有商品明细的空订单
     await supabaseAdmin.from("orders").delete().eq("id", order.id);
-    return { error: "订单明细创建失败：" + dbErrorMessage(itemsError) };
+    return {
+      error: t.checkout.orderItemsCreateFailed.replace(
+        "{error}",
+        dbErrorMessage(itemsError),
+      ),
+    };
   }
 
   for (const item of orderItems) {

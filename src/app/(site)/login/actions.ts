@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { safeRedirectPath } from "@/lib/customer-auth";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { getI18n } from "@/lib/i18n/dictionaries";
 
 export type LoginFormState = { error?: string } | undefined;
 
@@ -11,12 +12,13 @@ export async function signInCustomer(
   _prevState: LoginFormState,
   formData: FormData,
 ): Promise<LoginFormState> {
+  const { t } = await getI18n();
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const redirectTo = safeRedirectPath(String(formData.get("redirect") ?? ""));
 
   if (!email || !password) {
-    return { error: "请输入邮箱和密码" };
+    return { error: t.auth.fillEmailPassword };
   }
 
   // 同一邮箱 15 分钟内最多试 5 次，防止暴力破解密码
@@ -26,7 +28,7 @@ export async function signInCustomer(
     900,
   );
   if (!allowed) {
-    return { error: "尝试次数过多，请 15 分钟后再试" };
+    return { error: t.common.tooManyAttempts };
   }
 
   const supabase = await createSupabaseServerClient();
@@ -36,7 +38,7 @@ export async function signInCustomer(
   });
 
   if (error) {
-    return { error: "邮箱或密码错误" };
+    return { error: t.auth.wrongCredentials };
   }
 
   redirect(redirectTo);

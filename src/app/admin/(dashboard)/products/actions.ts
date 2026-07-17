@@ -14,6 +14,7 @@ import {
   type ProductFormValues,
 } from "@/lib/validation/product";
 import type { ProductImage } from "@/lib/products";
+import { getAdminI18n } from "@/lib/i18n/admin";
 
 const IMAGE_BUCKET = "product-images";
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -129,6 +130,8 @@ export async function createProduct(
 ): Promise<ProductFormState> {
   // proxy 和 layout 挡不住直接调用 action，这里必须再验一次
   const admin = await requirePermission("products");
+  const { t } = await getAdminI18n();
+  const validationDict = t.pages.products.validation;
 
   const values = formValues(formData);
   const [validCategories, validGenders, validSubcategories] =
@@ -141,6 +144,7 @@ export async function createProduct(
     formToRawInput(formData),
     validCategories,
     validGenders,
+    validationDict,
     validSubcategories,
   );
   if (validated.error !== undefined) {
@@ -179,7 +183,10 @@ export async function createProduct(
 
   if (error) {
     await removeUploadedImages(imagePaths);
-    return { error: uniqueViolationMessage(error) ?? error.message, values };
+    return {
+      error: uniqueViolationMessage(error, validationDict) ?? error.message,
+      values,
+    };
   }
 
   await logAdminAction(admin, {
@@ -249,6 +256,8 @@ export async function updateProduct(
   formData: FormData,
 ): Promise<ProductFormState> {
   const admin = await requirePermission("products");
+  const { t } = await getAdminI18n();
+  const validationDict = t.pages.products.validation;
 
   const values = formValues(formData);
   const [validCategories, validGenders, validSubcategories] =
@@ -261,6 +270,7 @@ export async function updateProduct(
     formToRawInput(formData),
     validCategories,
     validGenders,
+    validationDict,
     validSubcategories,
   );
   if (validated.error !== undefined) {
@@ -274,7 +284,7 @@ export async function updateProduct(
     .eq("id", id)
     .maybeSingle();
   if (findError || !existing) {
-    return { error: "商品不存在", values };
+    return { error: t.pages.products.notFound, values };
   }
 
   const slugInput = String(formData.get("slug") ?? "").trim();
@@ -321,7 +331,10 @@ export async function updateProduct(
 
   if (error) {
     await removeUploadedImages(newPaths);
-    return { error: uniqueViolationMessage(error) ?? error.message, values };
+    return {
+      error: uniqueViolationMessage(error, validationDict) ?? error.message,
+      values,
+    };
   }
 
   // 更新成功后才真正删掉被移除的旧图
@@ -346,6 +359,7 @@ export async function deleteProduct(
   id: string,
 ): Promise<{ error: string } | undefined> {
   const admin = await requirePermission("products");
+  const { t } = await getAdminI18n();
 
   const { data: existing, error: findError } = await supabaseAdmin
     .from("products")
@@ -353,7 +367,7 @@ export async function deleteProduct(
     .eq("id", id)
     .maybeSingle();
   if (findError || !existing) {
-    return { error: "商品不存在" };
+    return { error: t.pages.products.notFound };
   }
 
   const { error } = await supabaseAdmin.from("products").delete().eq("id", id);

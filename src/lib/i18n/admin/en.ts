@@ -165,6 +165,7 @@ export const en = {
     cannotEditSelf: "Can't modify your own account",
     backendError: "Something went wrong",
     retry: "Retry",
+    loading: "Loading",
   },
   pages: {
     customers: {
@@ -187,6 +188,7 @@ export const en = {
       empty: "No products yet.",
       confirmDelete:
         'Delete "{name}"? The product and its images will be permanently removed.',
+      notFound: "Product not found",
       newPageTitle: "Add Product",
       editPageTitle: "Edit Product",
       form: {
@@ -220,6 +222,25 @@ export const en = {
         tagsLabel: "Tags",
         createButton: "Create Product",
         saveButton: "Save Changes",
+      },
+      validation: {
+        requiredFields: "Name, SKU, and brand are required",
+        invalidPrice: "Price must be a number greater than 0",
+        invalidDiscountPrice: "Discount price must be a number greater than 0",
+        discountPriceTooHigh:
+          "Discount price must be lower than the regular price",
+        selectGender: "Please select a Gender",
+        selectCategory: "Please select a Category",
+        invalidSubcategory: "Invalid subcategory",
+        subcategoryMismatch:
+          "Subcategory doesn't match the selected category",
+        invalidTag: "Invalid tag: {tag}",
+        badgeTextTooLong: "Badge text is limited to 20 characters",
+        slugExists:
+          "This slug already exists, please change the product name or set a custom slug",
+        skuExists: "This SKU already exists, please check for duplicates",
+        genericConflict:
+          "Product conflicts with an existing one (unique constraint)",
       },
       columns: {
         image: "Image",

@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { uniqueViolationMessage, validateProduct } from "@/lib/validation/product";
+import { en } from "@/lib/i18n/admin/en";
 
 const validGenders = ["women", "men"];
 const validCategories = ["clothing", "shoes"];
+const dict = en.pages.products.validation;
 
 function validInput(overrides: Record<string, unknown> = {}) {
   return {
@@ -28,7 +30,7 @@ function validInput(overrides: Record<string, unknown> = {}) {
 
 describe("validateProduct", () => {
   it("接受合法输入", () => {
-    const result = validateProduct(validInput(), validCategories, validGenders);
+    const result = validateProduct(validInput(), validCategories, validGenders, dict);
     expect(result.error).toBeUndefined();
     expect(result.data?.name).toBe("Test Product");
     expect(result.data?.price).toBe(100);
@@ -39,19 +41,20 @@ describe("validateProduct", () => {
       validInput({ name: "" }),
       validCategories,
       validGenders,
+      dict,
     );
-    expect(result.error).toBe("商品名称、SKU、品牌为必填");
+    expect(result.error).toBe(dict.requiredFields);
   });
 
   it("价格不是正数时报错", () => {
     expect(
-      validateProduct(validInput({ price: "0" }), validCategories, validGenders)
+      validateProduct(validInput({ price: "0" }), validCategories, validGenders, dict)
         .error,
-    ).toBe("价格必须是大于 0 的数字");
+    ).toBe(dict.invalidPrice);
     expect(
-      validateProduct(validInput({ price: "abc" }), validCategories, validGenders)
+      validateProduct(validInput({ price: "abc" }), validCategories, validGenders, dict)
         .error,
-    ).toBe("价格必须是大于 0 的数字");
+    ).toBe(dict.invalidPrice);
   });
 
   it("折扣价必须低于原价", () => {
@@ -59,8 +62,9 @@ describe("validateProduct", () => {
       validInput({ price: "100", discountPrice: "100" }),
       validCategories,
       validGenders,
+      dict,
     );
-    expect(result.error).toBe("折扣价必须低于原价");
+    expect(result.error).toBe(dict.discountPriceTooHigh);
   });
 
   it("折扣价合法时正常通过", () => {
@@ -68,6 +72,7 @@ describe("validateProduct", () => {
       validInput({ price: "100", discountPrice: "80" }),
       validCategories,
       validGenders,
+      dict,
     );
     expect(result.error).toBeUndefined();
     expect(result.data?.discountPrice).toBe(80);
@@ -78,8 +83,9 @@ describe("validateProduct", () => {
       validInput({ gender: "alien" }),
       validCategories,
       validGenders,
+      dict,
     );
-    expect(result.error).toBe("请选择 Gender");
+    expect(result.error).toBe(dict.selectGender);
   });
 
   it("category 不在白名单里报错", () => {
@@ -87,8 +93,9 @@ describe("validateProduct", () => {
       validInput({ category: "unknown" }),
       validCategories,
       validGenders,
+      dict,
     );
-    expect(result.error).toBe("请选择 Category");
+    expect(result.error).toBe(dict.selectCategory);
   });
 
   it("tags 里有非法标签时报错", () => {
@@ -96,8 +103,9 @@ describe("validateProduct", () => {
       validInput({ tags: ["not-a-real-tag"] }),
       validCategories,
       validGenders,
+      dict,
     );
-    expect(result.error).toBe("无效的标签：not-a-real-tag");
+    expect(result.error).toBe(dict.invalidTag.replace("{tag}", "not-a-real-tag"));
   });
 
   it("badgeText 超过 20 字符报错", () => {
@@ -105,8 +113,9 @@ describe("validateProduct", () => {
       validInput({ badgeText: "a".repeat(21) }),
       validCategories,
       validGenders,
+      dict,
     );
-    expect(result.error).toBe("Badge 文字最多 20 个字符");
+    expect(result.error).toBe(dict.badgeTextTooLong);
   });
 
   it("负数库存兜底成 0", () => {
@@ -114,6 +123,7 @@ describe("validateProduct", () => {
       validInput({ stock: "-5" }),
       validCategories,
       validGenders,
+      dict,
     );
     expect(result.data?.stock).toBe(0);
   });
@@ -121,24 +131,35 @@ describe("validateProduct", () => {
 
 describe("uniqueViolationMessage", () => {
   it("非唯一约束冲突返回 null", () => {
-    expect(uniqueViolationMessage({ code: "23503", message: "x" })).toBeNull();
+    expect(
+      uniqueViolationMessage({ code: "23503", message: "x" }, dict),
+    ).toBeNull();
   });
 
   it("slug 冲突给出对应提示", () => {
     expect(
-      uniqueViolationMessage({ code: "23505", message: "duplicate key slug" }),
-    ).toBe("Slug 已存在，请换一个商品名称或手动指定 Slug");
+      uniqueViolationMessage(
+        { code: "23505", message: "duplicate key slug" },
+        dict,
+      ),
+    ).toBe(dict.slugExists);
   });
 
   it("sku 冲突给出对应提示", () => {
     expect(
-      uniqueViolationMessage({ code: "23505", message: "duplicate key sku" }),
-    ).toBe("SKU 已存在，请检查是否重复录入");
+      uniqueViolationMessage(
+        { code: "23505", message: "duplicate key sku" },
+        dict,
+      ),
+    ).toBe(dict.skuExists);
   });
 
   it("其他唯一约束冲突给出通用提示", () => {
     expect(
-      uniqueViolationMessage({ code: "23505", message: "duplicate key other" }),
-    ).toBe("商品信息与已有商品冲突（唯一性约束）");
+      uniqueViolationMessage(
+        { code: "23505", message: "duplicate key other" },
+        dict,
+      ),
+    ).toBe(dict.genericConflict);
   });
 });

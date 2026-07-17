@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { safeRedirectPath } from "@/lib/customer-auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { getI18n } from "@/lib/i18n/dictionaries";
 
 export type RegisterFormState =
   | { error?: string; needsEmailConfirm?: boolean }
@@ -13,23 +14,24 @@ export async function signUpCustomer(
   _prevState: RegisterFormState,
   formData: FormData,
 ): Promise<RegisterFormState> {
+  const { t } = await getI18n();
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const redirectTo = safeRedirectPath(String(formData.get("redirect") ?? ""));
 
   if (!name || !email || !password) {
-    return { error: "请填写完整信息" };
+    return { error: t.common.fillAllFields };
   }
   if (password.length < 6) {
-    return { error: "密码至少需要 6 位" };
+    return { error: t.auth.passwordMinLength };
   }
 
   // 同一 IP 1 小时内最多注册 10 次，防止批量注册滥用
   const ip = await getClientIp();
   const { allowed } = await checkRateLimit(`register:${ip}`, 10, 3600);
   if (!allowed) {
-    return { error: "注册请求过于频繁，请稍后再试" };
+    return { error: t.common.tooManyAttempts };
   }
 
   const supabase = await createSupabaseServerClient();
@@ -43,7 +45,7 @@ export async function signUpCustomer(
   if (error) {
     const message =
       error.message === "User already registered"
-        ? "该邮箱已被注册"
+        ? t.auth.emailAlreadyRegistered
         : error.message;
     return { error: message };
   }

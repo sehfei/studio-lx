@@ -4,8 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Banner } from "@/lib/banners";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
-export function BannerCarousel({ banners }: { banners: Banner[] }) {
+export function BannerCarousel({
+  banners,
+  t,
+}: {
+  banners: Banner[];
+  t: Dictionary;
+}) {
   const [index, setIndex] = useState(0);
 
   // 多张时每 5 秒自动切换
@@ -69,7 +76,7 @@ export function BannerCarousel({ banners }: { banners: Banner[] }) {
               <button
                 key={b.id}
                 type="button"
-                aria-label={`切换到第 ${i + 1} 张`}
+                aria-label={t.home.switchToSlide.replace("{n}", String(i + 1))}
                 onClick={() => setIndex(i)}
                 className={`h-2 w-2 rounded-full transition-colors ${
                   i === index ? "bg-background" : "bg-background/40"

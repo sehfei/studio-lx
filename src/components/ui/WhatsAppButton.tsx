@@ -1,4 +1,10 @@
-export function WhatsAppButton({ whatsappNumber }: { whatsappNumber: string }) {
+export function WhatsAppButton({
+  whatsappNumber,
+  label,
+}: {
+  whatsappNumber: string;
+  label: string;
+}) {
   const href = `https://api.whatsapp.com/send?phone=${whatsappNumber}`;
 
   return (
@@ -6,7 +12,7 @@ export function WhatsAppButton({ whatsappNumber }: { whatsappNumber: string }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="WhatsApp 咨询"
+      aria-label={label}
       className="fixed right-5 bottom-20 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-105 sm:bottom-5"
     >
       <svg viewBox="0 0 32 32" className="h-6 w-6 fill-current">

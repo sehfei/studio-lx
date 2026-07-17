@@ -128,11 +128,11 @@ export function ReviewForm({
         onClick={() => {
           setError(null);
           if (rating < 1) {
-            setError("请选择 1-5 星评分");
+            setError(t.product.selectRating);
             return;
           }
           if (!comment.trim()) {
-            setError("请填写评价内容");
+            setError(t.product.fillReviewComment);
             return;
           }
           const formData = new FormData();

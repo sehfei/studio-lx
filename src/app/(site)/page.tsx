@@ -63,7 +63,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <BannerCarousel banners={banners} />
+      <BannerCarousel banners={banners} t={t} />
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-8">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">

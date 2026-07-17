@@ -1,5 +1,8 @@
 import { TAGS, type Category, type Gender } from "@/lib/constants";
 import type { ProductImage } from "@/lib/products";
+import type { AdminDictionary } from "@/lib/i18n/admin";
+
+type ValidationDict = AdminDictionary["pages"]["products"]["validation"];
 
 // 商品写入的共享校验：admin Server Action 和 /api/admin/products 都走这里，
 // 保证两个入口的规则一致。
@@ -72,6 +75,7 @@ export function validateProduct(
   raw: RawProductInput,
   validCategories: readonly string[],
   validGenders: readonly string[],
+  dict: ValidationDict,
   validSubcategories: readonly { slug: string; category: string }[] = [],
 ): { data: ProductInput; error?: undefined } | { data?: undefined; error: string } {
   const name = toStr(raw.name);
@@ -79,33 +83,33 @@ export function validateProduct(
   const brand = toStr(raw.brand);
 
   if (!name || !sku || !brand) {
-    return { error: "商品名称、SKU、品牌为必填" };
+    return { error: dict.requiredFields };
   }
 
   const price = Number(raw.price);
   if (!Number.isFinite(price) || price <= 0) {
-    return { error: "价格必须是大于 0 的数字" };
+    return { error: dict.invalidPrice };
   }
 
   let discountPrice: number | null = null;
   if (raw.discountPrice != null && raw.discountPrice !== "") {
     discountPrice = Number(raw.discountPrice);
     if (!Number.isFinite(discountPrice) || discountPrice <= 0) {
-      return { error: "折扣价必须是大于 0 的数字" };
+      return { error: dict.invalidDiscountPrice };
     }
     if (discountPrice >= price) {
-      return { error: "折扣价必须低于原价" };
+      return { error: dict.discountPriceTooHigh };
     }
   }
 
   const gender = toStr(raw.gender) as Gender;
   if (!validGenders.includes(gender)) {
-    return { error: "请选择 Gender" };
+    return { error: dict.selectGender };
   }
 
   const category = toStr(raw.category) as Category;
   if (!validCategories.includes(category)) {
-    return { error: "请选择 Category" };
+    return { error: dict.selectCategory };
   }
 
   const subcategoryRaw = toStr(raw.subcategory);
@@ -113,10 +117,10 @@ export function validateProduct(
   if (subcategoryRaw) {
     const match = validSubcategories.find((s) => s.slug === subcategoryRaw);
     if (!match) {
-      return { error: "子分类无效" };
+      return { error: dict.invalidSubcategory };
     }
     if (match.category !== category) {
-      return { error: "子分类和所选分类不匹配" };
+      return { error: dict.subcategoryMismatch };
     }
     subcategory = subcategoryRaw;
   }
@@ -124,14 +128,14 @@ export function validateProduct(
   const tags = toStrArray(raw.tags);
   const invalidTag = tags.find((t) => !TAGS.includes(t as (typeof TAGS)[number]));
   if (invalidTag) {
-    return { error: `无效的标签：${invalidTag}` };
+    return { error: dict.invalidTag.replace("{tag}", invalidTag) };
   }
 
   const stockNum = Number(raw.stock);
 
   const badgeTextRaw = toStr(raw.badgeText);
   if (badgeTextRaw.length > 20) {
-    return { error: "Badge 文字最多 20 个字符" };
+    return { error: dict.badgeTextTooLong };
   }
 
   return {
@@ -211,17 +215,17 @@ export function productInputToRow(
   };
 }
 
-// Postgres 唯一约束冲突 → 中文提示
-export function uniqueViolationMessage(error: {
-  code?: string;
-  message: string;
-}): string | null {
+// Postgres 唯一约束冲突 → 翻译后的提示
+export function uniqueViolationMessage(
+  error: { code?: string; message: string },
+  dict: ValidationDict,
+): string | null {
   if (error.code !== "23505") return null;
   if (error.message.includes("slug")) {
-    return "Slug 已存在，请换一个商品名称或手动指定 Slug";
+    return dict.slugExists;
   }
   if (error.message.includes("sku")) {
-    return "SKU 已存在，请检查是否重复录入";
+    return dict.skuExists;
   }
-  return "商品信息与已有商品冲突（唯一性约束）";
+  return dict.genericConflict;
 }

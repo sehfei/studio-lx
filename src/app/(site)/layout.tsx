@@ -35,7 +35,10 @@ export default async function SiteLayout({
       />
       <main className="flex-1">{children}</main>
       <Footer identity={identity} t={t} />
-      <WhatsAppButton whatsappNumber={identity.whatsappNumber} />
+      <WhatsAppButton
+        whatsappNumber={identity.whatsappNumber}
+        label={t.common.whatsappLabel}
+      />
     </CartProvider>
   );
 }
