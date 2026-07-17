@@ -135,16 +135,14 @@ export default async function ProductPage({
               />
             </div>
           </div>
-          <ProductImage
-            src={product.images[1]?.url}
-            alt={product.images[1]?.alt}
-            label={product.name}
-          />
-          <ProductImage
-            src={product.images[2]?.url}
-            alt={product.images[2]?.alt}
-            label={product.name}
-          />
+          {product.images.slice(1).map((img, i) => (
+            <ProductImage
+              key={img.url || i}
+              src={img.url}
+              alt={img.alt}
+              label={product.name}
+            />
+          ))}
         </div>
 
         <div>
