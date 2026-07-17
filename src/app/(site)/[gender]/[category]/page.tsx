@@ -63,6 +63,7 @@ export default async function CategoryPage({
               key={sub.slug}
               href={`/${gender}/${category}/${sub.slug}`}
               className="border border-border-subtle px-4 py-2 hover:border-gold hover:text-gold"
+              style={{ borderRadius: "var(--radius)" }}
             >
               {sub.label}
             </Link>

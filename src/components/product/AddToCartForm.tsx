@@ -65,6 +65,7 @@ export function AddToCartForm({
                     ? "border-foreground bg-foreground text-background"
                     : "border-border-subtle text-foreground/70 hover:border-gold hover:text-gold"
                 }`}
+                style={{ borderRadius: "var(--radius)" }}
               >
                 {c}
               </button>
@@ -88,6 +89,7 @@ export function AddToCartForm({
                     ? "border-foreground bg-foreground text-background"
                     : "border-border-subtle text-foreground/70 hover:border-gold hover:text-gold"
                 }`}
+                style={{ borderRadius: "var(--radius)" }}
               >
                 {s}
               </button>

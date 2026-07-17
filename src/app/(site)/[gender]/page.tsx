@@ -55,6 +55,7 @@ export default async function GenderPage({
             key={child.slug}
             href={`/${gender}/${child.slug}`}
             className="border border-border-subtle px-4 py-2 hover:border-gold hover:text-gold"
+            style={{ borderRadius: "var(--radius)" }}
           >
             {categoryLabel(t, child.slug, child.label)}
           </Link>
