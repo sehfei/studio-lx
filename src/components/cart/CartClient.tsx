@@ -72,6 +72,7 @@ export function CartClient({ t }: { t: Dictionary }) {
                       )
                     }
                     className="w-16 border border-border-subtle px-2 py-1 text-sm outline-none focus:border-gold"
+                    style={{ borderRadius: "var(--radius)" }}
                   />
                 </div>
                 <p className="shrink-0 text-right text-sm sm:w-24">

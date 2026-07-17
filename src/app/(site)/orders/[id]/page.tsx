@@ -59,7 +59,10 @@ export default async function OrderDetailPage({
 
       <div className="mb-8">
         <h2 className="eyebrow mb-3">{t.orders.items}</h2>
-        <ul className="divide-y divide-border-subtle border border-border-subtle">
+        <ul
+          className="divide-y divide-border-subtle border border-border-subtle"
+          style={{ borderRadius: "var(--radius)" }}
+        >
           {(items ?? []).map((item) => (
             <li
               key={item.id}

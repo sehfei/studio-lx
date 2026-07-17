@@ -13,7 +13,10 @@ export function ContactForm({ t }: { t: Dictionary }) {
 
   if (state?.success) {
     return (
-      <p className="mt-10 border border-gold/40 bg-gold/5 px-4 py-3 text-sm text-gold">
+      <p
+        className="mt-10 border border-gold/40 bg-gold/5 px-4 py-3 text-sm text-gold"
+        style={{ borderRadius: "var(--radius)" }}
+      >
         {t.contact.sendSuccess}
       </p>
     );

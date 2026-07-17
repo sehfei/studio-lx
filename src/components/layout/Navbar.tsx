@@ -131,7 +131,10 @@ export function Navbar({
               <Link href={`/${cat.slug}`} className="hover:text-gold">
                 {label(cat.slug, cat.label)}
               </Link>
-              <div className="absolute left-1/2 top-full hidden -translate-x-1/2 border border-border-subtle bg-background py-2 shadow-lg group-hover:block">
+              <div
+                className="absolute left-1/2 top-full hidden -translate-x-1/2 border border-border-subtle bg-background py-2 shadow-lg group-hover:block"
+                style={{ borderRadius: "var(--radius)" }}
+              >
                 {categories.map((child) => (
                   <Link
                     key={child.slug}

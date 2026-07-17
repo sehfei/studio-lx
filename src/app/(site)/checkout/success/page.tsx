@@ -38,7 +38,10 @@ export default async function CheckoutSuccessPage({
     <div className="mx-auto max-w-2xl px-4 py-20 text-center sm:px-8">
       <h1 className="section-title mb-4">{t.orderConfirm.title}</h1>
       <p className="mb-8 text-sm text-foreground/60">{t.orderConfirm.thankYou}</p>
-      <div className="mb-8 border border-border-subtle p-6">
+      <div
+        className="mb-8 border border-border-subtle p-6"
+        style={{ borderRadius: "var(--radius)" }}
+      >
         <p className="eyebrow mb-2">{t.orderConfirm.orderNumber}</p>
         <p className="text-lg font-medium">{order.order_number}</p>
         <p className="mt-4 text-sm text-foreground/60">
@@ -47,7 +50,10 @@ export default async function CheckoutSuccessPage({
       </div>
 
       {hasBankInfo && (
-        <div className="mb-8 border border-gold/40 bg-gold/5 p-6 text-left">
+        <div
+          className="mb-8 border border-gold/40 bg-gold/5 p-6 text-left"
+          style={{ borderRadius: "var(--radius)" }}
+        >
           <p className="eyebrow mb-3">{t.orderConfirm.paymentInfo}</p>
           <dl className="space-y-1 text-sm">
             <div className="flex justify-between">

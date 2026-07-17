@@ -208,7 +208,11 @@ export default async function ProductPage({
         ) : (
           <ul className="space-y-4">
             {reviews.map((review) => (
-              <li key={review.id} className="border border-border-subtle p-4 text-sm">
+              <li
+                key={review.id}
+                className="border border-border-subtle p-4 text-sm"
+                style={{ borderRadius: "var(--radius)" }}
+              >
                 <p className="mb-1 font-medium">
                   {review.authorName}
                   <span className="ml-2 text-gold">

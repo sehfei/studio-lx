@@ -115,7 +115,10 @@ export function CheckoutClient({
         <form onSubmit={handleSubmit} className="space-y-4">
           <h2 className="eyebrow">{t.checkout.contactInfo}</h2>
           {error && (
-            <p className="border border-destructive/40 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+            <p
+              className="border border-destructive/40 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+              style={{ borderRadius: "var(--radius)" }}
+            >
               {error}
             </p>
           )}
@@ -194,7 +197,10 @@ export function CheckoutClient({
 
           <div className="mb-4">
             {appliedCoupon ? (
-              <div className="flex items-center justify-between border border-gold/40 bg-gold/5 px-3 py-2 text-sm">
+              <div
+                className="flex items-center justify-between border border-gold/40 bg-gold/5 px-3 py-2 text-sm"
+                style={{ borderRadius: "var(--radius)" }}
+              >
                 <span className="text-gold">
                   {appliedCoupon.code} — {appliedCoupon.description}
                 </span>

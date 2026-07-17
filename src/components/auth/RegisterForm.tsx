@@ -19,7 +19,10 @@ export function RegisterForm({
 
   if (state?.needsEmailConfirm) {
     return (
-      <p className="border border-gold/40 bg-gold/5 px-4 py-3 text-center text-sm text-gold">
+      <p
+        className="border border-gold/40 bg-gold/5 px-4 py-3 text-center text-sm text-gold"
+        style={{ borderRadius: "var(--radius)" }}
+      >
         {t.auth.needsEmailConfirm}
       </p>
     );

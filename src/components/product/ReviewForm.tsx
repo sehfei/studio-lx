@@ -64,7 +64,10 @@ export function ReviewForm({
 
   if (submitted) {
     return (
-      <p className="mt-8 border border-gold/40 bg-gold/5 px-4 py-3 text-sm text-gold">
+      <p
+        className="mt-8 border border-gold/40 bg-gold/5 px-4 py-3 text-sm text-gold"
+        style={{ borderRadius: "var(--radius)" }}
+      >
         {t.product.alreadyReviewed}
       </p>
     );
@@ -103,7 +106,10 @@ export function ReviewForm({
   }
 
   return (
-    <div className="mt-8 max-w-md border border-border-subtle p-4">
+    <div
+      className="mt-8 max-w-md border border-border-subtle p-4"
+      style={{ borderRadius: "var(--radius)" }}
+    >
       <p className="mb-3 text-sm font-medium">{t.product.writeReview}</p>
       <p className="mb-1 text-xs text-foreground/50">{t.product.ratingLabel}</p>
       <div className="mb-3 flex">

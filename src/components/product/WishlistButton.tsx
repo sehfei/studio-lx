@@ -49,6 +49,7 @@ export function WishlistButton({
             ? "border-gold text-gold"
             : "border-border-subtle text-foreground/60 hover:border-gold hover:text-gold"
         }`}
+        style={{ borderRadius: "var(--radius)" }}
       >
         <WishlistIcon className="h-4 w-4" filled={inWishlist} />
         {inWishlist ? t.product.inWishlist : t.product.addToWishlist}
