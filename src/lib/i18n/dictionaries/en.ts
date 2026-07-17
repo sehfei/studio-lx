@@ -81,6 +81,10 @@ export const en = {
       "Only customers who purchased this product can leave a review.",
     loginToReview: "Please log in to write a review.",
     reviewCount: "reviews",
+    viewImage: "View image {n}",
+    closeGallery: "Close",
+    previousImage: "Previous image",
+    nextImage: "Next image",
   },
   cart: {
     title: "Cart",

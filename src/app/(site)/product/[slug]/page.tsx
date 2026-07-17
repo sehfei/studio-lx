@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { ProductImage } from "@/components/ui/ProductImage";
-import { ProductBadge } from "@/components/ui/ProductBadge";
+import { ProductGallery } from "@/components/product/ProductGallery";
 import { discountPercent, displayBadge, getProductBySlug } from "@/lib/products";
 import { getI18n } from "@/lib/i18n/dictionaries";
 import { AddToCartForm } from "@/components/product/AddToCartForm";
@@ -124,26 +123,13 @@ export default async function ProductPage({
         dangerouslySetInnerHTML={{ __html: safeJsonLd(productSchema) }}
       />
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="relative col-span-2">
-            {badge && <ProductBadge text={badge.text} variant={badge.variant} />}
-            <div className={outOfStock ? "opacity-60 grayscale" : ""}>
-              <ProductImage
-                src={product.images[0]?.url}
-                alt={product.images[0]?.alt}
-                label={product.name}
-              />
-            </div>
-          </div>
-          {product.images.slice(1).map((img, i) => (
-            <ProductImage
-              key={img.url || i}
-              src={img.url}
-              alt={img.alt}
-              label={product.name}
-            />
-          ))}
-        </div>
+        <ProductGallery
+          images={product.images}
+          productName={product.name}
+          badge={badge}
+          outOfStock={outOfStock}
+          t={t}
+        />
 
         <div>
           <p className="eyebrow mb-2">{product.brand}</p>

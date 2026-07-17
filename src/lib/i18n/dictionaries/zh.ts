@@ -81,6 +81,10 @@ export const zh: Dictionary = {
     verifiedPurchaseRequired: "只有购买过该商品的顾客才能评价。",
     loginToReview: "请先登录后再评价。",
     reviewCount: "条评价",
+    viewImage: "查看第 {n} 张图",
+    closeGallery: "关闭",
+    previousImage: "上一张",
+    nextImage: "下一张",
   },
   cart: {
     title: "购物车",
