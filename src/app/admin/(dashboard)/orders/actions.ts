@@ -34,6 +34,7 @@ export async function updateOrderStatus(
     targetType: "order",
     targetId: id,
     summary: `订单状态改为「${status}」`,
+    summaryParams: { status },
   });
 
   revalidatePath("/admin/orders");
@@ -57,6 +58,7 @@ export async function setPaymentStatus(
     targetType: "order",
     targetId: id,
     summary: `订单${paid ? "标记为已付款" : "标记为未付款"}`,
+    summaryParams: { status: paid ? "paidStatus" : "unpaidStatus" },
   });
 
   revalidatePath("/admin/orders");

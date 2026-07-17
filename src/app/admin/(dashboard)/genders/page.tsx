@@ -29,7 +29,7 @@ export default async function AdminGendersPage() {
 
       <div className="mb-8 border border-border-subtle p-4">
         <p className="eyebrow mb-3">{dict.addNew}</p>
-        <AddGenderForm />
+        <AddGenderForm dict={dict} common={t.common} />
       </div>
 
       <AdminTable
@@ -49,7 +49,13 @@ export default async function AdminGendersPage() {
             sort: g.sort_order,
             products: countBySlug.get(g.slug) ?? 0,
             actions: (
-              <DeleteGenderButton id={g.id} slug={g.slug} label={g.label} />
+              <DeleteGenderButton
+                id={g.id}
+                slug={g.slug}
+                label={g.label}
+                dict={dict}
+                common={t.common}
+              />
             ),
           },
         }))}

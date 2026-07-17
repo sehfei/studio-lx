@@ -59,6 +59,7 @@ export async function createBackendUser(
     action: "user.create",
     targetType: "user",
     summary: `创建后台账号 ${email}（角色：${role}）`,
+    summaryParams: { email, role: role === "admin" ? "roleAdmin" : "roleStaff" },
   });
 
   revalidatePath("/admin/users");
@@ -106,6 +107,15 @@ export async function setUserRole(
     targetType: "user",
     targetId: userId,
     summary: `修改用户角色为「${role}」（用户 ID: ${userId}）`,
+    summaryParams: {
+      role:
+        role === "admin"
+          ? "roleAdmin"
+          : role === "staff"
+            ? "roleStaff"
+            : "roleCustomer",
+      userId,
+    },
   });
 
   revalidatePath("/admin/users");

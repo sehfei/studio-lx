@@ -45,6 +45,7 @@ export async function createGender(
     targetType: "gender",
     targetId: slug,
     summary: `新增性别分区「${label}」`,
+    summaryParams: { label },
   });
 
   revalidatePath("/admin/genders");
@@ -80,6 +81,7 @@ export async function deleteGender(
     targetType: "gender",
     targetId: slug,
     summary: `删除性别分区「${slug}」`,
+    summaryParams: { slug },
   });
 
   revalidatePath("/admin/genders");

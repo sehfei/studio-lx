@@ -45,6 +45,7 @@ export async function createCategory(
     targetType: "category",
     targetId: slug,
     summary: `新增分类「${label}」`,
+    summaryParams: { label },
   });
 
   revalidatePath("/admin/categories");
@@ -80,6 +81,7 @@ export async function deleteCategory(
     targetType: "category",
     targetId: slug,
     summary: `删除分类「${slug}」`,
+    summaryParams: { slug },
   });
 
   revalidatePath("/admin/categories");

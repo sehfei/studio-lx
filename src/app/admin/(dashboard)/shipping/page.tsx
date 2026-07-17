@@ -15,7 +15,7 @@ export default async function AdminShippingPage() {
     <div>
       <h1 className="mb-2 text-lg font-medium">{dict.title}</h1>
       <p className="mb-8 text-sm text-foreground/50">{dict.desc}</p>
-      <ShippingForm initial={settings} />
+      <ShippingForm initial={settings} dict={dict} common={t.common} />
     </div>
   );
 }

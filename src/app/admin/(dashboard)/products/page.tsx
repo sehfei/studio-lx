@@ -60,7 +60,12 @@ export default async function AdminProductsPage() {
                 >
                   {dict.edit}
                 </Link>
-                <DeleteProductButton id={p.id} name={p.name} />
+                <DeleteProductButton
+                  id={p.id}
+                  name={p.name}
+                  dict={dict}
+                  common={t.common}
+                />
               </div>
             ),
           },

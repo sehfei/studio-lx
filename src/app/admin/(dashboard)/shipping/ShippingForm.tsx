@@ -4,18 +4,28 @@ import { useActionState } from "react";
 import { Spinner } from "@/components/ui/Spinner";
 import { saveShippingSettings } from "./actions";
 import type { ShippingSettings } from "@/lib/shipping";
+import type { AdminDictionary } from "@/lib/i18n/admin";
 
-export function ShippingForm({ initial }: { initial: ShippingSettings }) {
+export function ShippingForm({
+  initial,
+  dict,
+  common,
+}: {
+  initial: ShippingSettings;
+  dict: AdminDictionary["pages"]["shipping"];
+  common: AdminDictionary["common"];
+}) {
   const [state, formAction, pending] = useActionState(
     saveShippingSettings,
     undefined,
   );
+  const f = dict.form;
 
   return (
     <form action={formAction} className="max-w-md space-y-4">
       <div>
         <label className="mb-1 block text-xs text-foreground/50">
-          西马运费（RM）
+          {f.westFeeLabel}
         </label>
         <input
           name="westFee"
@@ -29,7 +39,7 @@ export function ShippingForm({ initial }: { initial: ShippingSettings }) {
       </div>
       <div>
         <label className="mb-1 block text-xs text-foreground/50">
-          东马运费（RM）— 沙巴 / 砂拉越 / 纳闽
+          {f.eastFeeLabel}
         </label>
         <input
           name="eastFee"
@@ -43,7 +53,7 @@ export function ShippingForm({ initial }: { initial: ShippingSettings }) {
       </div>
       <div>
         <label className="mb-1 block text-xs text-foreground/50">
-          免运费门槛（RM，留空表示不设免运费）
+          {f.freeShippingThresholdLabel}
         </label>
         <input
           name="freeShippingThreshold"
@@ -62,7 +72,7 @@ export function ShippingForm({ initial }: { initial: ShippingSettings }) {
 
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending && <Spinner size="sm" />}
-        {pending ? "保存中" : "保存"}
+        {pending ? common.saving : common.save}
       </button>
     </form>
   );

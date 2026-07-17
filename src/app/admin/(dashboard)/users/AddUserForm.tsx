@@ -8,8 +8,12 @@ import type { AdminDictionary } from "@/lib/i18n/admin";
 
 export function AddUserForm({
   navDict,
+  dict,
+  common,
 }: {
   navDict: AdminDictionary["sidebar"]["nav"];
+  dict: AdminDictionary["pages"]["users"];
+  common: AdminDictionary["common"];
 }) {
   const [state, formAction, pending] = useActionState(
     createBackendUser,
@@ -23,7 +27,9 @@ export function AddUserForm({
   return (
     <form action={formAction} className="flex flex-wrap items-end gap-3">
       <div>
-        <label className="mb-1 block text-xs text-foreground/50">邮箱</label>
+        <label className="mb-1 block text-xs text-foreground/50">
+          {dict.emailLabel}
+        </label>
         <input
           name="email"
           type="email"
@@ -32,7 +38,9 @@ export function AddUserForm({
         />
       </div>
       <div>
-        <label className="mb-1 block text-xs text-foreground/50">初始密码</label>
+        <label className="mb-1 block text-xs text-foreground/50">
+          {dict.initialPasswordLabel}
+        </label>
         <input
           name="password"
           type="text"
@@ -42,25 +50,29 @@ export function AddUserForm({
         />
       </div>
       <div>
-        <label className="mb-1 block text-xs text-foreground/50">角色</label>
+        <label className="mb-1 block text-xs text-foreground/50">
+          {dict.roleLabel}
+        </label>
         <select
           name="role"
           value={role}
           onChange={(e) => setRole(e.target.value as UserRole)}
           className="border border-border-subtle bg-background px-3 py-2 text-sm outline-none focus:border-gold"
         >
-          <option value="staff">Staff</option>
-          <option value="admin">Admin</option>
+          <option value="staff">{dict.roleStaff.replace(" ({n})", "")}</option>
+          <option value="admin">{dict.roleAdmin}</option>
         </select>
       </div>
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending && <Spinner size="sm" />}
-        {pending ? "创建中" : "+ 添加账号"}
+        {pending ? common.creating : dict.addButton}
       </button>
 
       {role === "staff" && (
         <div className="w-full">
-          <p className="mb-1 text-xs text-foreground/50">权限清单</p>
+          <p className="mb-1 text-xs text-foreground/50">
+            {dict.permissionsLabel}
+          </p>
           <PermissionChecklist
             selected={permissions}
             onChange={setPermissions}

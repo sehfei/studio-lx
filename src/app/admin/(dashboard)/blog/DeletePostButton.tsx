@@ -3,8 +3,19 @@
 import { useTransition } from "react";
 import { Spinner } from "@/components/ui/Spinner";
 import { deletePost } from "./actions";
+import type { AdminDictionary } from "@/lib/i18n/admin";
 
-export function DeletePostButton({ id, title }: { id: string; title: string }) {
+export function DeletePostButton({
+  id,
+  title,
+  dict,
+  common,
+}: {
+  id: string;
+  title: string;
+  dict: AdminDictionary["pages"]["blog"];
+  common: AdminDictionary["common"];
+}) {
   const [pending, startTransition] = useTransition();
 
   return (
@@ -13,7 +24,7 @@ export function DeletePostButton({ id, title }: { id: string; title: string }) {
       disabled={pending}
       className="inline-flex items-center gap-1.5 text-xs text-destructive hover:underline disabled:opacity-50"
       onClick={() => {
-        if (!confirm(`确定删除「${title}」？不可恢复`)) return;
+        if (!confirm(dict.confirmDelete.replace("{name}", title))) return;
         startTransition(async () => {
           const result = await deletePost(id);
           if (result?.error) alert(result.error);
@@ -21,7 +32,7 @@ export function DeletePostButton({ id, title }: { id: string; title: string }) {
       }}
     >
       {pending && <Spinner size="sm" />}
-      {pending ? "删除中" : "删除"}
+      {pending ? common.deleting : common.delete}
     </button>
   );
 }

@@ -3,15 +3,20 @@
 import { useTransition } from "react";
 import { Spinner } from "@/components/ui/Spinner";
 import { deleteCoupon, toggleCouponActive } from "./actions";
+import type { AdminDictionary } from "@/lib/i18n/admin";
 
 export function CouponControls({
   id,
   code,
   isActive,
+  dict,
+  common,
 }: {
   id: string;
   code: string;
   isActive: boolean;
+  dict: AdminDictionary["pages"]["coupons"];
+  common: AdminDictionary["common"];
 }) {
   const [togglePending, startToggle] = useTransition();
   const [deletePending, startDelete] = useTransition();
@@ -34,13 +39,13 @@ export function CouponControls({
         }`}
       >
         {togglePending && <Spinner size="sm" />}
-        {isActive ? "已启用" : "已停用"}
+        {isActive ? dict.enabled : dict.disabled}
       </button>
       <button
         type="button"
         disabled={deletePending}
         onClick={() => {
-          if (!confirm(`确定删除优惠码「${code}」？`)) return;
+          if (!confirm(dict.confirmDelete.replace("{code}", code))) return;
           startDelete(async () => {
             const result = await deleteCoupon(id);
             if (result?.error) alert(result.error);
@@ -48,7 +53,7 @@ export function CouponControls({
         }}
         className="text-xs text-destructive hover:underline disabled:opacity-50"
       >
-        {deletePending ? "删除中" : "删除"}
+        {deletePending ? common.deleting : common.delete}
       </button>
     </div>
   );

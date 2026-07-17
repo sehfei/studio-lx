@@ -187,6 +187,7 @@ export async function createProduct(
     targetType: "product",
     targetId: slug,
     summary: `新增商品「${input.name}」(SKU: ${input.sku})`,
+    summaryParams: { name: input.name, sku: input.sku },
   });
 
   revalidateCatalog(input.gender, input.category);
@@ -331,6 +332,7 @@ export async function updateProduct(
     targetType: "product",
     targetId: slug,
     summary: `更新商品「${input.name}」(SKU: ${input.sku})`,
+    summaryParams: { name: input.name, sku: input.sku },
   });
 
   // 新旧分类、新旧 slug 的页面都要刷新
@@ -370,6 +372,7 @@ export async function deleteProduct(
     targetType: "product",
     targetId: existing.slug,
     summary: `删除商品（slug: ${existing.slug}）`,
+    summaryParams: { slug: existing.slug },
   });
 
   revalidateCatalog(existing.gender, existing.category, [existing.slug]);

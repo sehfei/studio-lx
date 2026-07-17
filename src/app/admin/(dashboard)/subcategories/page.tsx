@@ -44,7 +44,11 @@ export default async function AdminSubcategoriesPage() {
                 <h2 className="eyebrow mb-3">{category.label}</h2>
 
                 <div className="mb-4 border border-border-subtle p-4">
-                  <AddSubcategoryForm category={category.slug} />
+                  <AddSubcategoryForm
+                    category={category.slug}
+                    dict={dict}
+                    common={t.common}
+                  />
                 </div>
 
                 <AdminTable
@@ -76,6 +80,8 @@ export default async function AdminSubcategoriesPage() {
                           id={s.id}
                           slug={s.slug}
                           label={s.label}
+                          dict={dict}
+                          common={t.common}
                         />
                       ),
                     },

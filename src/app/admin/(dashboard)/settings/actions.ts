@@ -94,6 +94,7 @@ export async function undoLastSave(): Promise<ThemeFormState> {
     action: "settings.theme_undo",
     targetType: "theme_settings",
     summary: "撤销上一次主题保存",
+    summaryParams: {},
   });
 
   revalidatePath("/", "layout");
@@ -159,6 +160,7 @@ export async function saveTheme(
     action: "settings.theme_save",
     targetType: "theme_settings",
     summary: "更新网站主题设置",
+    summaryParams: {},
   });
 
   return { success: "已保存，全站生效" };
@@ -204,6 +206,7 @@ export async function saveAnnouncement(
     action: "settings.announcement_save",
     targetType: "announcement_settings",
     summary: `更新公告设置（${enabled ? "启用" : "关闭"}）`,
+    summaryParams: { status: enabled ? "enabled" : "disabled" },
   });
 
   revalidatePath("/", "layout");
@@ -328,6 +331,7 @@ export async function saveIdentity(
     action: "settings.identity_save",
     targetType: "identity_settings",
     summary: "更新品牌与联系方式设置",
+    summaryParams: {},
   });
 
   revalidatePath("/", "layout");
@@ -367,6 +371,7 @@ export async function savePages(
     action: "settings.pages_save",
     targetType: "pages_settings",
     summary: "更新页面内容设置",
+    summaryParams: {},
   });
 
   revalidatePath("/", "layout");

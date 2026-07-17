@@ -29,7 +29,7 @@ export default async function AdminCategoriesPage() {
 
       <div className="mb-8 border border-border-subtle p-4">
         <p className="eyebrow mb-3">{dict.addNew}</p>
-        <AddCategoryForm />
+        <AddCategoryForm dict={dict} common={t.common} />
       </div>
 
       <AdminTable
@@ -49,7 +49,13 @@ export default async function AdminCategoriesPage() {
             sort: c.sort_order,
             products: countBySlug.get(c.slug) ?? 0,
             actions: (
-              <DeleteCategoryButton id={c.id} slug={c.slug} label={c.label} />
+              <DeleteCategoryButton
+                id={c.id}
+                slug={c.slug}
+                label={c.label}
+                dict={dict}
+                common={t.common}
+              />
             ),
           },
         }))}

@@ -63,6 +63,7 @@ export async function createCoupon(
     targetType: "coupon",
     targetId: code,
     summary: `新增优惠码「${code}」`,
+    summaryParams: { code },
   });
 
   revalidatePath("/admin/coupons");
@@ -85,6 +86,7 @@ export async function toggleCouponActive(
     targetType: "coupon",
     targetId: id,
     summary: `优惠码${isActive ? "启用" : "停用"}（id: ${id}）`,
+    summaryParams: { status: isActive ? "enabled" : "disabled", id },
   });
 
   revalidatePath("/admin/coupons");
@@ -102,6 +104,7 @@ export async function deleteCoupon(
     targetType: "coupon",
     targetId: id,
     summary: `删除优惠码（id: ${id}）`,
+    summaryParams: { id },
   });
 
   revalidatePath("/admin/coupons");

@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { createBanner, updateBanner } from "./actions";
 import { Spinner } from "@/components/ui/Spinner";
 import type { Banner } from "@/lib/banners";
+import type { AdminDictionary } from "@/lib/i18n/admin";
 
 const cardClass =
   "rounded-2xl border border-border-subtle bg-background p-6 shadow-sm";
@@ -23,10 +24,19 @@ function toLocalInput(iso?: string): string {
 }
 
 // 不传 banner 是新增，传了就是编辑
-export function BannerForm({ banner }: { banner?: Banner }) {
+export function BannerForm({
+  banner,
+  dict,
+  common,
+}: {
+  banner?: Banner;
+  dict: AdminDictionary["pages"]["banners"];
+  common: AdminDictionary["common"];
+}) {
   const action = banner ? updateBanner.bind(null, banner.id) : createBanner;
   const [state, formAction, pending] = useActionState(action, undefined);
   const v = state?.values;
+  const f = dict.form;
 
   return (
     <form action={formAction} className="max-w-2xl space-y-6">
@@ -38,7 +48,7 @@ export function BannerForm({ banner }: { banner?: Banner }) {
 
       <div className={cardClass}>
         <label className={labelClass}>
-          Banner 图片 {banner ? "（不选则保留当前图）" : "*"}
+          {f.imageLabel} {banner ? f.imageKeepCurrent : "*"}
         </label>
         {banner?.imageUrl && (
           <div className="relative mb-3 h-32 w-full overflow-hidden rounded-xl border border-border-subtle">
@@ -58,14 +68,14 @@ export function BannerForm({ banner }: { banner?: Banner }) {
           className="block w-full text-xs file:mr-3 file:rounded-full file:border-0 file:bg-foreground file:px-3 file:py-1.5 file:text-xs file:text-background"
         />
         <p className="mt-2 text-xs text-foreground/40">
-          建议宽幅横图，JPEG/PNG/WEBP，最大 5MB。
+          {f.imageHint}
         </p>
       </div>
 
       <div className={cardClass}>
         <div className="space-y-4">
           <div>
-            <label className={labelClass}>标题（可选）</label>
+            <label className={labelClass}>{f.titleLabel}</label>
             <input
               name="title"
               className={inputClass}
@@ -74,17 +84,17 @@ export function BannerForm({ banner }: { banner?: Banner }) {
             />
           </div>
           <div>
-            <label className={labelClass}>副标题（可选）</label>
+            <label className={labelClass}>{f.subtitleLabel}</label>
             <input
               name="subtitle"
               className={inputClass}
               defaultValue={v ? v.subtitle : banner?.subtitle}
-              placeholder="限时优惠，全场低至五折"
+              placeholder="Limited time offer, up to 50% off"
             />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className={labelClass}>按钮链接（可选）</label>
+              <label className={labelClass}>{f.linkUrlLabel}</label>
               <input
                 name="linkUrl"
                 className={inputClass}
@@ -93,12 +103,12 @@ export function BannerForm({ banner }: { banner?: Banner }) {
               />
             </div>
             <div>
-              <label className={labelClass}>按钮文字（可选）</label>
+              <label className={labelClass}>{f.linkTextLabel}</label>
               <input
                 name="linkText"
                 className={inputClass}
                 defaultValue={v ? v.linkText : banner?.linkText}
-                placeholder="立即选购"
+                placeholder="Shop Now"
               />
             </div>
           </div>
@@ -109,7 +119,7 @@ export function BannerForm({ banner }: { banner?: Banner }) {
         <div className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className={labelClass}>排序（数字小的排前面）</label>
+              <label className={labelClass}>{f.sortOrderLabel}</label>
               <input
                 name="sortOrder"
                 type="number"
@@ -124,12 +134,12 @@ export function BannerForm({ banner }: { banner?: Banner }) {
                 defaultChecked={v ? v.isActive : (banner?.isActive ?? true)}
                 className="h-5 w-5 accent-foreground"
               />
-              启用（显示在首页）
+              {f.activeLabel}
             </label>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className={labelClass}>开始时间（可选）</label>
+              <label className={labelClass}>{f.startsAtLabel}</label>
               <input
                 name="startsAt"
                 type="datetime-local"
@@ -138,7 +148,7 @@ export function BannerForm({ banner }: { banner?: Banner }) {
               />
             </div>
             <div>
-              <label className={labelClass}>结束时间（可选）</label>
+              <label className={labelClass}>{f.endsAtLabel}</label>
               <input
                 name="endsAt"
                 type="datetime-local"
@@ -148,14 +158,14 @@ export function BannerForm({ banner }: { banner?: Banner }) {
             </div>
           </div>
           <p className="text-xs text-foreground/40">
-            留空表示不限时间。填了时间则只在时间窗内显示。
+            {f.scheduleHint}
           </p>
         </div>
       </div>
 
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending && <Spinner size="sm" />}
-        {pending ? "保存中" : banner ? "保存修改" : "创建 Banner"}
+        {pending ? common.saving : banner ? f.saveButton : f.createButton}
       </button>
     </form>
   );

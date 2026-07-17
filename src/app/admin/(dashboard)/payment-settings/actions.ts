@@ -34,6 +34,7 @@ export async function savePaymentSettings(
     action: "payment_settings.save",
     targetType: "payment_settings",
     summary: "更新收款设置",
+    summaryParams: {},
   });
 
   revalidatePath("/", "layout");

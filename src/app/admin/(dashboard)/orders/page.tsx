@@ -45,6 +45,7 @@ export default async function AdminOrdersPage() {
                 id={o.id}
                 status={o.status}
                 paymentStatus={o.payment_status}
+                dict={dict}
               />
             ),
             date: new Date(o.created_at).toLocaleDateString("en-MY", {

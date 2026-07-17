@@ -50,6 +50,7 @@ export async function createSubcategory(
     targetType: "subcategory",
     targetId: slug,
     summary: `新增子分类「${label}」（属于 ${category}）`,
+    summaryParams: { label, category },
   });
 
   revalidatePath("/admin/subcategories");
@@ -85,6 +86,7 @@ export async function deleteSubcategory(
     targetType: "subcategory",
     targetId: slug,
     summary: `删除子分类「${slug}」`,
+    summaryParams: { slug },
   });
 
   revalidatePath("/admin/subcategories");

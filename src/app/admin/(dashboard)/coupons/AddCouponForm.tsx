@@ -3,17 +3,27 @@
 import { useActionState } from "react";
 import { Spinner } from "@/components/ui/Spinner";
 import { createCoupon } from "./actions";
+import type { AdminDictionary } from "@/lib/i18n/admin";
 
-export function AddCouponForm() {
+export function AddCouponForm({
+  dict,
+  common,
+}: {
+  dict: AdminDictionary["pages"]["coupons"];
+  common: AdminDictionary["common"];
+}) {
   const [state, formAction, pending] = useActionState(
     createCoupon,
     undefined,
   );
+  const f = dict.form;
 
   return (
     <form action={formAction} className="flex flex-wrap items-end gap-3">
       <div>
-        <label className="mb-1 block text-xs text-foreground/50">优惠码</label>
+        <label className="mb-1 block text-xs text-foreground/50">
+          {f.codeLabel}
+        </label>
         <input
           name="code"
           required
@@ -22,18 +32,22 @@ export function AddCouponForm() {
         />
       </div>
       <div>
-        <label className="mb-1 block text-xs text-foreground/50">类型</label>
+        <label className="mb-1 block text-xs text-foreground/50">
+          {f.typeLabel}
+        </label>
         <select
           name="type"
           required
           className="border border-border-subtle bg-background px-3 py-2 text-sm outline-none focus:border-gold"
         >
-          <option value="percentage">百分比 %</option>
-          <option value="fixed">固定金额 RM</option>
+          <option value="percentage">{f.percentageOption}</option>
+          <option value="fixed">{f.fixedOption}</option>
         </select>
       </div>
       <div>
-        <label className="mb-1 block text-xs text-foreground/50">数值</label>
+        <label className="mb-1 block text-xs text-foreground/50">
+          {f.valueLabel}
+        </label>
         <input
           name="value"
           type="number"
@@ -46,7 +60,7 @@ export function AddCouponForm() {
       </div>
       <div>
         <label className="mb-1 block text-xs text-foreground/50">
-          最低消费（选填）
+          {f.minSpendLabel}
         </label>
         <input
           name="minSpend"
@@ -58,7 +72,7 @@ export function AddCouponForm() {
       </div>
       <div>
         <label className="mb-1 block text-xs text-foreground/50">
-          使用次数上限（选填）
+          {f.maxUsesLabel}
         </label>
         <input
           name="maxUses"
@@ -69,7 +83,7 @@ export function AddCouponForm() {
       </div>
       <div>
         <label className="mb-1 block text-xs text-foreground/50">
-          过期时间（选填）
+          {f.expiresAtLabel}
         </label>
         <input
           name="expiresAt"
@@ -79,7 +93,7 @@ export function AddCouponForm() {
       </div>
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending && <Spinner size="sm" />}
-        {pending ? "添加中" : "+ 添加优惠码"}
+        {pending ? common.adding : dict.addButton}
       </button>
       {state?.error && (
         <p className="w-full text-sm text-destructive">{state.error}</p>

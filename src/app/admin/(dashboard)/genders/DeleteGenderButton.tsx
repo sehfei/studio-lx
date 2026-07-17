@@ -3,15 +3,20 @@
 import { useTransition } from "react";
 import { Spinner } from "@/components/ui/Spinner";
 import { deleteGender } from "./actions";
+import type { AdminDictionary } from "@/lib/i18n/admin";
 
 export function DeleteGenderButton({
   id,
   slug,
   label,
+  dict,
+  common,
 }: {
   id: string;
   slug: string;
   label: string;
+  dict: AdminDictionary["pages"]["genders"];
+  common: AdminDictionary["common"];
 }) {
   const [pending, startTransition] = useTransition();
 
@@ -21,7 +26,7 @@ export function DeleteGenderButton({
       disabled={pending}
       className="inline-flex items-center gap-1.5 text-xs text-destructive hover:underline disabled:opacity-50"
       onClick={() => {
-        if (!confirm(`确定删除分区「${label}」？`)) return;
+        if (!confirm(dict.confirmDelete.replace("{name}", label))) return;
         startTransition(async () => {
           const result = await deleteGender(id, slug);
           if (result?.error) alert(result.error);
@@ -29,7 +34,7 @@ export function DeleteGenderButton({
       }}
     >
       {pending && <Spinner size="sm" />}
-      {pending ? "删除中" : "删除"}
+      {pending ? common.deleting : common.delete}
     </button>
   );
 }

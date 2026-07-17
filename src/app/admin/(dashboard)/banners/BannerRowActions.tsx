@@ -4,18 +4,23 @@ import Link from "next/link";
 import { useTransition } from "react";
 import { Spinner } from "@/components/ui/Spinner";
 import { deleteBanner, toggleBannerActive } from "./actions";
+import type { AdminDictionary } from "@/lib/i18n/admin";
 
 export function BannerRowActions({
   id,
   title,
   isActive,
+  dict,
+  common,
 }: {
   id: string;
   title: string;
   isActive: boolean;
+  dict: AdminDictionary["pages"]["banners"];
+  common: AdminDictionary["common"];
 }) {
   const [pending, startTransition] = useTransition();
-  const label = title || "此 banner";
+  const label = title || dict.thisBanner;
 
   return (
     <div className="flex items-center gap-3">
@@ -30,20 +35,20 @@ export function BannerRowActions({
           });
         }}
       >
-        {isActive ? "下架" : "上架"}
+        {isActive ? dict.deactivate : dict.activate}
       </button>
       <Link
         href={`/admin/banners/${id}/edit`}
         className="text-xs text-foreground/60 hover:text-gold hover:underline"
       >
-        编辑
+        {common.edit}
       </Link>
       <button
         type="button"
         disabled={pending}
         className="inline-flex items-center gap-1.5 text-xs text-destructive hover:underline disabled:opacity-50"
         onClick={() => {
-          if (!confirm(`确定删除「${label}」？图片也会一起删除，不可恢复`)) {
+          if (!confirm(dict.confirmDelete.replace("{name}", label))) {
             return;
           }
           startTransition(async () => {
@@ -53,7 +58,7 @@ export function BannerRowActions({
         }}
       >
         {pending && <Spinner size="sm" />}
-        删除
+        {common.delete}
       </button>
     </div>
   );

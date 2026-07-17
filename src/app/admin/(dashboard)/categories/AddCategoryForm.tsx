@@ -3,8 +3,15 @@
 import { useActionState } from "react";
 import { Spinner } from "@/components/ui/Spinner";
 import { createCategory } from "./actions";
+import type { AdminDictionary } from "@/lib/i18n/admin";
 
-export function AddCategoryForm() {
+export function AddCategoryForm({
+  dict,
+  common,
+}: {
+  dict: AdminDictionary["pages"]["categories"];
+  common: AdminDictionary["common"];
+}) {
   const [state, formAction, pending] = useActionState(
     createCategory,
     undefined,
@@ -14,7 +21,7 @@ export function AddCategoryForm() {
     <form action={formAction} className="flex flex-wrap items-end gap-3">
       <div>
         <label className="mb-1 block text-xs text-foreground/50">
-          分类名称
+          {dict.nameLabel}
         </label>
         <input
           name="label"
@@ -25,7 +32,7 @@ export function AddCategoryForm() {
       </div>
       <div>
         <label className="mb-1 block text-xs text-foreground/50">
-          Slug（留空自动生成）
+          {common.slugHint}
         </label>
         <input
           name="slug"
@@ -34,7 +41,9 @@ export function AddCategoryForm() {
         />
       </div>
       <div>
-        <label className="mb-1 block text-xs text-foreground/50">排序</label>
+        <label className="mb-1 block text-xs text-foreground/50">
+          {common.sort}
+        </label>
         <input
           name="sortOrder"
           type="number"
@@ -44,7 +53,7 @@ export function AddCategoryForm() {
       </div>
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending && <Spinner size="sm" />}
-        {pending ? "添加中" : "+ 添加分类"}
+        {pending ? common.adding : dict.addButton}
       </button>
       {state?.error && (
         <p className="w-full text-sm text-destructive">{state.error}</p>

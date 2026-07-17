@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { OrderStatusControls } from "../OrderStatusControls";
+import { getAdminI18n } from "@/lib/i18n/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,8 @@ export default async function AdminOrderDetailPage({
 }) {
   await requirePermission("orders");
   const { id } = await params;
+  const { t } = await getAdminI18n();
+  const dict = t.pages.orders;
 
   const { data: order } = await supabaseAdmin
     .from("orders")
@@ -33,7 +36,7 @@ export default async function AdminOrderDetailPage({
         href="/admin/orders"
         className="mb-6 inline-block text-xs text-foreground/50 hover:text-gold"
       >
-        ← Back to Orders
+        {dict.backLink}
       </Link>
 
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
@@ -42,12 +45,13 @@ export default async function AdminOrderDetailPage({
           id={order.id}
           status={order.status}
           paymentStatus={order.payment_status}
+          dict={dict}
         />
       </div>
 
       <div className="grid gap-8 lg:grid-cols-2">
         <div>
-          <h2 className="eyebrow mb-3">收货信息</h2>
+          <h2 className="eyebrow mb-3">{dict.shippingInfoTitle}</h2>
           <dl className="space-y-2 border border-border-subtle p-4 text-sm">
             <div className="flex justify-between gap-4">
               <dt className="text-foreground/50">Name</dt>
@@ -84,7 +88,7 @@ export default async function AdminOrderDetailPage({
         </div>
 
         <div>
-          <h2 className="eyebrow mb-3">商品明细</h2>
+          <h2 className="eyebrow mb-3">{dict.itemDetailTitle}</h2>
           <ul className="divide-y divide-border-subtle border border-border-subtle">
             {(items ?? []).map((item) => (
               <li

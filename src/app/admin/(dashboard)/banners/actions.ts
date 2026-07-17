@@ -141,6 +141,7 @@ export async function createBanner(
     action: "banner.create",
     targetType: "banner",
     summary: `新增横幅「${values.title || "（无标题）"}」`,
+    summaryParams: { title: values.title || "untitled" },
   });
 
   revalidateBanner();
@@ -195,6 +196,7 @@ export async function updateBanner(
     targetType: "banner",
     targetId: id,
     summary: `更新横幅「${values.title || "（无标题）"}」`,
+    summaryParams: { title: values.title || "untitled" },
   });
 
   revalidateBanner();
@@ -225,6 +227,7 @@ export async function deleteBanner(
     targetType: "banner",
     targetId: id,
     summary: `删除横幅（id: ${id}）`,
+    summaryParams: { id },
   });
 
   revalidateBanner();
@@ -247,6 +250,7 @@ export async function toggleBannerActive(
     targetType: "banner",
     targetId: id,
     summary: `横幅${isActive ? "上架" : "下架"}（id: ${id}）`,
+    summaryParams: { status: isActive ? "active" : "inactive", id },
   });
 
   revalidateBanner();

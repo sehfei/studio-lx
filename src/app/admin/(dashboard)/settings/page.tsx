@@ -41,7 +41,11 @@ export default async function AdminSettingsPage() {
         <p className="mb-8 text-sm text-foreground/50">
           {t.settings.identitySectionDesc}
         </p>
-        <IdentityForm initial={identity} />
+        <IdentityForm
+          initial={identity}
+          dict={t.settings.identityForm}
+          common={t.common}
+        />
       </div>
 
       <div className="border-t border-border-subtle pt-8">
@@ -51,7 +55,11 @@ export default async function AdminSettingsPage() {
         <p className="mb-8 text-sm text-foreground/50">
           {t.settings.pagesSectionDesc}
         </p>
-        <PagesForm initial={pages} />
+        <PagesForm
+          initial={pages}
+          dict={t.settings.pagesForm}
+          common={t.common}
+        />
       </div>
 
       <div className="border-t border-border-subtle pt-8">
@@ -61,7 +69,11 @@ export default async function AdminSettingsPage() {
         <p className="mb-8 text-sm text-foreground/50">
           {t.settings.announcementSectionDesc}
         </p>
-        <AnnouncementForm initial={announcement} />
+        <AnnouncementForm
+          initial={announcement}
+          dict={t.settings.announcementForm}
+          common={t.common}
+        />
       </div>
     </div>
   );

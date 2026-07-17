@@ -93,6 +93,8 @@ export default async function AdminBannersPage() {
                   id={banner.id}
                   title={banner.title}
                   isActive={banner.isActive}
+                  dict={dict}
+                  common={t.common}
                 />
               </div>
             );

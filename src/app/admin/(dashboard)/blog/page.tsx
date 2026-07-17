@@ -54,7 +54,12 @@ export default async function AdminBlogPage() {
                 >
                   {dict.edit}
                 </Link>
-                <DeletePostButton id={post.id} title={post.title} />
+                <DeletePostButton
+                  id={post.id}
+                  title={post.title}
+                  dict={dict}
+                  common={t.common}
+                />
               </div>
             ),
           },

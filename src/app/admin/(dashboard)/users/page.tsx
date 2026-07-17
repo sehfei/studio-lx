@@ -25,7 +25,7 @@ export default async function AdminUsersPage() {
 
       <div className="mb-8 border border-border-subtle p-4">
         <p className="eyebrow mb-3">{dict.addNew}</p>
-        <AddUserForm navDict={t.sidebar.nav} />
+        <AddUserForm navDict={t.sidebar.nav} dict={dict} common={t.common} />
       </div>
 
       <AdminTable
@@ -89,6 +89,8 @@ export default async function AdminUsersPage() {
                   permissions={permissions}
                   isSelf={isSelf}
                   navDict={t.sidebar.nav}
+                  dict={dict}
+                  common={t.common}
                 />
               ),
             },

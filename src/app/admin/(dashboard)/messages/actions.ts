@@ -22,6 +22,7 @@ export async function markMessageRead(
     targetType: "contact_message",
     targetId: id,
     summary: `留言标记已读（id: ${id}）`,
+    summaryParams: { id },
   });
 
   revalidatePath("/admin/messages");

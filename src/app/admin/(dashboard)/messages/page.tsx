@@ -45,7 +45,7 @@ export default async function AdminMessagesPage() {
                 </div>
                 <div className="flex items-center gap-3 text-xs text-foreground/40">
                   {new Date(m.created_at).toLocaleString("en-MY")}
-                  {!m.is_read && <MarkReadButton id={m.id} />}
+                  {!m.is_read && <MarkReadButton id={m.id} dict={dict} />}
                 </div>
               </div>
               <p className="text-sm text-foreground/70">{m.message}</p>

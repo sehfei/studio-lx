@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import type { AnnouncementSettings } from "@/lib/announcement";
 import { Spinner } from "@/components/ui/Spinner";
 import { saveAnnouncement } from "./actions";
+import type { AdminDictionary } from "@/lib/i18n/admin";
 
 // 和 ThemeForm 一致：后台表单外壳用固定的现代圆角风格，
 // 不跟随网站自己的 --radius 设置（那是给访客看的，不是给后台工具看的）。
@@ -16,8 +17,12 @@ const inputClass =
 
 export function AnnouncementForm({
   initial,
+  dict,
+  common,
 }: {
   initial: AnnouncementSettings;
+  dict: AdminDictionary["settings"]["announcementForm"];
+  common: AdminDictionary["common"];
 }) {
   const [state, formAction, pending] = useActionState(
     saveAnnouncement,
@@ -44,24 +49,24 @@ export function AnnouncementForm({
           defaultChecked={initial.enabled}
           className="h-5 w-5 accent-foreground"
         />
-        在网站顶部显示公告
+        {dict.showOnSiteLabel}
       </label>
 
       <div>
-        <label className={labelClass}>公告内容</label>
+        <label className={labelClass}>{dict.messageLabel}</label>
         <textarea
           name="message"
           rows={2}
           maxLength={200}
           defaultValue={initial.message}
-          placeholder="例如：全场满 RM200 免运费，限时到本月底"
+          placeholder={dict.messagePlaceholder}
           className={inputClass}
         />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className={labelClass}>按钮链接（可选）</label>
+          <label className={labelClass}>{dict.linkUrlLabel}</label>
           <input
             name="linkUrl"
             defaultValue={initial.linkUrl}
@@ -70,11 +75,11 @@ export function AnnouncementForm({
           />
         </div>
         <div>
-          <label className={labelClass}>按钮文字（可选）</label>
+          <label className={labelClass}>{dict.linkTextLabel}</label>
           <input
             name="linkText"
             defaultValue={initial.linkText}
-            placeholder="立即选购"
+            placeholder={dict.linkTextPlaceholder}
             className={inputClass}
           />
         </div>
@@ -82,7 +87,7 @@ export function AnnouncementForm({
 
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending && <Spinner size="sm" />}
-        {pending ? "保存中" : "保存并全站生效"}
+        {pending ? common.saving : dict.saveButton}
       </button>
     </form>
   );

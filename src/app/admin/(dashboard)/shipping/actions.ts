@@ -47,6 +47,7 @@ export async function saveShippingSettings(
     action: "shipping_settings.save",
     targetType: "shipping_settings",
     summary: `更新运费设置（西马 RM${westFee} / 东马 RM${eastFee}）`,
+    summaryParams: { westFee: String(westFee), eastFee: String(eastFee) },
   });
 
   revalidatePath("/", "layout");

@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import type { PageKey, SitePages } from "@/lib/pages";
 import { Spinner } from "@/components/ui/Spinner";
 import { savePages } from "./actions";
+import type { AdminDictionary } from "@/lib/i18n/admin";
 
 const cardClass =
   "rounded-2xl border border-border-subtle bg-background p-6 shadow-sm";
@@ -17,11 +18,13 @@ function PageEditor({
   heading,
   hint,
   initial,
+  dict,
 }: {
   keyName: PageKey;
   heading: string;
   hint: string;
   initial: SitePages[keyof SitePages];
+  dict: AdminDictionary["settings"]["pagesForm"];
 }) {
   return (
     <div className={cardClass}>
@@ -32,7 +35,7 @@ function PageEditor({
       <p className="mb-4 text-xs text-foreground/40">{hint}</p>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label className={labelClass}>标题（English）</label>
+          <label className={labelClass}>{dict.titleEnLabel}</label>
           <input
             name={`${keyName}-titleEn`}
             defaultValue={initial.titleEn}
@@ -40,7 +43,7 @@ function PageEditor({
           />
         </div>
         <div>
-          <label className={labelClass}>标题（中文）</label>
+          <label className={labelClass}>{dict.titleZhLabel}</label>
           <input
             name={`${keyName}-titleZh`}
             defaultValue={initial.titleZh}
@@ -48,7 +51,7 @@ function PageEditor({
           />
         </div>
         <div>
-          <label className={labelClass}>正文（English）</label>
+          <label className={labelClass}>{dict.bodyEnLabel}</label>
           <textarea
             name={`${keyName}-bodyEn`}
             rows={6}
@@ -57,7 +60,7 @@ function PageEditor({
           />
         </div>
         <div>
-          <label className={labelClass}>正文（中文）</label>
+          <label className={labelClass}>{dict.bodyZhLabel}</label>
           <textarea
             name={`${keyName}-bodyZh`}
             rows={6}
@@ -70,7 +73,15 @@ function PageEditor({
   );
 }
 
-export function PagesForm({ initial }: { initial: SitePages }) {
+export function PagesForm({
+  initial,
+  dict,
+  common,
+}: {
+  initial: SitePages;
+  dict: AdminDictionary["settings"]["pagesForm"];
+  common: AdminDictionary["common"];
+}) {
   const [state, formAction, pending] = useActionState(savePages, undefined);
 
   return (
@@ -88,32 +99,36 @@ export function PagesForm({ initial }: { initial: SitePages }) {
 
       <PageEditor
         keyName="about"
-        heading="关于我们"
-        hint="留空则显示内置默认文案。正文里换行会保留。"
+        heading={dict.aboutHeading}
+        hint={dict.defaultHint}
         initial={initial.about}
+        dict={dict}
       />
       <PageEditor
         keyName="shipping"
-        heading="运费与退换货"
-        hint="留空则显示内置默认文案。正文里换行会保留。"
+        heading={dict.shippingHeading}
+        hint={dict.defaultHint}
         initial={initial.shipping}
+        dict={dict}
       />
       <PageEditor
         keyName="privacy"
-        heading="隐私政策"
-        hint="留空则显示内置默认文案（通用模板，正式使用前建议找律师确认马来西亚 PDPA 合规性）。正文里换行会保留。"
+        heading={dict.privacyHeading}
+        hint={dict.legalDefaultHint}
         initial={initial.privacy}
+        dict={dict}
       />
       <PageEditor
         keyName="terms"
-        heading="服务条款"
-        hint="留空则显示内置默认文案（通用模板，正式使用前建议找律师确认）。正文里换行会保留。"
+        heading={dict.termsHeading}
+        hint={dict.legalDefaultHint}
         initial={initial.terms}
+        dict={dict}
       />
 
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending && <Spinner size="sm" />}
-        {pending ? "保存中" : "保存并全站生效"}
+        {pending ? common.saving : dict.saveButton}
       </button>
     </form>
   );

@@ -3,26 +3,28 @@
 import { useTransition } from "react";
 import { Spinner } from "@/components/ui/Spinner";
 import { setPaymentStatus, updateOrderStatus } from "./actions";
-
-const STATUS_OPTIONS = [
-  { value: "pending", label: "Pending" },
-  { value: "processing", label: "Processing" },
-  { value: "shipped", label: "Shipped" },
-  { value: "completed", label: "Completed" },
-  { value: "cancelled", label: "Cancelled" },
-];
+import type { AdminDictionary } from "@/lib/i18n/admin";
 
 export function OrderStatusControls({
   id,
   status,
   paymentStatus,
+  dict,
 }: {
   id: string;
   status: string;
   paymentStatus: string;
+  dict: AdminDictionary["pages"]["orders"];
 }) {
   const [statusPending, startStatusTransition] = useTransition();
   const [paymentPending, startPaymentTransition] = useTransition();
+  const statusOptions = [
+    { value: "pending", label: dict.statusOptions.pending },
+    { value: "processing", label: dict.statusOptions.processing },
+    { value: "shipped", label: dict.statusOptions.shipped },
+    { value: "completed", label: dict.statusOptions.completed },
+    { value: "cancelled", label: dict.statusOptions.cancelled },
+  ];
 
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -38,7 +40,7 @@ export function OrderStatusControls({
         }}
         className="border border-border-subtle bg-background px-3 py-1.5 text-sm outline-none focus:border-gold"
       >
-        {STATUS_OPTIONS.map((opt) => (
+        {statusOptions.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
           </option>
@@ -64,7 +66,7 @@ export function OrderStatusControls({
         }`}
       >
         {paymentPending && <Spinner size="sm" />}
-        {paymentStatus === "paid" ? "已付款" : "标记已付款"}
+        {paymentStatus === "paid" ? dict.paymentPaid : dict.markAsPaid}
       </button>
     </div>
   );

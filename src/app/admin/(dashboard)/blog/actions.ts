@@ -116,6 +116,7 @@ export async function createPost(
     targetType: "blog_post",
     targetId: slug,
     summary: `新增文章「${values.title}」`,
+    summaryParams: { title: values.title },
   });
 
   revalidateBlog();
@@ -183,6 +184,7 @@ export async function updatePost(
     targetType: "blog_post",
     targetId: slug,
     summary: `更新文章「${values.title}」`,
+    summaryParams: { title: values.title },
   });
 
   revalidateBlog();
@@ -215,6 +217,7 @@ export async function deletePost(
     targetType: "blog_post",
     targetId: id,
     summary: `删除文章（id: ${id}）`,
+    summaryParams: { id },
   });
 
   revalidateBlog();

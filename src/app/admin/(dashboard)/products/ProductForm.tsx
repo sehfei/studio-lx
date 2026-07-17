@@ -9,6 +9,7 @@ import type { Product } from "@/lib/products";
 import type { CategoryRow } from "@/lib/categories";
 import type { GenderRow } from "@/lib/genders";
 import type { SubcategoryRow } from "@/lib/subcategories";
+import type { AdminDictionary } from "@/lib/i18n/admin";
 
 // 展示名：首字母大写，连字符转空格（new-arrival -> New Arrival）
 function toLabel(value: string): string {
@@ -29,12 +30,17 @@ export function ProductForm({
   categories,
   genders,
   subcategories,
+  dict,
+  common,
 }: {
   product?: Product;
   categories: CategoryRow[];
   genders: GenderRow[];
   subcategories: SubcategoryRow[];
+  dict: AdminDictionary["pages"]["products"];
+  common: AdminDictionary["common"];
 }) {
+  const f = dict.form;
   const action = product ? updateProduct.bind(null, product.id) : createProduct;
   const [state, formAction, pending] = useActionState(action, undefined);
   // 提交报错时用返回的原始值回填，避免 React 19 重置表单清空所填内容
@@ -73,7 +79,7 @@ export function ProductForm({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className={labelClass}>Product Name *</label>
+          <label className={labelClass}>{f.nameLabel} *</label>
           <input
             name="name"
             required
@@ -82,11 +88,11 @@ export function ProductForm({
           />
         </div>
         <div>
-          <label className={labelClass}>Slug（留空自动生成）</label>
+          <label className={labelClass}>{common.slugHint}</label>
           <input name="slug" className={inputClass} defaultValue={v ? v.slug : product?.slug} />
         </div>
         <div>
-          <label className={labelClass}>SKU *</label>
+          <label className={labelClass}>{f.skuLabel} *</label>
           <input
             name="sku"
             required
@@ -95,7 +101,7 @@ export function ProductForm({
           />
         </div>
         <div>
-          <label className={labelClass}>Brand *</label>
+          <label className={labelClass}>{f.brandLabel} *</label>
           <input
             name="brand"
             required
@@ -106,7 +112,7 @@ export function ProductForm({
       </div>
 
       <div>
-        <label className={labelClass}>Description</label>
+        <label className={labelClass}>{f.descriptionLabel}</label>
         <textarea
           name="description"
           rows={3}
@@ -117,7 +123,7 @@ export function ProductForm({
 
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <label className={labelClass}>Price (RM) *</label>
+          <label className={labelClass}>{f.priceLabel} *</label>
           <input
             name="price"
             type="number"
@@ -129,7 +135,7 @@ export function ProductForm({
           />
         </div>
         <div>
-          <label className={labelClass}>Discount Price (RM)</label>
+          <label className={labelClass}>{f.discountPriceLabel}</label>
           <input
             name="discountPrice"
             type="number"
@@ -140,7 +146,7 @@ export function ProductForm({
           />
         </div>
         <div>
-          <label className={labelClass}>Stock</label>
+          <label className={labelClass}>{f.stockLabel}</label>
           <input
             name="stock"
             type="number"
@@ -153,7 +159,7 @@ export function ProductForm({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className={labelClass}>Gender *</label>
+          <label className={labelClass}>{f.genderLabel} *</label>
           <select
             name="gender"
             required
@@ -161,7 +167,7 @@ export function ProductForm({
             defaultValue={v ? v.gender : (product?.gender ?? "")}
           >
             <option value="" disabled>
-              选择 Gender
+              {f.selectGender}
             </option>
             {genders.map((g) => (
               <option key={g.slug} value={g.slug}>
@@ -171,7 +177,7 @@ export function ProductForm({
           </select>
         </div>
         <div>
-          <label className={labelClass}>Category *</label>
+          <label className={labelClass}>{f.categoryLabel} *</label>
           <select
             name="category"
             required
@@ -180,7 +186,7 @@ export function ProductForm({
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
             <option value="" disabled>
-              选择 Category
+              {f.selectCategory}
             </option>
             {categories.map((c) => (
               <option key={c.slug} value={c.slug}>
@@ -190,7 +196,7 @@ export function ProductForm({
           </select>
         </div>
         <div>
-          <label className={labelClass}>Sub-Category（可选）</label>
+          <label className={labelClass}>{f.subcategoryLabel}</label>
           <select
             name="subcategory"
             className={inputClass}
@@ -199,8 +205,8 @@ export function ProductForm({
           >
             <option value="">
               {availableSubcategories.length === 0
-                ? "该分类还没有子分类"
-                : "不选（不归到任何子分类）"}
+                ? f.noSubcategories
+                : f.dontAssignSubcategory}
             </option>
             {availableSubcategories.map((s) => (
               <option key={s.slug} value={s.slug}>
@@ -213,7 +219,7 @@ export function ProductForm({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className={labelClass}>Colors（逗号分隔，如 Black,White）</label>
+          <label className={labelClass}>{f.colorsLabel}</label>
           <input
             name="colors"
             className={inputClass}
@@ -221,7 +227,7 @@ export function ProductForm({
           />
         </div>
         <div>
-          <label className={labelClass}>Sizes（逗号分隔，如 S,M,L）</label>
+          <label className={labelClass}>{f.sizesLabel}</label>
           <input
             name="sizes"
             className={inputClass}
@@ -229,7 +235,7 @@ export function ProductForm({
           />
         </div>
         <div>
-          <label className={labelClass}>Material</label>
+          <label className={labelClass}>{f.materialLabel}</label>
           <input
             name="material"
             className={inputClass}
@@ -237,7 +243,7 @@ export function ProductForm({
           />
         </div>
         <div>
-          <label className={labelClass}>Weight</label>
+          <label className={labelClass}>{f.weightLabel}</label>
           <input
             name="weight"
             className={inputClass}
@@ -249,7 +255,7 @@ export function ProductForm({
 
       {product && product.images.length > 0 && (
         <div>
-          <label className={labelClass}>现有图片</label>
+          <label className={labelClass}>{f.existingImages}</label>
           <div className="flex flex-wrap gap-4">
             {product.images.map((img) => (
               <div key={img.url} className="w-28 text-center">
@@ -261,12 +267,12 @@ export function ProductForm({
                   type="text"
                   name="existingImageAlt"
                   defaultValue={img.alt}
-                  placeholder="Alt text（图片描述）"
+                  placeholder={f.altTextPlaceholder}
                   className="mt-1 w-full border border-border-subtle px-1 py-1 text-xs"
                 />
                 <label className="mt-1 flex items-center justify-center gap-1 text-xs text-destructive">
                   <input type="checkbox" name="removeImages" value={img.url} />
-                  删除
+                  {common.delete}
                 </label>
               </div>
             ))}
@@ -276,7 +282,7 @@ export function ProductForm({
 
       <div>
         <label className={labelClass}>
-          {product ? "追加图片" : "Images"}（可多选，JPEG/PNG/WEBP/GIF，单张最大5MB）
+          {product ? f.imagesLabelAppend : f.imagesLabelNew} {f.imagesHint}
         </label>
         <input
           type="file"
@@ -286,9 +292,7 @@ export function ProductForm({
           onChange={handleFilesChange}
           className={`${inputClass} file:mr-4 file:border-0 file:bg-foreground file:px-3 file:py-1.5 file:text-xs file:text-background`}
         />
-        <p className="mt-1 text-xs text-foreground/40">
-          每张图片建议填写 alt text（描述图片内容，比如"黑色羊毛大衣正面图"），对 SEO 和无障碍访问都有帮助。留空则用商品名称代替。
-        </p>
+        <p className="mt-1 text-xs text-foreground/40">{f.altTextHint}</p>
         {newImages.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-4">
             {newImages.map((img, i) => (
@@ -311,7 +315,7 @@ export function ProductForm({
                       ),
                     )
                   }
-                  placeholder="Alt text（图片描述）"
+                  placeholder={f.altTextPlaceholder}
                   className="mt-1 w-full border border-border-subtle px-1 py-1 text-xs"
                 />
               </div>
@@ -321,7 +325,7 @@ export function ProductForm({
       </div>
 
       <div>
-        <label className={labelClass}>Badge（可选，显示在商品图左上角）</label>
+        <label className={labelClass}>{f.badgeLabel}</label>
         <input
           name="badgeText"
           list="badge-suggestions"
@@ -341,17 +345,17 @@ export function ProductForm({
       </div>
 
       <div>
-        <label className={labelClass}>Shipping Info</label>
+        <label className={labelClass}>{f.shippingInfoLabel}</label>
         <input
           name="shippingInfo"
           className={inputClass}
-          placeholder="西马 2-4 工作日，东马 4-7 工作日"
+          placeholder="e.g. 2-4 business days"
           defaultValue={v ? v.shippingInfo : product?.shippingInfo}
         />
       </div>
 
       <div>
-        <label className={labelClass}>Tags</label>
+        <label className={labelClass}>{f.tagsLabel}</label>
         <div className="flex gap-4 text-sm">
           {tagOptions.map((tag) => (
             <label key={tag.value} className="flex items-center gap-2">
@@ -370,10 +374,10 @@ export function ProductForm({
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending && <Spinner size="sm" />}
         {pending
-          ? "保存中"
+          ? common.saving
           : product
-            ? "Save Changes"
-            : "Create Product"}
+            ? f.saveButton
+            : f.createButton}
       </button>
     </form>
   );

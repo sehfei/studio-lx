@@ -23,7 +23,7 @@ export default async function AdminCouponsPage() {
 
       <div className="mb-8 border border-border-subtle p-4">
         <p className="eyebrow mb-3">{dict.addNew}</p>
-        <AddCouponForm />
+        <AddCouponForm dict={dict} common={t.common} />
       </div>
 
       <AdminTable
@@ -56,6 +56,8 @@ export default async function AdminCouponsPage() {
                 id={c.id}
                 code={c.code}
                 isActive={c.is_active}
+                dict={dict}
+                common={t.common}
               />
             ),
           },

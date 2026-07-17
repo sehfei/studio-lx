@@ -4,17 +4,27 @@ import { useActionState } from "react";
 import { Spinner } from "@/components/ui/Spinner";
 import { savePaymentSettings } from "./actions";
 import type { PaymentSettings } from "@/lib/payment-settings";
+import type { AdminDictionary } from "@/lib/i18n/admin";
 
-export function PaymentSettingsForm({ initial }: { initial: PaymentSettings }) {
+export function PaymentSettingsForm({
+  initial,
+  dict,
+  common,
+}: {
+  initial: PaymentSettings;
+  dict: AdminDictionary["pages"]["paymentSettings"];
+  common: AdminDictionary["common"];
+}) {
   const [state, formAction, pending] = useActionState(
     savePaymentSettings,
     undefined,
   );
+  const f = dict.form;
 
   return (
     <form action={formAction} className="max-w-md space-y-4">
       <div>
-        <label className="mb-1 block text-xs text-foreground/50">银行名称</label>
+        <label className="mb-1 block text-xs text-foreground/50">{f.bankNameLabel}</label>
         <input
           name="bankName"
           defaultValue={initial.bankName}
@@ -23,7 +33,7 @@ export function PaymentSettingsForm({ initial }: { initial: PaymentSettings }) {
         />
       </div>
       <div>
-        <label className="mb-1 block text-xs text-foreground/50">户口持有人</label>
+        <label className="mb-1 block text-xs text-foreground/50">{f.accountNameLabel}</label>
         <input
           name="accountName"
           defaultValue={initial.accountName}
@@ -32,7 +42,7 @@ export function PaymentSettingsForm({ initial }: { initial: PaymentSettings }) {
         />
       </div>
       <div>
-        <label className="mb-1 block text-xs text-foreground/50">户口号码</label>
+        <label className="mb-1 block text-xs text-foreground/50">{f.accountNumberLabel}</label>
         <input
           name="accountNumber"
           defaultValue={initial.accountNumber}
@@ -42,7 +52,7 @@ export function PaymentSettingsForm({ initial }: { initial: PaymentSettings }) {
       </div>
       <div>
         <label className="mb-1 block text-xs text-foreground/50">
-          额外说明（选填，例如：转账后请把收据发到 WhatsApp）
+          {f.instructionsLabel}
         </label>
         <textarea
           name="instructions"
@@ -59,7 +69,7 @@ export function PaymentSettingsForm({ initial }: { initial: PaymentSettings }) {
 
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending && <Spinner size="sm" />}
-        {pending ? "保存中" : "保存"}
+        {pending ? common.saving : common.save}
       </button>
     </form>
   );

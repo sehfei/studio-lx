@@ -3,8 +3,17 @@
 import { useActionState } from "react";
 import { Spinner } from "@/components/ui/Spinner";
 import { createSubcategory } from "./actions";
+import type { AdminDictionary } from "@/lib/i18n/admin";
 
-export function AddSubcategoryForm({ category }: { category: string }) {
+export function AddSubcategoryForm({
+  category,
+  dict,
+  common,
+}: {
+  category: string;
+  dict: AdminDictionary["pages"]["subcategories"];
+  common: AdminDictionary["common"];
+}) {
   const [state, formAction, pending] = useActionState(
     createSubcategory,
     undefined,
@@ -15,7 +24,7 @@ export function AddSubcategoryForm({ category }: { category: string }) {
       <input type="hidden" name="category" value={category} />
       <div>
         <label className="mb-1 block text-xs text-foreground/50">
-          子分类名称
+          {dict.nameLabel}
         </label>
         <input
           name="label"
@@ -26,7 +35,7 @@ export function AddSubcategoryForm({ category }: { category: string }) {
       </div>
       <div>
         <label className="mb-1 block text-xs text-foreground/50">
-          Slug（留空自动生成）
+          {common.slugHint}
         </label>
         <input
           name="slug"
@@ -35,7 +44,9 @@ export function AddSubcategoryForm({ category }: { category: string }) {
         />
       </div>
       <div>
-        <label className="mb-1 block text-xs text-foreground/50">排序</label>
+        <label className="mb-1 block text-xs text-foreground/50">
+          {common.sort}
+        </label>
         <input
           name="sortOrder"
           type="number"
@@ -45,7 +56,7 @@ export function AddSubcategoryForm({ category }: { category: string }) {
       </div>
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending && <Spinner size="sm" />}
-        {pending ? "添加中" : "+ 添加子分类"}
+        {pending ? common.adding : dict.addButton}
       </button>
       {state?.error && (
         <p className="w-full text-sm text-destructive">{state.error}</p>

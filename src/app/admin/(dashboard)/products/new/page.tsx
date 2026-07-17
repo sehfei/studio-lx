@@ -3,9 +3,11 @@ import { getCategories } from "@/lib/categories";
 import { getGenders } from "@/lib/genders";
 import { getSubcategories } from "@/lib/subcategories";
 import { requirePermission } from "@/lib/auth";
+import { getAdminI18n } from "@/lib/i18n/admin";
 
 export default async function NewProductPage() {
   await requirePermission("products");
+  const { t } = await getAdminI18n();
   const [categories, genders, subcategories] = await Promise.all([
     getCategories(),
     getGenders(),
@@ -13,11 +15,15 @@ export default async function NewProductPage() {
   ]);
   return (
     <div>
-      <h1 className="mb-8 text-lg font-medium">Add Product</h1>
+      <h1 className="mb-8 text-lg font-medium">
+        {t.pages.products.newPageTitle}
+      </h1>
       <ProductForm
         categories={categories}
         genders={genders}
         subcategories={subcategories}
+        dict={t.pages.products}
+        common={t.common}
       />
     </div>
   );

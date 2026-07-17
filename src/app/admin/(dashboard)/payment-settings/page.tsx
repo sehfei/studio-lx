@@ -15,7 +15,7 @@ export default async function AdminPaymentSettingsPage() {
     <div>
       <h1 className="mb-2 text-lg font-medium">{dict.title}</h1>
       <p className="mb-8 text-sm text-foreground/50">{dict.desc}</p>
-      <PaymentSettingsForm initial={settings} />
+      <PaymentSettingsForm initial={settings} dict={dict} common={t.common} />
     </div>
   );
 }

@@ -5,11 +5,21 @@ import { useActionState } from "react";
 import { createPost, updatePost } from "./actions";
 import { Spinner } from "@/components/ui/Spinner";
 import type { BlogPost } from "@/lib/blog";
+import type { AdminDictionary } from "@/lib/i18n/admin";
 
 const inputClass = "input-theme";
 const labelClass = "mb-1 block text-xs tracking-widest text-foreground/50 uppercase";
 
-export function BlogForm({ post }: { post?: BlogPost }) {
+export function BlogForm({
+  post,
+  dict,
+  common,
+}: {
+  post?: BlogPost;
+  dict: AdminDictionary["pages"]["blog"];
+  common: AdminDictionary["common"];
+}) {
+  const f = dict.form;
   const action = post ? updatePost.bind(null, post.id) : createPost;
   const [state, formAction, pending] = useActionState(action, undefined);
   const v = state?.values;
@@ -23,7 +33,7 @@ export function BlogForm({ post }: { post?: BlogPost }) {
       )}
 
       <div>
-        <label className={labelClass}>Title *</label>
+        <label className={labelClass}>{f.titleLabel} *</label>
         <input
           name="title"
           required
@@ -33,7 +43,7 @@ export function BlogForm({ post }: { post?: BlogPost }) {
       </div>
 
       <div>
-        <label className={labelClass}>Slug（留空自动生成）</label>
+        <label className={labelClass}>{common.slugHint}</label>
         <input
           name="slug"
           className={inputClass}
@@ -42,7 +52,7 @@ export function BlogForm({ post }: { post?: BlogPost }) {
       </div>
 
       <div>
-        <label className={labelClass}>Excerpt（列表页摘要）</label>
+        <label className={labelClass}>{f.excerptLabel}</label>
         <textarea
           name="excerpt"
           rows={2}
@@ -52,7 +62,7 @@ export function BlogForm({ post }: { post?: BlogPost }) {
       </div>
 
       <div>
-        <label className={labelClass}>Content</label>
+        <label className={labelClass}>{f.contentLabel}</label>
         <textarea
           name="content"
           rows={10}
@@ -63,7 +73,7 @@ export function BlogForm({ post }: { post?: BlogPost }) {
 
       {post?.coverImage && (
         <div>
-          <label className={labelClass}>现有封面图</label>
+          <label className={labelClass}>{f.existingCoverImage}</label>
           <span className="relative block h-32 w-48 overflow-hidden border border-border-subtle">
             <Image src={post.coverImage} alt="" fill className="object-cover" />
           </span>
@@ -72,7 +82,7 @@ export function BlogForm({ post }: { post?: BlogPost }) {
 
       <div>
         <label className={labelClass}>
-          {post ? "替换封面图" : "封面图"}（可选，JPEG/PNG/WEBP，最大 5MB）
+          {post ? f.replaceCoverImage : f.coverImageLabel} {f.coverImageHint}
         </label>
         <input
           type="file"
@@ -88,12 +98,12 @@ export function BlogForm({ post }: { post?: BlogPost }) {
           name="isPublished"
           defaultChecked={v ? v.isPublished : (post?.isPublished ?? true)}
         />
-        已发布（取消勾选 = 存为草稿，前台不显示）
+        {f.publishedLabel}
       </label>
 
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending && <Spinner size="sm" />}
-        {pending ? "保存中" : post ? "Save Changes" : "Create Post"}
+        {pending ? common.saving : post ? f.saveButton : f.createButton}
       </button>
     </form>
   );

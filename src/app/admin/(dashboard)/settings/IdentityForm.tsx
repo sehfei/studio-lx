@@ -5,6 +5,7 @@ import Image from "next/image";
 import type { SiteIdentity } from "@/lib/identity";
 import { Spinner } from "@/components/ui/Spinner";
 import { saveIdentity } from "./actions";
+import type { AdminDictionary } from "@/lib/i18n/admin";
 
 const cardClass =
   "rounded-2xl border border-border-subtle bg-background p-6 shadow-sm";
@@ -33,6 +34,8 @@ function AssetUploader({
   removeName,
   accept,
   previewClassName,
+  noneText,
+  removeCurrentImageText,
 }: {
   label: string;
   hint: string;
@@ -41,6 +44,8 @@ function AssetUploader({
   removeName: string;
   accept: string;
   previewClassName: string;
+  noneText: string;
+  removeCurrentImageText: string;
 }) {
   return (
     <div className="flex items-center gap-4 rounded-2xl border border-border-subtle p-4">
@@ -57,7 +62,7 @@ function AssetUploader({
             unoptimized
           />
         ) : (
-          <span className="text-[10px] text-foreground/30">无</span>
+          <span className="text-[10px] text-foreground/30">{noneText}</span>
         )}
       </div>
       <div className="min-w-0 flex-1">
@@ -72,7 +77,7 @@ function AssetUploader({
         {currentUrl && (
           <label className="mt-2 flex items-center gap-2 text-xs text-destructive">
             <input type="checkbox" name={removeName} className="h-3.5 w-3.5" />
-            删除当前图片
+            {removeCurrentImageText}
           </label>
         )}
       </div>
@@ -80,7 +85,15 @@ function AssetUploader({
   );
 }
 
-export function IdentityForm({ initial }: { initial: SiteIdentity }) {
+export function IdentityForm({
+  initial,
+  dict,
+  common,
+}: {
+  initial: SiteIdentity;
+  dict: AdminDictionary["settings"]["identityForm"];
+  common: AdminDictionary["common"];
+}) {
   const [state, formAction, pending] = useActionState(
     saveIdentity,
     undefined,
@@ -100,43 +113,49 @@ export function IdentityForm({ initial }: { initial: SiteIdentity }) {
       )}
 
       <div className={cardClass}>
-        <SectionHeading>品牌图片</SectionHeading>
+        <SectionHeading>{dict.brandImagesHeading}</SectionHeading>
         <div className="space-y-3">
           <AssetUploader
-            label="Logo"
-            hint="导航栏和页脚会用到，留空则显示网站名称文字"
+            label={dict.logoLabel}
+            hint={dict.logoHint}
             currentUrl={initial.logoUrl}
             fileName="logoFile"
             removeName="removeLogo"
             accept="image/png,image/jpeg,image/webp,image/svg+xml"
             previewClassName="h-16 w-32 rounded-xl"
+            noneText={dict.none}
+            removeCurrentImageText={dict.removeCurrentImage}
           />
           <AssetUploader
-            label="Favicon（浏览器标签页图标）"
-            hint="建议正方形图片，PNG 或 ICO"
+            label={dict.faviconLabel}
+            hint={dict.faviconHint}
             currentUrl={initial.faviconUrl}
             fileName="faviconFile"
             removeName="removeFavicon"
             accept="image/png,image/x-icon,image/vnd.microsoft.icon"
             previewClassName="h-12 w-12 rounded-full"
+            noneText={dict.none}
+            removeCurrentImageText={dict.removeCurrentImage}
           />
           <AssetUploader
-            label="首页 Hero 图片"
-            hint="首页最顶部的大图，留空则显示占位背景"
+            label={dict.heroLabel}
+            hint={dict.heroHint}
             currentUrl={initial.heroImageUrl}
             fileName="heroFile"
             removeName="removeHero"
             accept="image/png,image/jpeg,image/webp"
             previewClassName="h-16 w-28 rounded-xl"
+            noneText={dict.none}
+            removeCurrentImageText={dict.removeCurrentImage}
           />
         </div>
       </div>
 
       <div className={cardClass}>
-        <SectionHeading>联系方式</SectionHeading>
+        <SectionHeading>{dict.contactHeading}</SectionHeading>
         <div className="space-y-3">
           <div>
-            <label className={labelClass}>WhatsApp 号码（含国家代码，纯数字）</label>
+            <label className={labelClass}>{dict.whatsappLabel}</label>
             <input
               name="whatsappNumber"
               defaultValue={initial.whatsappNumber}
@@ -146,7 +165,7 @@ export function IdentityForm({ initial }: { initial: SiteIdentity }) {
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div>
-              <label className={labelClass}>Instagram 链接</label>
+              <label className={labelClass}>{dict.instagramLabel}</label>
               <input
                 name="instagramUrl"
                 defaultValue={initial.instagramUrl}
@@ -155,7 +174,7 @@ export function IdentityForm({ initial }: { initial: SiteIdentity }) {
               />
             </div>
             <div>
-              <label className={labelClass}>Facebook 链接</label>
+              <label className={labelClass}>{dict.facebookLabel}</label>
               <input
                 name="facebookUrl"
                 defaultValue={initial.facebookUrl}
@@ -164,7 +183,7 @@ export function IdentityForm({ initial }: { initial: SiteIdentity }) {
               />
             </div>
             <div>
-              <label className={labelClass}>TikTok 链接</label>
+              <label className={labelClass}>{dict.tiktokLabel}</label>
               <input
                 name="tiktokUrl"
                 defaultValue={initial.tiktokUrl}
@@ -177,10 +196,10 @@ export function IdentityForm({ initial }: { initial: SiteIdentity }) {
       </div>
 
       <div className={cardClass}>
-        <SectionHeading>访问统计</SectionHeading>
+        <SectionHeading>{dict.analyticsHeading}</SectionHeading>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <label className={labelClass}>Google Analytics ID</label>
+            <label className={labelClass}>{dict.gaIdLabel}</label>
             <input
               name="gaId"
               defaultValue={initial.gaId}
@@ -189,7 +208,7 @@ export function IdentityForm({ initial }: { initial: SiteIdentity }) {
             />
           </div>
           <div>
-            <label className={labelClass}>Meta Pixel ID</label>
+            <label className={labelClass}>{dict.metaPixelIdLabel}</label>
             <input
               name="metaPixelId"
               defaultValue={initial.metaPixelId}
@@ -202,7 +221,7 @@ export function IdentityForm({ initial }: { initial: SiteIdentity }) {
 
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending && <Spinner size="sm" />}
-        {pending ? "保存中" : "保存并全站生效"}
+        {pending ? common.saving : dict.saveButton}
       </button>
     </form>
   );

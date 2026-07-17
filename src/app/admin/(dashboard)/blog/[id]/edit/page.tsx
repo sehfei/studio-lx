@@ -4,6 +4,7 @@ import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { mapBlogRow, type BlogPostRow } from "@/lib/blog";
 import { BlogForm } from "../../BlogForm";
+import { getAdminI18n } from "@/lib/i18n/admin";
 
 export const metadata: Metadata = { title: "Edit Post" };
 
@@ -13,6 +14,7 @@ export default async function EditPostPage({
   params: Promise<{ id: string }>;
 }) {
   await requirePermission("blog");
+  const { t } = await getAdminI18n();
   const { id } = await params;
 
   const { data } = await supabaseAdmin
@@ -26,8 +28,10 @@ export default async function EditPostPage({
 
   return (
     <div>
-      <h1 className="mb-8 text-lg font-medium">Edit Post</h1>
-      <BlogForm post={post} />
+      <h1 className="mb-8 text-lg font-medium">
+        {t.pages.blog.editPageTitle}
+      </h1>
+      <BlogForm post={post} dict={t.pages.blog} common={t.common} />
     </div>
   );
 }

@@ -12,12 +12,16 @@ export function UserRoleEditor({
   permissions: initialPermissions,
   isSelf,
   navDict,
+  dict,
+  common,
 }: {
   userId: string;
   role: UserRole;
   permissions: string[];
   isSelf: boolean;
   navDict: AdminDictionary["sidebar"]["nav"];
+  dict: AdminDictionary["pages"]["users"];
+  common: AdminDictionary["common"];
 }) {
   const [role, setRole] = useState<UserRole>(initialRole);
   const [permissions, setPermissions] = useState<string[]>(initialPermissions);
@@ -26,7 +30,11 @@ export function UserRoleEditor({
   // 自己这一行整个禁用，服务端 setUserRole 也有"不能降级最后一个管理员"的保护，
   // 这里在前端多一层直观提示，不让店主手滑把自己踢出后台。
   if (isSelf) {
-    return <span className="text-xs text-foreground/30">不能修改自己</span>;
+    return (
+      <span className="text-xs text-foreground/30">
+        {common.cannotEditSelf}
+      </span>
+    );
   }
 
   const dirty =
@@ -38,7 +46,7 @@ export function UserRoleEditor({
     if (
       initialRole === "admin" &&
       role !== "admin" &&
-      !confirm("确定取消这个账号的管理员权限？")
+      !confirm(dict.confirmRemoveAdmin)
     ) {
       return;
     }
@@ -56,9 +64,9 @@ export function UserRoleEditor({
         onChange={(e) => setRole(e.target.value as UserRole)}
         className="border border-border-subtle bg-background px-2 py-1 text-xs outline-none focus:border-gold"
       >
-        <option value="customer">Customer</option>
-        <option value="staff">Staff</option>
-        <option value="admin">Admin</option>
+        <option value="customer">{dict.roleCustomer}</option>
+        <option value="staff">{dict.roleStaff.replace(" ({n})", "")}</option>
+        <option value="admin">{dict.roleAdmin}</option>
       </select>
 
       {role === "staff" && (
@@ -77,7 +85,7 @@ export function UserRoleEditor({
           className="inline-flex items-center gap-1.5 border border-gold/40 px-3 py-1.5 text-xs text-gold hover:bg-gold/5"
         >
           {pending && <Spinner size="sm" />}
-          保存
+          {dict.save}
         </button>
       )}
     </div>

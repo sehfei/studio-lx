@@ -12,6 +12,9 @@ export async function logAdminAction(
     targetType: string;
     targetId?: string;
     summary: string;
+    // summary 是给旧记录/数据库里直接查看用的固定文案（历史记录不能回溯翻译）；
+    // summaryParams 有值时，后台审计日志页面会按当前语言用 action 对应的模板重新拼一遍。
+    summaryParams?: Record<string, string>;
   },
 ): Promise<void> {
   const { error } = await supabaseAdmin.from("audit_logs").insert({
@@ -21,6 +24,7 @@ export async function logAdminAction(
     target_type: params.targetType,
     target_id: params.targetId ?? null,
     summary: params.summary,
+    summary_params: params.summaryParams ?? null,
   });
   if (error) {
     console.error("audit log insert failed:", error);
