@@ -182,6 +182,41 @@ export function ChevronRightIcon({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
+export function PlusIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      style={{ strokeWidth: "var(--icon-stroke-width, 1.5)" }}
+      strokeLinecap="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 8v8" />
+      <path d="M8 12h8" />
+    </svg>
+  );
+}
+
+export function MinusIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      style={{ strokeWidth: "var(--icon-stroke-width, 1.5)" }}
+      strokeLinecap="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M8 12h8" />
+    </svg>
+  );
+}
+
 export function WishlistIcon({ className = "h-5 w-5", filled = false }: IconProps & { filled?: boolean }) {
   return (
     <svg

@@ -184,3 +184,26 @@ export async function getProductsByGenderCategorySubcategory(
   if (error) throw error;
   return (data ?? []).map(mapRow);
 }
+
+export type NavProduct = { id: string; name: string; slug: string };
+
+// 导航菜单手风琴展开用：只查 id/name/slug，不带 description/images 这些大字段。
+// 不传 subcategory 时查该分类下没有归到任何子分类的商品
+// （对没有子分类的 category 来说，等于查该分类下全部商品）。
+export async function getNavProducts(
+  gender: Product["gender"],
+  category: Product["category"],
+  subcategory?: string,
+): Promise<NavProduct[]> {
+  let query = supabase
+    .from("products")
+    .select("id, name, slug")
+    .eq("gender", gender)
+    .eq("category", category);
+  query = subcategory
+    ? query.eq("subcategory", subcategory)
+    : query.is("subcategory", null);
+  const { data, error } = await query.order("name", { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+}

@@ -23,6 +23,9 @@ export const zh: Dictionary = {
     menu: "菜单",
     close: "关闭",
     backToTop: "返回顶部",
+    expand: "展开 {name}",
+    collapse: "收起 {name}",
+    noProductsYet: "暂无商品",
   },
   categories: {
     women: "女装",

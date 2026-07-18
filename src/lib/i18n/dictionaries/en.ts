@@ -22,6 +22,9 @@ export const en = {
     menu: "Menu",
     close: "Close",
     backToTop: "Back to top",
+    expand: "Show {name} items",
+    collapse: "Hide {name} items",
+    noProductsYet: "No products yet",
   },
   categories: {
     women: "Women",

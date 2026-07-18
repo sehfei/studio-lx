@@ -15,6 +15,8 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useCart } from "@/components/cart/CartContext";
 import type { CategoryRow } from "@/lib/categories";
 import type { GenderRow } from "@/lib/genders";
+import type { SubcategoryRow } from "@/lib/subcategories";
+import { NavAccordion } from "./NavAccordion";
 import {
   SearchIcon,
   CartIcon,
@@ -30,17 +32,21 @@ export function Navbar({
   t,
   categories,
   genders,
+  subcategories,
 }: {
   logoUrl?: string;
   locale: Locale;
   t: Dictionary;
   categories: CategoryRow[];
   genders: GenderRow[];
+  subcategories: SubcategoryRow[];
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { count: cartCount } = useCart();
   const label = (slug: string, fallback: string) =>
     categoryLabel(t, slug, fallback);
+  const subsByCategory = (category: string) =>
+    subcategories.filter((s) => s.category === category);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border-subtle bg-background/95 backdrop-blur">
@@ -132,18 +138,36 @@ export function Navbar({
                 {label(cat.slug, cat.label)}
               </Link>
               <div
-                className="absolute left-1/2 top-full hidden -translate-x-1/2 border border-border-subtle bg-background py-2 shadow-lg group-hover:block"
+                className="absolute left-1/2 top-full hidden max-h-[70vh] w-56 -translate-x-1/2 overflow-y-auto border border-border-subtle bg-background px-5 py-2 shadow-lg group-hover:block"
                 style={{ borderRadius: "var(--radius)" }}
               >
-                {categories.map((child) => (
-                  <Link
-                    key={child.slug}
-                    href={`/${cat.slug}/${child.slug}`}
-                    className="block min-w-[10rem] px-5 py-2 text-left normal-case tracking-normal hover:text-gold"
-                  >
-                    {label(child.slug, child.label)}
-                  </Link>
-                ))}
+                {categories.map((child) => {
+                  const subs = subsByCategory(child.slug);
+                  return (
+                    <NavAccordion
+                      key={child.slug}
+                      labelText={label(child.slug, child.label)}
+                      href={`/${cat.slug}/${child.slug}`}
+                      gender={cat.slug}
+                      category={child.slug}
+                      hasChildren={subs.length > 0}
+                      t={t}
+                    >
+                      {subs.map((sub) => (
+                        <NavAccordion
+                          key={sub.slug}
+                          labelText={sub.label}
+                          href={`/${cat.slug}/${child.slug}/${sub.slug}`}
+                          gender={cat.slug}
+                          category={child.slug}
+                          subcategory={sub.slug}
+                          hasChildren={false}
+                          t={t}
+                        />
+                      ))}
+                    </NavAccordion>
+                  );
+                })}
               </div>
             </li>
           ))}
@@ -176,18 +200,37 @@ export function Navbar({
                 >
                   {label(cat.slug, cat.label)}
                 </Link>
-                <ul className="mt-2 space-y-2 pl-4 text-foreground/70">
-                  {categories.map((child) => (
-                    <li key={child.slug}>
-                      <Link
+                <div className="mt-1 pl-4">
+                  {categories.map((child) => {
+                    const subs = subsByCategory(child.slug);
+                    return (
+                      <NavAccordion
+                        key={child.slug}
+                        labelText={label(child.slug, child.label)}
                         href={`/${cat.slug}/${child.slug}`}
-                        onClick={() => setMobileOpen(false)}
+                        gender={cat.slug}
+                        category={child.slug}
+                        hasChildren={subs.length > 0}
+                        t={t}
+                        onNavigate={() => setMobileOpen(false)}
                       >
-                        {label(child.slug, child.label)}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+                        {subs.map((sub) => (
+                          <NavAccordion
+                            key={sub.slug}
+                            labelText={sub.label}
+                            href={`/${cat.slug}/${child.slug}/${sub.slug}`}
+                            gender={cat.slug}
+                            category={child.slug}
+                            subcategory={sub.slug}
+                            hasChildren={false}
+                            t={t}
+                            onNavigate={() => setMobileOpen(false)}
+                          />
+                        ))}
+                      </NavAccordion>
+                    );
+                  })}
+                </div>
               </li>
             ))}
             {[...featureCollections, ...mainNavLinks].map((item) => (
