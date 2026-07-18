@@ -9,6 +9,8 @@ import {
   DEFAULT_THEME,
   DENSITY_OPTIONS,
   FONT_PRESETS,
+  ICON_WEIGHT_OPTIONS,
+  iconWeightVars,
   RADIUS_OPTIONS,
   THEME_PRESETS,
   type ThemeSettings,
@@ -31,6 +33,7 @@ const COLOR_KEYS: (keyof ThemeSettings["colors"])[] = [
   "foreground",
   "primary",
   "accent",
+  "iconColor",
   "border",
   "muted",
   "destructive",
@@ -139,6 +142,7 @@ export function ThemeForm({
     "--foreground": theme.colors.foreground,
     "--primary": theme.colors.primary,
     "--gold": theme.colors.accent,
+    "--icon-color": theme.colors.iconColor,
     "--border-subtle": theme.colors.border,
     "--muted": theme.colors.muted,
     "--destructive": theme.colors.destructive,
@@ -148,6 +152,7 @@ export function ThemeForm({
     "--font-sans-active": `var(${font.sansVar})`,
     ...buttonStyleVars(theme.buttonStyle),
     ...buttonSizeVars(theme.buttonSize),
+    ...iconWeightVars(theme.iconWeight),
   } as React.CSSProperties;
 
   return (
@@ -334,6 +339,17 @@ export function ThemeForm({
           />
         </div>
 
+        <div className={cardClass}>
+          <SectionHeading>{dict.iconWeight}</SectionHeading>
+          <Segmented
+            name="iconWeight"
+            options={ICON_WEIGHT_OPTIONS.map((i) => i.id)}
+            value={theme.iconWeight}
+            onChange={(v) => setTheme((t) => ({ ...t, iconWeight: v }))}
+            renderLabel={(v) => dict.iconWeights[v] ?? v}
+          />
+        </div>
+
         {undoState?.error && (
           <p className="rounded-2xl border border-destructive/40 bg-destructive/5 px-4 py-3 text-sm text-destructive">
             {undoState.error}
@@ -422,17 +438,17 @@ export function ThemeForm({
                 {dict.previewIcons}
               </p>
               <div className="flex items-center gap-4">
-                <span className="hover:text-gold">
-                  <SearchIcon className="h-4 w-4" />
+                <span className="hover:text-icon">
+                  <SearchIcon className="h-5 w-5" />
                 </span>
-                <span className="hover:text-gold">
-                  <WishlistIcon className="h-4 w-4" />
+                <span className="hover:text-icon">
+                  <WishlistIcon className="h-5 w-5" />
                 </span>
-                <span className="hover:text-gold">
-                  <CartIcon className="h-4 w-4" />
+                <span className="hover:text-icon">
+                  <CartIcon className="h-5 w-5" />
                 </span>
-                <span className="hover:text-gold">
-                  <AccountIcon className="h-4 w-4" />
+                <span className="hover:text-icon">
+                  <AccountIcon className="h-5 w-5" />
                 </span>
               </div>
             </div>

@@ -46,7 +46,7 @@ export function Navbar({
     <header className="sticky top-0 z-50 border-b border-border-subtle bg-background/95 backdrop-blur">
       <div className="relative mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-8">
         <button
-          className="-m-2 p-2 hover:text-gold lg:hidden"
+          className="-m-2 p-2 hover:text-icon lg:hidden"
           onClick={() => setMobileOpen((v) => !v)}
           aria-label={mobileOpen ? t.nav.close : t.nav.menu}
         >
@@ -78,7 +78,7 @@ export function Navbar({
           <Link
             href="/search"
             aria-label={t.nav.search}
-            className="-m-2 flex items-center gap-1.5 p-2 hover:text-gold"
+            className="-m-2 flex items-center gap-1.5 p-2 hover:text-icon"
           >
             <SearchIcon className="h-4 w-4" />
             <span className="hidden sm:inline">{t.nav.search}</span>
@@ -86,7 +86,7 @@ export function Navbar({
           <Link
             href="/wishlist"
             aria-label={t.nav.wishlist}
-            className="-m-2 flex items-center gap-1.5 p-2 hover:text-gold"
+            className="-m-2 flex items-center gap-1.5 p-2 hover:text-icon"
           >
             <WishlistIcon className="h-4 w-4" />
             <span className="hidden sm:inline">{t.nav.wishlist}</span>
@@ -94,7 +94,7 @@ export function Navbar({
           <Link
             href="/cart"
             aria-label={t.nav.cart}
-            className="-m-2 flex items-center gap-1.5 p-2 hover:text-gold"
+            className="-m-2 flex items-center gap-1.5 p-2 hover:text-icon"
           >
             <span className="relative inline-flex">
               <CartIcon className="h-4 w-4" />
@@ -109,7 +109,7 @@ export function Navbar({
           <Link
             href="/account"
             aria-label={t.nav.account}
-            className="-m-2 hidden items-center gap-1.5 p-2 hover:text-gold sm:flex"
+            className="-m-2 hidden items-center gap-1.5 p-2 hover:text-icon sm:flex"
           >
             <AccountIcon className="h-4 w-4" />
             <span>{t.nav.account}</span>

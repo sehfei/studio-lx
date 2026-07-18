@@ -10,6 +10,7 @@ export type ThemeColors = {
   foreground: string;
   primary: string; // 主按钮色
   accent: string; // 强调色（金色）
+  iconColor: string; // 图标悬停色，跟强调色分开，可以单独调
   border: string;
   muted: string; // 次要文字
   destructive: string; // 删除/报错
@@ -109,6 +110,15 @@ export const BUTTON_SIZE_OPTIONS = [
 
 export type ButtonSizeId = (typeof BUTTON_SIZE_OPTIONS)[number]["id"];
 
+// 图标线条粗细：影响所有 NavIcons 图标的 stroke-width。
+export const ICON_WEIGHT_OPTIONS = [
+  { id: "thin", label: "细", strokeWidth: "1" },
+  { id: "regular", label: "标准（默认）", strokeWidth: "1.5" },
+  { id: "bold", label: "粗", strokeWidth: "2" },
+] as const;
+
+export type IconWeightId = (typeof ICON_WEIGHT_OPTIONS)[number]["id"];
+
 export type ThemeSettings = {
   colors: ThemeColors;
   fontPreset: FontPresetId;
@@ -116,6 +126,7 @@ export type ThemeSettings = {
   density: DensityId;
   buttonStyle: ButtonStyleId;
   buttonSize: ButtonSizeId;
+  iconWeight: IconWeightId;
 };
 
 export const DEFAULT_THEME: ThemeSettings = {
@@ -124,6 +135,7 @@ export const DEFAULT_THEME: ThemeSettings = {
     foreground: "#111111",
     primary: "#111111",
     accent: "#a9824c",
+    iconColor: "#a9824c",
     border: "#e5e2dd",
     muted: "#6b6560",
     destructive: "#dc2626",
@@ -133,6 +145,7 @@ export const DEFAULT_THEME: ThemeSettings = {
   density: "normal",
   buttonStyle: "filled",
   buttonSize: "normal",
+  iconWeight: "regular",
 };
 
 // 预设配色方案：只覆盖 colors，字体/圆角/间距/按钮风格保留用户当前选择。
@@ -147,6 +160,7 @@ export const THEME_PRESETS: { id: string; label: string; colors: ThemeColors }[]
       foreground: "#111111",
       primary: "#111111",
       accent: "#a9824c",
+      iconColor: "#a9824c",
       border: "#e5e2dd",
       muted: "#6b6560",
       destructive: "#dc2626",
@@ -160,6 +174,7 @@ export const THEME_PRESETS: { id: string; label: string; colors: ThemeColors }[]
       foreground: "#2b2622",
       primary: "#2b2622",
       accent: "#b08d57",
+      iconColor: "#b08d57",
       border: "#e8ddc9",
       muted: "#8a7f6d",
       destructive: "#b3261e",
@@ -173,6 +188,7 @@ export const THEME_PRESETS: { id: string; label: string; colors: ThemeColors }[]
       foreground: "#10192b",
       primary: "#10192b",
       accent: "#c19a49",
+      iconColor: "#c19a49",
       border: "#dfe3ea",
       muted: "#5b6472",
       destructive: "#c0392b",
@@ -186,6 +202,7 @@ export const THEME_PRESETS: { id: string; label: string; colors: ThemeColors }[]
       foreground: "#2e2422",
       primary: "#2e2422",
       accent: "#c98a7d",
+      iconColor: "#c98a7d",
       border: "#f0dcd6",
       muted: "#8a7570",
       destructive: "#b3402f",
@@ -199,6 +216,7 @@ export const THEME_PRESETS: { id: string; label: string; colors: ThemeColors }[]
       foreground: "#12201b",
       primary: "#12201b",
       accent: "#b08d57",
+      iconColor: "#b08d57",
       border: "#dfe6e1",
       muted: "#5f6b64",
       destructive: "#b3261e",
@@ -212,6 +230,7 @@ export const THEME_PRESETS: { id: string; label: string; colors: ThemeColors }[]
       foreground: "#000000",
       primary: "#000000",
       accent: "#000000",
+      iconColor: "#000000",
       border: "#dddddd",
       muted: "#767676",
       destructive: "#cc0000",
@@ -239,6 +258,9 @@ export function mergeTheme(partial: unknown): ThemeSettings {
     buttonSize: BUTTON_SIZE_OPTIONS.some((b) => b.id === p.buttonSize)
       ? (p.buttonSize as ButtonSizeId)
       : DEFAULT_THEME.buttonSize,
+    iconWeight: ICON_WEIGHT_OPTIONS.some((i) => i.id === p.iconWeight)
+      ? (p.iconWeight as IconWeightId)
+      : DEFAULT_THEME.iconWeight,
   };
 }
 
@@ -291,6 +313,14 @@ export function buttonSizeVars(
   };
 }
 
+// 图标粗细 -> CSS 变量，同 buttonStyleVars，主题注入和后台预览共用。
+export function iconWeightVars(iconWeight: IconWeightId): Record<string, string> {
+  const weight =
+    ICON_WEIGHT_OPTIONS.find((i) => i.id === iconWeight) ??
+    ICON_WEIGHT_OPTIONS[1];
+  return { "--icon-stroke-width": weight.strokeWidth };
+}
+
 export const getTheme = cache(async (): Promise<ThemeSettings> => {
   try {
     const { data, error } = await supabase
@@ -317,6 +347,7 @@ export function themeToCssVars(theme: ThemeSettings): Record<string, string> {
     "--foreground": theme.colors.foreground,
     "--primary": theme.colors.primary,
     "--gold": theme.colors.accent,
+    "--icon-color": theme.colors.iconColor,
     "--border-subtle": theme.colors.border,
     "--muted": theme.colors.muted,
     "--destructive": theme.colors.destructive,
@@ -326,6 +357,7 @@ export function themeToCssVars(theme: ThemeSettings): Record<string, string> {
     "--font-sans-active": `var(${font.sansVar})`,
     ...buttonStyleVars(theme.buttonStyle),
     ...buttonSizeVars(theme.buttonSize),
+    ...iconWeightVars(theme.iconWeight),
   };
 }
 

@@ -8,6 +8,8 @@
   --foreground: #111111;
   --primary: #111111;
   --gold: #a9824c;
+  --icon-color: #a9824c;
+  --icon-stroke-width: 1.5;
   --border-subtle: #e5e5e5;
   --muted: #666666;
   --destructive: #dc2626;
@@ -33,6 +35,7 @@
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-gold: var(--gold);
+  --color-icon: var(--icon-color);
   --color-border-subtle: var(--border-subtle);
   --color-muted: var(--muted);
   --color-destructive: var(--destructive);

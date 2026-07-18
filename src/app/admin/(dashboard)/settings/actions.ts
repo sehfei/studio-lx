@@ -11,6 +11,7 @@ import {
   contrastRatio,
   DENSITY_OPTIONS,
   FONT_PRESETS,
+  ICON_WEIGHT_OPTIONS,
   RADIUS_OPTIONS,
   type ThemeSettings,
 } from "@/lib/theme";
@@ -30,6 +31,7 @@ function readColors(formData: FormData) {
     "foreground",
     "primary",
     "accent",
+    "iconColor",
     "border",
     "muted",
     "destructive",
@@ -144,6 +146,11 @@ export async function saveTheme(
     return { error: "按钮大小无效" };
   }
 
+  const iconWeight = String(formData.get("iconWeight") ?? "");
+  if (!ICON_WEIGHT_OPTIONS.some((i) => i.id === iconWeight)) {
+    return { error: "图标粗细无效" };
+  }
+
   const theme: ThemeSettings = {
     colors,
     fontPreset: fontPreset as ThemeSettings["fontPreset"],
@@ -151,6 +158,7 @@ export async function saveTheme(
     density: density as ThemeSettings["density"],
     buttonStyle: buttonStyle as ThemeSettings["buttonStyle"],
     buttonSize: buttonSize as ThemeSettings["buttonSize"],
+    iconWeight: iconWeight as ThemeSettings["iconWeight"],
   };
 
   const dbError = await persistTheme(theme);

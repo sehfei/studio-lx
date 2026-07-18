@@ -53,10 +53,17 @@ export const en = {
       foreground: "Text",
       primary: "Primary button",
       accent: "Accent",
+      iconColor: "Icon hover color",
       border: "Border",
       muted: "Secondary text",
       destructive: "Danger (delete/error)",
     },
+    iconWeight: "Icon weight",
+    iconWeights: {
+      thin: "Thin",
+      regular: "Regular (default)",
+      bold: "Bold",
+    } as Record<string, string>,
     hexAria: "hex value",
     previewTitle: "Elegance in Every Detail",
     previewBody:
@@ -66,7 +73,7 @@ export const en = {
     previewLoading: "Loading",
     previewCard: "Card / input corner radius",
     previewError: "This is the error message color",
-    previewIcons: "Nav icons (accent = hover color)",
+    previewIcons: "Nav icons (hover to preview icon color)",
     themePresets: {
       "noir-gold": "Noir Gold (default)",
       champagne: "Champagne",
