@@ -41,7 +41,7 @@ export function AdminSidebar({
         <div className="flex items-center gap-3">
           <button
             type="button"
-            className="-m-2 p-2 hover:text-gold"
+            className="-m-2 p-2 hover:text-icon"
             onClick={() => setMobileOpen((v) => !v)}
             aria-label={dict.title}
             aria-expanded={mobileOpen}
@@ -57,31 +57,31 @@ export function AdminSidebar({
           </p>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
           <span
-            className="-m-3 p-3 text-foreground/60"
+            className="-m-2 p-2 text-foreground/60"
             title={email}
             aria-label={email}
           >
-            <AccountIcon className="h-6 w-6" />
+            <AccountIcon className="h-4 w-4" />
           </span>
           <Link
             href="/"
-            className="-m-3 p-3 hover:text-gold"
+            className="-m-2 p-2 hover:text-icon"
             aria-label={dict.backToSite}
             title={dict.backToSite}
           >
-            <HomeIcon className="h-6 w-6" />
+            <HomeIcon className="h-4 w-4" />
           </Link>
           <AdminLanguageSwitcher current={locale} compact />
           <form action={signOut}>
             <button
               type="submit"
-              className="-m-3 p-3 hover:text-gold"
+              className="-m-2 p-2 hover:text-icon"
               aria-label={dict.signOut}
               title={dict.signOut}
             >
-              <LogoutIcon className="h-6 w-6" />
+              <LogoutIcon className="h-4 w-4" />
             </button>
           </form>
         </div>
