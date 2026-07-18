@@ -141,8 +141,9 @@ export function LogoutIcon({ className = "h-5 w-5" }: IconProps) {
       className={className}
       aria-hidden="true"
     >
-      <path d="M17 6.5a8 8 0 1 0 0 11" />
-      <path d="M14.5 9l3 3-3 3" />
+      <path d="M13.5 4.5H8a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h5.5" />
+      <path d="M9.5 12H20" />
+      <path d="M16.5 8.5 20 12l-3.5 3.5" />
     </svg>
   );
 }

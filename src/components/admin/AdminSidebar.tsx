@@ -8,13 +8,7 @@ import type { AdminDictionary } from "@/lib/i18n/admin";
 import type { Locale } from "@/lib/i18n/config";
 import { signOut } from "@/app/admin/login/actions";
 import { AdminLanguageSwitcher } from "@/components/admin/AdminLanguageSwitcher";
-import {
-  MenuIcon,
-  CloseIcon,
-  AccountIcon,
-  HomeIcon,
-  LogoutIcon,
-} from "@/components/ui/NavIcons";
+import { MenuIcon, CloseIcon, HomeIcon, LogoutIcon } from "@/components/ui/NavIcons";
 
 export function AdminSidebar({
   dict,
@@ -59,11 +53,11 @@ export function AdminSidebar({
 
         <div className="flex items-center gap-4">
           <span
-            className="-m-2 p-2 text-foreground/60"
+            className="-m-2 max-w-20 truncate p-2 text-xs font-medium text-foreground/60"
             title={email}
             aria-label={email}
           >
-            <AccountIcon className="h-4 w-4" />
+            {email.split("@")[0]}
           </span>
           <Link
             href="/"
