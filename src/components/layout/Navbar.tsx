@@ -45,8 +45,13 @@ export function Navbar({
   const { count: cartCount } = useCart();
   const label = (slug: string, fallback: string) =>
     categoryLabel(t, slug, fallback);
-  const subsByCategory = (category: string) =>
-    subcategories.filter((s) => s.category === category);
+  // 分类/子分类要显式勾选了某个性别才在该性别下面的导航栏出现
+  const categoriesForGender = (gender: string) =>
+    categories.filter((c) => c.genders.includes(gender));
+  const subsByCategory = (category: string, gender: string) =>
+    subcategories.filter(
+      (s) => s.category === category && s.genders.includes(gender),
+    );
 
   return (
     <header className="sticky top-0 z-50 border-b border-border-subtle bg-background/95 backdrop-blur">
@@ -141,8 +146,8 @@ export function Navbar({
                 className="absolute left-1/2 top-full hidden max-h-[70vh] w-56 -translate-x-1/2 overflow-y-auto border border-border-subtle bg-background px-5 py-2 shadow-lg group-hover:block"
                 style={{ borderRadius: "var(--radius)" }}
               >
-                {categories.map((child) => {
-                  const subs = subsByCategory(child.slug);
+                {categoriesForGender(cat.slug).map((child) => {
+                  const subs = subsByCategory(child.slug, cat.slug);
                   return (
                     <NavAccordion
                       key={child.slug}
@@ -201,8 +206,8 @@ export function Navbar({
                   {label(cat.slug, cat.label)}
                 </Link>
                 <div className="mt-1 pl-4">
-                  {categories.map((child) => {
-                    const subs = subsByCategory(child.slug);
+                  {categoriesForGender(cat.slug).map((child) => {
+                    const subs = subsByCategory(child.slug, cat.slug);
                     return (
                       <NavAccordion
                         key={child.slug}

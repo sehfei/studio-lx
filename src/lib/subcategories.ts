@@ -9,6 +9,7 @@ export type SubcategoryRow = {
   slug: string;
   label: string;
   sort_order: number;
+  genders: string[];
 };
 
 export const getSubcategories = cache(async (): Promise<SubcategoryRow[]> => {

@@ -8,6 +8,7 @@ export type CategoryRow = {
   slug: string;
   label: string;
   sort_order: number;
+  genders: string[];
 };
 
 export const getCategories = cache(async (): Promise<CategoryRow[]> => {

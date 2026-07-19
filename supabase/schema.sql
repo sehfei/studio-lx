@@ -417,3 +417,9 @@ create table if not exists audit_logs (
 alter table audit_logs enable row level security;
 
 create index if not exists audit_logs_created_at_idx on audit_logs(created_at desc);
+
+-- 分类/子分类按性别显示：加 genders 数组字段，标记这个分类/子分类要在哪些性别的
+-- 导航栏下面显示。默认空数组（哪个性别都不显示），现有数据也是空数组，需要后台
+-- 手动给每个分类/子分类勾选性别才会出现在对应性别的导航栏里。
+alter table categories add column if not exists genders text[] not null default '{}'::text[];
+alter table subcategories add column if not exists genders text[] not null default '{}'::text[];

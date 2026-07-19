@@ -5,6 +5,7 @@ import { requirePermission } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { dbErrorMessage } from "@/lib/db-error";
 import { logAdminAction } from "@/lib/audit-log";
+import { getAdminI18n } from "@/lib/i18n/admin";
 import {
   BUTTON_SIZE_OPTIONS,
   BUTTON_STYLE_OPTIONS,
@@ -343,7 +344,8 @@ export async function saveIdentity(
   });
 
   revalidatePath("/", "layout");
-  return { success: "已保存，全站生效" };
+  const { t } = await getAdminI18n();
+  return { success: t.settings.identityForm.savedSuccess };
 }
 
 export type PagesFormState =
