@@ -135,27 +135,44 @@ export function ProductGallery({
 
         {images.length > 1 && (
           <div className="mt-3 grid grid-cols-4 gap-2">
-            {images.map((img, i) => (
-              <button
-                key={img.url || i}
-                type="button"
-                onClick={() => setActiveIndex(i)}
-                aria-current={i === activeIndex}
-                aria-label={t.product.viewImage.replace("{n}", String(i + 1))}
-                className="block cursor-pointer"
-              >
-                <ProductImage
-                  src={img.url}
-                  alt={img.alt}
-                  label={productName}
-                  className={
-                    i === activeIndex
-                      ? "outline outline-2 outline-offset-2 outline-gold"
-                      : "opacity-70 hover:opacity-100"
-                  }
-                />
-              </button>
-            ))}
+            {images.slice(0, 4).map((img, i) => {
+              // 超过4张就不再多加一排缩略图，第4格叠加"+N"，点击直接弹全屏，
+              // 剩下的图都能在全屏里左右切换看到
+              const hiddenCount = images.length - 4;
+              const isOverflowTile = i === 3 && hiddenCount > 0;
+              return (
+                <button
+                  key={img.url || i}
+                  type="button"
+                  onClick={() => {
+                    setActiveIndex(i);
+                    if (isOverflowTile) setOpenIndex(i);
+                  }}
+                  aria-current={i === activeIndex}
+                  aria-label={t.product.viewImage.replace("{n}", String(i + 1))}
+                  className="relative block cursor-pointer"
+                >
+                  <ProductImage
+                    src={img.url}
+                    alt={img.alt}
+                    label={productName}
+                    className={
+                      i === activeIndex
+                        ? "outline outline-2 outline-offset-2 outline-gold"
+                        : "opacity-70 hover:opacity-100"
+                    }
+                  />
+                  {isOverflowTile && (
+                    <span
+                      className="absolute inset-0 flex items-center justify-center bg-black/50 text-sm font-medium text-white"
+                      style={{ borderRadius: "var(--radius)" }}
+                    >
+                      +{hiddenCount}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         )}
 
