@@ -131,41 +131,47 @@ export default async function ProductPage({
           t={t}
         />
 
-        <div>
-          <p className="eyebrow mb-2">{product.brand}</p>
-          <h1 className="section-title mb-4">{product.name}</h1>
-          <p className="mb-1 text-xs text-foreground/40">SKU: {product.sku}</p>
+        <div className="flex flex-col">
+          <div className="order-1">
+            <p className="eyebrow mb-2">{product.brand}</p>
+            <h1 className="section-title mb-4">{product.name}</h1>
+            <p className="mb-1 text-xs text-foreground/40">SKU: {product.sku}</p>
 
-          <div className="mb-6 flex items-center gap-3 text-lg">
-            {hasDiscount ? (
-              <>
-                <span className="text-gold">
-                  RM {product.discountPrice!.toFixed(2)}
-                </span>
-                <span className="text-foreground/40 line-through">
-                  RM {product.price.toFixed(2)}
-                </span>
-                {discountPercent(product.price, product.discountPrice!) > 0 && (
-                  <span
-                    className="bg-gold px-2 py-0.5 text-sm font-medium text-background"
-                    style={{ borderRadius: "var(--radius)" }}
-                  >
-                    -{discountPercent(product.price, product.discountPrice!)}%
+            <div className="mb-6 flex items-center gap-3 text-lg">
+              {hasDiscount ? (
+                <>
+                  <span className="text-gold">
+                    RM {product.discountPrice!.toFixed(2)}
                   </span>
-                )}
-              </>
-            ) : (
-              <span>RM {product.price.toFixed(2)}</span>
-            )}
+                  <span className="text-foreground/40 line-through">
+                    RM {product.price.toFixed(2)}
+                  </span>
+                  {discountPercent(product.price, product.discountPrice!) > 0 && (
+                    <span
+                      className="bg-gold px-2 py-0.5 text-sm font-medium text-background"
+                      style={{ borderRadius: "var(--radius)" }}
+                    >
+                      -{discountPercent(product.price, product.discountPrice!)}%
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span>RM {product.price.toFixed(2)}</span>
+              )}
+            </div>
           </div>
 
-          <p className="mb-8 text-sm text-foreground/70">
+          {/* 手机版把购买操作（颜色/尺码/加购/购买/心愿单）挪到简介前面，
+              不用先滑过一长段文字描述才能下单；桌面版维持原来简介在前的顺序。*/}
+          <p className="order-4 mb-8 text-sm text-foreground/70 lg:order-2">
             {product.description}
           </p>
 
-          <AddToCartForm product={product} t={t} />
+          <div className="order-2 lg:order-3">
+            <AddToCartForm product={product} t={t} />
+          </div>
 
-          <div className="-mt-6 mb-10">
+          <div className="order-3 mb-10 lg:order-4">
             <WishlistButton
               productId={product.id}
               initialInWishlist={initialInWishlist}
@@ -173,7 +179,7 @@ export default async function ProductPage({
             />
           </div>
 
-          <dl className="space-y-2 border-t border-border-subtle pt-6 text-sm">
+          <dl className="order-5 space-y-2 border-t border-border-subtle pt-6 text-sm">
             <div className="flex justify-between">
               <dt className="text-foreground/50">{t.product.material}</dt>
               <dd>{product.material}</dd>

@@ -98,7 +98,7 @@ export function AddToCartForm({
         </div>
       )}
 
-      <div className="mb-10 flex flex-col gap-3 sm:flex-row">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row">
         <button
           type="button"
           onClick={handleAddToCart}
