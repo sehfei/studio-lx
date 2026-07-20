@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { ProductImage } from "@/components/ui/ProductImage";
+import { PlaceholderImage } from "@/components/ui/PlaceholderImage";
 import { ProductBadge } from "@/components/ui/ProductBadge";
 import { CloseIcon, ChevronLeftIcon, ChevronRightIcon } from "@/components/ui/NavIcons";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
@@ -23,6 +24,19 @@ export function ProductGallery({
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  // 鼠标悬停大图时的相对位置（百分比），用来做跟随鼠标的放大镜效果
+  const [zoomPos, setZoomPos] = useState<{ x: number; y: number } | null>(
+    null,
+  );
+
+  function showPrev(e: React.MouseEvent) {
+    e.stopPropagation();
+    setActiveIndex((i) => (i - 1 + images.length) % images.length);
+  }
+  function showNext(e: React.MouseEvent) {
+    e.stopPropagation();
+    setActiveIndex((i) => (i + 1) % images.length);
+  }
 
   useEffect(() => {
     if (openIndex === null) return;
@@ -53,25 +67,69 @@ export function ProductGallery({
 
   return (
     <>
-      <div>
+      <div className="mx-auto w-full max-w-md">
         <div className="relative">
           {badge && <ProductBadge text={badge.text} variant={badge.variant} />}
           <div className={outOfStock ? "opacity-60 grayscale" : ""}>
-            <button
-              type="button"
-              onClick={() => setOpenIndex(activeIndex)}
-              className="block w-full cursor-zoom-in"
-              aria-label={t.product.viewImage.replace(
-                "{n}",
-                String(activeIndex + 1),
-              )}
-            >
-              <ProductImage
-                src={images[activeIndex]?.url}
-                alt={images[activeIndex]?.alt}
-                label={productName}
-              />
-            </button>
+            {images[activeIndex]?.url ? (
+              <button
+                type="button"
+                onClick={() => setOpenIndex(activeIndex)}
+                onMouseMove={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  setZoomPos({
+                    x: ((e.clientX - rect.left) / rect.width) * 100,
+                    y: ((e.clientY - rect.top) / rect.height) * 100,
+                  });
+                }}
+                onMouseLeave={() => setZoomPos(null)}
+                className="relative block aspect-[3/4] w-full cursor-zoom-in overflow-hidden"
+                style={{ borderRadius: "var(--radius)" }}
+                aria-label={t.product.viewImage.replace(
+                  "{n}",
+                  String(activeIndex + 1),
+                )}
+              >
+                <Image
+                  src={images[activeIndex].url}
+                  alt={images[activeIndex].alt || productName}
+                  fill
+                  className="object-cover transition-transform duration-200 ease-out"
+                  style={
+                    zoomPos
+                      ? {
+                          transform: "scale(2)",
+                          transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
+                        }
+                      : undefined
+                  }
+                  sizes="(max-width: 1024px) 90vw, 448px"
+                />
+              </button>
+            ) : (
+              <PlaceholderImage label={productName} />
+            )}
+
+            {images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={showPrev}
+                  aria-label={t.product.previousImage}
+                  className="absolute left-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-foreground/80 hover:text-gold"
+                >
+                  <ChevronLeftIcon className="h-5 w-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={showNext}
+                  aria-label={t.product.nextImage}
+                  className="absolute right-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-foreground/80 hover:text-gold"
+                >
+                  <ChevronRightIcon className="h-5 w-5" />
+                </button>
+              </>
+            )}
           </div>
         </div>
 
