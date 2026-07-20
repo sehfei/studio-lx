@@ -51,7 +51,8 @@ export default async function AdminProductsPage() {
             sku: p.sku,
             brand: p.brand,
             price: `RM ${p.price.toFixed(2)}`,
-            stock: p.stock,
+            stock:
+              p.badgeText?.toLowerCase() === "pre-order" ? "Pre-order" : p.stock,
             actions: (
               <div className="flex items-center gap-3">
                 <Link
