@@ -33,18 +33,18 @@ export function ProductCard({
         <h3 className="text-sm text-foreground group-hover:text-gold">
           {product.name}
         </h3>
-        <div className="flex items-center gap-2 text-sm">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
           {hasDiscount ? (
             <>
-              <span className="text-gold">
-                RM {product.discountPrice!.toFixed(2)}
+              <span className="whitespace-nowrap text-gold">
+                RM&nbsp;{product.discountPrice!.toFixed(2)}
               </span>
-              <span className="text-foreground/40 line-through">
-                RM {product.price.toFixed(2)}
+              <span className="whitespace-nowrap text-foreground/40 line-through">
+                RM&nbsp;{product.price.toFixed(2)}
               </span>
               {discountPercent(product.price, product.discountPrice!) > 0 && (
                 <span
-                  className="bg-gold px-1.5 py-0.5 text-xs font-medium text-background"
+                  className="whitespace-nowrap bg-gold px-1.5 py-0.5 text-xs font-medium text-background"
                   style={{ borderRadius: "var(--radius)" }}
                 >
                   -{discountPercent(product.price, product.discountPrice!)}%
@@ -52,7 +52,7 @@ export function ProductCard({
               )}
             </>
           ) : (
-            <span>RM {product.price.toFixed(2)}</span>
+            <span className="whitespace-nowrap">RM&nbsp;{product.price.toFixed(2)}</span>
           )}
         </div>
       </div>

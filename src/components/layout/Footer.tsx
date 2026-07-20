@@ -18,8 +18,8 @@ export function Footer({
 
   return (
     <footer className="border-t border-border-subtle bg-background">
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 py-12 text-sm sm:grid-cols-4 sm:px-8">
-        <div className="col-span-2 sm:col-span-1">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-12 text-sm sm:grid-cols-4 sm:gap-8 sm:px-8">
+        <div>
           <p className="font-display text-lg tracking-widest uppercase">
             {siteConfig.name}
           </p>
