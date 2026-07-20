@@ -21,6 +21,7 @@ export function ProductGallery({
   outOfStock: boolean;
   t: Dictionary;
 }) {
+  const [activeIndex, setActiveIndex] = useState(0);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -42,49 +43,87 @@ export function ProductGallery({
     };
   }, [openIndex, images.length]);
 
+  // 关闭大图时把缩略图选中态同步到浏览到的那一张，而不是弹窗前的那张
+  function closeLightbox() {
+    if (openIndex !== null) setActiveIndex(openIndex);
+    setOpenIndex(null);
+  }
+
   const active = openIndex !== null ? images[openIndex] : null;
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="relative col-span-2">
+      <div>
+        <div className="relative">
           {badge && <ProductBadge text={badge.text} variant={badge.variant} />}
           <div className={outOfStock ? "opacity-60 grayscale" : ""}>
             <button
               type="button"
-              onClick={() => setOpenIndex(0)}
+              onClick={() => setOpenIndex(activeIndex)}
               className="block w-full cursor-zoom-in"
-              aria-label={t.product.viewImage.replace("{n}", "1")}
+              aria-label={t.product.viewImage.replace(
+                "{n}",
+                String(activeIndex + 1),
+              )}
             >
               <ProductImage
-                src={images[0]?.url}
-                alt={images[0]?.alt}
+                src={images[activeIndex]?.url}
+                alt={images[activeIndex]?.alt}
                 label={productName}
               />
             </button>
           </div>
         </div>
-        {images.slice(1).map((img, i) => (
-          <button
-            key={img.url || i}
-            type="button"
-            onClick={() => setOpenIndex(i + 1)}
-            className="block cursor-zoom-in"
-            aria-label={t.product.viewImage.replace("{n}", String(i + 2))}
-          >
-            <ProductImage src={img.url} alt={img.alt} label={productName} />
-          </button>
-        ))}
+
+        {images.length > 1 && (
+          <div className="mt-3 grid grid-cols-4 gap-2">
+            {images.map((img, i) => (
+              <button
+                key={img.url || i}
+                type="button"
+                onClick={() => setActiveIndex(i)}
+                aria-current={i === activeIndex}
+                aria-label={t.product.viewImage.replace("{n}", String(i + 1))}
+                className="block cursor-pointer"
+              >
+                <ProductImage
+                  src={img.url}
+                  alt={img.alt}
+                  label={productName}
+                  className={
+                    i === activeIndex
+                      ? "outline outline-2 outline-offset-2 outline-gold"
+                      : "opacity-70 hover:opacity-100"
+                  }
+                />
+              </button>
+            ))}
+          </div>
+        )}
+
+        {images.length > 1 && (
+          <div className="mt-3 flex justify-center gap-1.5">
+            {images.map((_, i) => (
+              <span
+                key={i}
+                aria-hidden
+                className={`h-1.5 w-1.5 rounded-full ${
+                  i === activeIndex ? "bg-gold" : "bg-foreground/20"
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {active && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
-          onClick={() => setOpenIndex(null)}
+          onClick={closeLightbox}
         >
           <button
             type="button"
-            onClick={() => setOpenIndex(null)}
+            onClick={closeLightbox}
             aria-label={t.product.closeGallery}
             className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center text-white/80 hover:text-white"
           >
