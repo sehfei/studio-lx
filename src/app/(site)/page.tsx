@@ -114,15 +114,15 @@ export default async function Home() {
         />
       </section>
 
-      <section className="bg-foreground py-16 text-background">
+      <section className="bg-gold/10 py-10 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-8">
-          <p className="eyebrow mb-4 text-background/60">{t.home.limitedTime}</p>
+          <p className="eyebrow mb-4">{t.home.limitedTime}</p>
           <h2 className="section-title mb-6">{t.categories.promotion}</h2>
-          <Link href="/promotion" className="btn-outline border-background text-background hover:border-gold hover:text-gold">
+          <Link href="/promotion" className="btn-outline">
             {t.home.shopPromotion}
           </Link>
         </div>
-        <div className="mx-auto mt-12 max-w-7xl bg-background px-4 py-10 sm:px-8">
+        <div className="mx-auto mt-8 max-w-7xl bg-background px-4 py-6 sm:mt-12 sm:px-8 sm:py-10">
           <ProductGrid
             products={promotions}
             emptyText={t.home.emptyProducts}
