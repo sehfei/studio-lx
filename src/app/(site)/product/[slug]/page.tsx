@@ -182,7 +182,7 @@ export default async function ProductPage({
               <dt className="text-foreground/50">{t.product.weight}</dt>
               <dd>{product.weight}</dd>
             </div>
-            {product.stock > 0 && (
+            {product.stock > 0 && product.badgeText?.toLowerCase() !== "pre-order" && (
               <div className="flex justify-between">
                 <dt className="text-foreground/50">{t.product.stock}</dt>
                 <dd>
