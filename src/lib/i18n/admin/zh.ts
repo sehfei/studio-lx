@@ -365,6 +365,10 @@ export const zh: AdminDictionary = {
       nameLabel: "分区名称",
       addButton: "+ 添加分区",
       confirmDelete: "确定删除分区「{name}」？",
+      imageLabel: "卡片图片（首页展示用）",
+      imageHint: "建议横图（4:3），JPEG/PNG/WEBP，最大 5MB。",
+      removeCurrentImage: "删除当前图片",
+      editPageTitle: "编辑性别分区",
       columns: {
         label: "名称",
         slug: "Slug",

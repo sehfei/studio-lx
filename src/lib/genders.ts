@@ -8,6 +8,7 @@ export type GenderRow = {
   slug: string;
   label: string;
   sort_order: number;
+  image_url: string | null;
 };
 
 export const getGenders = cache(async (): Promise<GenderRow[]> => {

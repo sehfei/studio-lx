@@ -264,6 +264,44 @@ export async function updateSubcategory(
 
 export type GenderFormState = { error?: string } | undefined;
 
+const GENDER_IMAGE_BUCKET = "site-assets";
+const MAX_GENDER_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_GENDER_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+// 性别卡片图放 site-assets 桶的 genders/ 目录下，每张独立随机文件名
+async function uploadGenderImage(
+  file: File,
+): Promise<{ url?: string; error?: string }> {
+  if (!ALLOWED_GENDER_IMAGE_TYPES.includes(file.type)) {
+    return { error: "图片格式只支持 JPEG / PNG / WEBP" };
+  }
+  if (file.size > MAX_GENDER_IMAGE_SIZE) {
+    return { error: "图片不能超过 5MB" };
+  }
+  const ext = file.name.includes(".")
+    ? file.name.slice(file.name.lastIndexOf("."))
+    : ".jpg";
+  const path = `genders/${crypto.randomUUID()}${ext}`;
+  const { error } = await supabaseAdmin.storage
+    .from(GENDER_IMAGE_BUCKET)
+    .upload(path, file, { contentType: file.type });
+  if (error) {
+    return { error: `图片上传失败：${error.message}` };
+  }
+  const { data } = supabaseAdmin.storage
+    .from(GENDER_IMAGE_BUCKET)
+    .getPublicUrl(path);
+  return { url: data.publicUrl };
+}
+
+async function removeGenderImageByUrl(url: string) {
+  const marker = `/object/public/${GENDER_IMAGE_BUCKET}/`;
+  const i = url.indexOf(marker);
+  if (i === -1) return;
+  const path = decodeURIComponent(url.slice(i + marker.length));
+  await supabaseAdmin.storage.from(GENDER_IMAGE_BUCKET).remove([path]);
+}
+
 export async function createGender(
   _prevState: GenderFormState,
   formData: FormData,
@@ -282,10 +320,19 @@ export async function createGender(
     return { error: "无法从名称生成有效的 slug，请手动指定" };
   }
 
+  let imageUrl: string | undefined;
+  const imageFile = formData.get("image");
+  if (imageFile instanceof File && imageFile.size > 0) {
+    const upload = await uploadGenderImage(imageFile);
+    if (upload.error) return { error: upload.error };
+    imageUrl = upload.url;
+  }
+
   const { error } = await supabaseAdmin.from("genders").insert({
     slug,
     label,
     sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
+    image_url: imageUrl,
   });
 
   if (error) {
@@ -300,6 +347,64 @@ export async function createGender(
     targetType: "gender",
     targetId: slug,
     summary: `新增性别分区「${label}」`,
+    summaryParams: { label },
+  });
+
+  revalidatePath("/admin/categories");
+  revalidatePath("/", "layout");
+  return undefined;
+}
+
+// 编辑只改名称/排序/图片，slug 不让改，理由同 updateCategory。
+export async function updateGender(
+  id: string,
+  _prevState: GenderFormState,
+  formData: FormData,
+): Promise<GenderFormState> {
+  const admin = await requirePermission("categories");
+
+  const label = String(formData.get("label") ?? "").trim();
+  const sortOrder = Number(formData.get("sortOrder") ?? 0);
+  const removeImage = formData.get("removeImage") === "on";
+
+  if (!label) {
+    return { error: "请填写分区名称" };
+  }
+
+  const { data: existing } = await supabaseAdmin
+    .from("genders")
+    .select("image_url")
+    .eq("id", id)
+    .maybeSingle();
+
+  let imageUrl: string | null | undefined = existing?.image_url ?? null;
+
+  const imageFile = formData.get("image");
+  if (imageFile instanceof File && imageFile.size > 0) {
+    const upload = await uploadGenderImage(imageFile);
+    if (upload.error) return { error: upload.error };
+    if (existing?.image_url) await removeGenderImageByUrl(existing.image_url);
+    imageUrl = upload.url;
+  } else if (removeImage && existing?.image_url) {
+    await removeGenderImageByUrl(existing.image_url);
+    imageUrl = null;
+  }
+
+  const { error } = await supabaseAdmin
+    .from("genders")
+    .update({
+      label,
+      sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
+      image_url: imageUrl,
+    })
+    .eq("id", id);
+  if (error) return { error: dbErrorMessage(error) };
+
+  await logAdminAction(admin, {
+    action: "gender.update",
+    targetType: "gender",
+    targetId: id,
+    summary: `更新性别分区「${label}」`,
     summaryParams: { label },
   });
 

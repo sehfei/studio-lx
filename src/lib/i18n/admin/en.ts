@@ -371,6 +371,10 @@ export const en = {
       nameLabel: "Section name",
       addButton: "+ Add section",
       confirmDelete: 'Delete section "{name}"?',
+      imageLabel: "Card image (shown on the homepage)",
+      imageHint: "Landscape image recommended (4:3), JPEG/PNG/WEBP, max 5MB.",
+      removeCurrentImage: "Remove current image",
+      editPageTitle: "Edit Gender Section",
       columns: {
         label: "Label",
         slug: "Slug",

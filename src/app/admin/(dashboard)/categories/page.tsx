@@ -274,13 +274,21 @@ export default async function AdminCategoriesPage() {
                       sort: g.sort_order,
                       products: genderCountBySlug.get(g.slug) ?? 0,
                       actions: (
-                        <DeleteGenderButton
-                          id={g.id}
-                          slug={g.slug}
-                          label={g.label}
-                          dict={gendersDict}
-                          common={t.common}
-                        />
+                        <div className="flex items-center gap-3">
+                          <Link
+                            href={`/admin/categories/gender/${g.id}/edit`}
+                            className="text-xs text-foreground/60 hover:text-gold hover:underline"
+                          >
+                            {t.common.edit}
+                          </Link>
+                          <DeleteGenderButton
+                            id={g.id}
+                            slug={g.slug}
+                            label={g.label}
+                            dict={gendersDict}
+                            common={t.common}
+                          />
+                        </div>
                       ),
                     },
                   }))}

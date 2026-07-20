@@ -74,9 +74,19 @@ export default async function Home() {
               className="group relative block overflow-hidden"
               style={{ borderRadius: "var(--radius)" }}
             >
-              <PlaceholderImage
-                className="aspect-[4/3] transition-transform duration-500 ease-out group-hover:scale-105"
-              />
+              {cat.image_url ? (
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <Image
+                    src={cat.image_url}
+                    alt=""
+                    fill
+                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                  />
+                </div>
+              ) : (
+                <PlaceholderImage className="aspect-[4/3] transition-transform duration-500 ease-out group-hover:scale-105" />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/50 via-transparent to-transparent" />
               <p className="absolute inset-x-0 bottom-6 text-center font-display text-2xl tracking-widest text-background uppercase transition-colors duration-300 group-hover:text-gold">
                 {categoryLabel(t, cat.slug, cat.label)}

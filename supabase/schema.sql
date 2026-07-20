@@ -423,3 +423,7 @@ create index if not exists audit_logs_created_at_idx on audit_logs(created_at de
 -- 手动给每个分类/子分类勾选性别才会出现在对应性别的导航栏里。
 alter table categories add column if not exists genders text[] not null default '{}'::text[];
 alter table subcategories add column if not exists genders text[] not null default '{}'::text[];
+
+-- 性别分区卡片图：首页 Women/Men/Unisex 卡片背景图，后台可上传/更换，
+-- 没传过就是 null，前台用占位图代替。
+alter table genders add column if not exists image_url text;
