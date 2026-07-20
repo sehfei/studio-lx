@@ -158,6 +158,7 @@ export const en = {
       linkTextLabel: "Button Text (optional)",
       linkTextPlaceholder: "Shop Now",
       saveButton: "Save & apply site-wide",
+      savedSuccess: "Saved, live site-wide",
     },
   },
   common: {

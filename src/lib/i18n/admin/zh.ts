@@ -158,6 +158,7 @@ export const zh: AdminDictionary = {
       linkTextLabel: "按钮文字（可选）",
       linkTextPlaceholder: "立即选购",
       saveButton: "保存并全站生效",
+      savedSuccess: "已保存，全站生效",
     },
   },
   common: {

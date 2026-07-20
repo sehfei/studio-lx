@@ -16,7 +16,14 @@ export function AnnouncementBar({
 
   useEffect(() => {
     if (!announcement.enabled || !announcement.message) return;
-    const dismissedAt = Number(localStorage.getItem(STORAGE_KEY) ?? 0);
+    // Instagram/WhatsApp 等 App 内置浏览器、Safari 无痕模式等环境下
+    // localStorage 可能直接抛错，抛错就当没关闭过，正常显示公告
+    let dismissedAt = 0;
+    try {
+      dismissedAt = Number(localStorage.getItem(STORAGE_KEY) ?? 0);
+    } catch {
+      dismissedAt = 0;
+    }
     // 服务端渲染时读不到 localStorage，只能在客户端挂载后再决定是否显示；
     // 内容更新时间比顾客关闭时间新，说明是新公告，重新显示
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -28,7 +35,11 @@ export function AnnouncementBar({
   }
 
   const close = () => {
-    localStorage.setItem(STORAGE_KEY, String(Date.now()));
+    try {
+      localStorage.setItem(STORAGE_KEY, String(Date.now()));
+    } catch {
+      // 存不了就算了，这次访问关掉就好，下次再看到也不影响功能
+    }
     setDismissed(true);
   };
 

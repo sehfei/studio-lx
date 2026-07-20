@@ -219,7 +219,8 @@ export async function saveAnnouncement(
   });
 
   revalidatePath("/", "layout");
-  return { success: "已保存，全站生效" };
+  const { t } = await getAdminI18n();
+  return { success: t.settings.announcementForm.savedSuccess };
 }
 
 export type IdentityFormState =
