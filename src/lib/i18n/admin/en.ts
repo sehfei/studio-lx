@@ -221,6 +221,8 @@ export const en = {
         materialLabel: "Material",
         weightLabel: "Weight",
         existingImages: "Existing Images",
+        reorderHint: "Press and hold, then drag to reorder. The first image is the product's cover photo.",
+        coverLabel: "Cover",
         imagesLabelNew: "Images",
         imagesLabelAppend: "Add more images",
         imagesHint: "(multiple allowed, JPEG/PNG/WEBP/GIF, max 5MB each)",

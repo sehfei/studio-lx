@@ -290,16 +290,20 @@ export async function updateProduct(
   const slugInput = String(formData.get("slug") ?? "").trim();
   const slug = slugify(slugInput || input.name);
 
-  // 勾选删除的旧图 + 改过的 alt 文字 + 新上传的图，合成最终图片列表
+  // 勾选删除的旧图 + 改过的 alt 文字 + 新上传的图，合成最终图片列表。
+  // 顺序按表单提交的 existingImageUrl 顺序来（后台支持拖拽调整图片顺序，
+  // 第一张会是封面图），不能再按数据库原顺序，不然拖拽调整了也不会生效。
   const removeImages = formData.getAll("removeImages").map(String);
   const existingUrls = formData.getAll("existingImageUrl").map(String);
   const existingAlts = formData.getAll("existingImageAlt").map(String);
-  const altByUrl = new Map(existingUrls.map((url, i) => [url, existingAlts[i] ?? ""]));
-  const keptImages = ((existing.images ?? []) as ProductImage[])
-    .filter((img) => !removeImages.includes(img.url))
-    .map((img) => ({
-      url: img.url,
-      alt: altByUrl.get(img.url)?.trim() || img.alt,
+  const originalByUrl = new Map(
+    ((existing.images ?? []) as ProductImage[]).map((img) => [img.url, img]),
+  );
+  const keptImages = existingUrls
+    .filter((url) => !removeImages.includes(url))
+    .map((url, i) => ({
+      url,
+      alt: existingAlts[i]?.trim() || originalByUrl.get(url)?.alt || "",
     }));
 
   const imageFiles = formData

@@ -219,6 +219,8 @@ export const zh: AdminDictionary = {
         materialLabel: "材质",
         weightLabel: "重量",
         existingImages: "现有图片",
+        reorderHint: "长按图片再拖动可以调整顺序，第一张是商品封面图。",
+        coverLabel: "封面",
         imagesLabelNew: "图片",
         imagesLabelAppend: "追加图片",
         imagesHint: "（可多选，JPEG/PNG/WEBP/GIF，单张最大5MB）",

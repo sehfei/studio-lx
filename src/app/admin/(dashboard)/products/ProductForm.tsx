@@ -1,11 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { createProduct, updateProduct } from "./actions";
 import { TAGS } from "@/lib/constants";
 import { Spinner } from "@/components/ui/Spinner";
-import type { Product } from "@/lib/products";
+import type { Product, ProductImage as ProductImageType } from "@/lib/products";
 import type { CategoryRow } from "@/lib/categories";
 import type { GenderRow } from "@/lib/genders";
 import type { SubcategoryRow } from "@/lib/subcategories";
@@ -68,6 +68,61 @@ export function ProductForm({
       })),
     );
   };
+
+  // 现有图片的顺序：长按缩略图拖到另一张上面就互换位置，第一张是封面图。
+  // key 用 img.url（不是数组下标），拖动重排时 React 靠 key 认出同一张图，
+  // 已经手动改过的 alt text 不会因为重排而丢失。
+  const [existingImages, setExistingImages] = useState<ProductImageType[]>(
+    product?.images ?? [],
+  );
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function handleThumbPointerDown(
+    e: React.PointerEvent<HTMLElement>,
+    index: number,
+  ) {
+    const el = e.currentTarget;
+    const pointerId = e.pointerId;
+    const begin = () => {
+      el.setPointerCapture(pointerId);
+      setDragIndex(index);
+      setOverIndex(index);
+    };
+    if (e.pointerType === "touch") {
+      longPressTimer.current = setTimeout(begin, 350);
+    } else {
+      begin();
+    }
+  }
+
+  function handleThumbPointerMove(e: React.PointerEvent) {
+    if (dragIndex === null) return;
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const target = el?.closest<HTMLElement>("[data-image-index]");
+    if (target) {
+      const idx = Number(target.dataset.imageIndex);
+      if (!Number.isNaN(idx)) setOverIndex(idx);
+    }
+  }
+
+  function handleThumbPointerUp() {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    if (dragIndex !== null && overIndex !== null && dragIndex !== overIndex) {
+      setExistingImages((prev) => {
+        const next = [...prev];
+        const [moved] = next.splice(dragIndex, 1);
+        next.splice(overIndex, 0, moved);
+        return next;
+      });
+    }
+    setDragIndex(null);
+    setOverIndex(null);
+  }
 
   return (
     <form action={formAction} className="max-w-2xl space-y-6">
@@ -253,14 +308,39 @@ export function ProductForm({
         </div>
       </div>
 
-      {product && product.images.length > 0 && (
+      {existingImages.length > 0 && (
         <div>
           <label className={labelClass}>{f.existingImages}</label>
+          <p className="mb-2 text-xs text-foreground/40">{f.reorderHint}</p>
           <div className="flex flex-wrap gap-4">
-            {product.images.map((img) => (
+            {existingImages.map((img, i) => (
               <div key={img.url} className="w-28 text-center">
-                <span className="relative block h-24 w-24 overflow-hidden border border-border-subtle">
-                  <Image src={img.url} alt="" fill className="object-cover" />
+                <span
+                  data-image-index={i}
+                  onPointerDown={(e) => handleThumbPointerDown(e, i)}
+                  onPointerMove={handleThumbPointerMove}
+                  onPointerUp={handleThumbPointerUp}
+                  onPointerCancel={handleThumbPointerUp}
+                  className={`relative block h-24 w-24 touch-none overflow-hidden border select-none ${
+                    dragIndex === i
+                      ? "cursor-grabbing opacity-40"
+                      : overIndex === i && dragIndex !== null
+                        ? "cursor-grabbing border-gold"
+                        : "cursor-grab border-border-subtle"
+                  }`}
+                >
+                  <Image
+                    src={img.url}
+                    alt=""
+                    fill
+                    draggable={false}
+                    className="object-cover"
+                  />
+                  {i === 0 && (
+                    <span className="absolute left-1 top-1 bg-background/80 px-1.5 py-0.5 text-[10px] tracking-widest uppercase">
+                      {f.coverLabel}
+                    </span>
+                  )}
                 </span>
                 <input type="hidden" name="existingImageUrl" value={img.url} />
                 <input
