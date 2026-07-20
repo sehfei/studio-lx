@@ -146,13 +146,19 @@ export async function getProductsByTag(
   return (data ?? []).map(mapRow);
 }
 
+// "unisex" 是特殊性别：商品填 unisex 时，逛 Women/Men 任何一个性别页面都要
+// 能看到它，所以按性别查商品时，除了查该性别本身，还要连带查 unisex。
+function genderFilterValues(gender: Product["gender"]): string[] {
+  return gender === "unisex" ? ["unisex"] : [gender, "unisex"];
+}
+
 export async function getProductsByGender(
   gender: Product["gender"],
 ): Promise<Product[]> {
   const { data, error } = await supabase
     .from("products")
     .select("*")
-    .eq("gender", gender);
+    .in("gender", genderFilterValues(gender));
   if (error) throw error;
   return (data ?? []).map(mapRow);
 }
@@ -164,7 +170,7 @@ export async function getProductsByGenderCategory(
   const { data, error } = await supabase
     .from("products")
     .select("*")
-    .eq("gender", gender)
+    .in("gender", genderFilterValues(gender))
     .eq("category", category);
   if (error) throw error;
   return (data ?? []).map(mapRow);
@@ -178,7 +184,7 @@ export async function getProductsByGenderCategorySubcategory(
   const { data, error } = await supabase
     .from("products")
     .select("*")
-    .eq("gender", gender)
+    .in("gender", genderFilterValues(gender))
     .eq("category", category)
     .eq("subcategory", subcategory);
   if (error) throw error;
@@ -198,7 +204,7 @@ export async function getNavProducts(
   let query = supabase
     .from("products")
     .select("id, name, slug")
-    .eq("gender", gender)
+    .in("gender", genderFilterValues(gender))
     .eq("category", category);
   query = subcategory
     ? query.eq("subcategory", subcategory)
