@@ -14,8 +14,8 @@ export default async function PromotionPage() {
     getI18n(),
   ]);
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-8">
-      <h1 className="section-title mb-10">{t.categories.promotion}</h1>
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8 sm:py-12">
+      <h1 className="section-title mb-6 sm:mb-10">{t.categories.promotion}</h1>
       <ProductGrid
         products={products}
         emptyText={t.home.emptyProducts}
