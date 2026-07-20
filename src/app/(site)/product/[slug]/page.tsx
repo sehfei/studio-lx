@@ -182,12 +182,14 @@ export default async function ProductPage({
               <dt className="text-foreground/50">{t.product.weight}</dt>
               <dd>{product.weight}</dd>
             </div>
-            <div className="flex justify-between">
-              <dt className="text-foreground/50">{t.product.stock}</dt>
-              <dd>
-                {product.stock} {t.product.stockUnit}
-              </dd>
-            </div>
+            {product.stock > 0 && (
+              <div className="flex justify-between">
+                <dt className="text-foreground/50">{t.product.stock}</dt>
+                <dd>
+                  {product.stock} {t.product.stockUnit}
+                </dd>
+              </div>
+            )}
             <div className="flex justify-between">
               <dt className="text-foreground/50">{t.product.shipping}</dt>
               <dd className="text-right">{product.shippingInfo}</dd>
