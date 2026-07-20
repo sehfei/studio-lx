@@ -13,6 +13,15 @@ export function AnnouncementBar({
   closeLabel?: string;
 }) {
   const [dismissed, setDismissed] = useState(true); // 首屏先不显示，避免闪烁
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   useEffect(() => {
     if (!announcement.enabled || !announcement.message) return;
@@ -43,22 +52,37 @@ export function AnnouncementBar({
     setDismissed(true);
   };
 
-  return (
-    <div className="relative flex min-h-11 items-center justify-center gap-3 bg-foreground px-10 py-2 text-center text-xs tracking-wide text-background sm:text-sm">
+  const content = (
+    <span className="mx-8 inline-flex shrink-0 items-center gap-3 whitespace-nowrap">
       <span>{announcement.message}</span>
       {announcement.linkUrl && announcement.linkText && (
         <a
           href={announcement.linkUrl}
-          className="shrink-0 underline underline-offset-2 hover:text-gold"
+          className="underline underline-offset-2 hover:text-gold"
         >
           {announcement.linkText}
         </a>
+      )}
+    </span>
+  );
+
+  return (
+    <div className="relative flex min-h-11 items-center overflow-hidden bg-foreground px-10 py-2 text-xs tracking-wide text-background sm:text-sm">
+      {reducedMotion ? (
+        <div className="flex flex-1 items-center justify-center text-center">
+          {content}
+        </div>
+      ) : (
+        <div className="flex w-max animate-marquee">
+          {content}
+          {content}
+        </div>
       )}
       <button
         type="button"
         onClick={close}
         aria-label={closeLabel}
-        className="absolute right-2 flex h-8 w-8 shrink-0 items-center justify-center text-background/70 hover:text-background"
+        className="absolute right-2 flex h-8 w-8 shrink-0 items-center justify-center bg-foreground text-background/70 hover:text-background"
       >
         ✕
       </button>

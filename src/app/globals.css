@@ -125,6 +125,27 @@ body {
   }
 }
 
+/* Scrolling ticker for the announcement bar, see
+   src/components/layout/AnnouncementBar.tsx. Content is rendered twice in a
+   row and this shifts by exactly one copy's width (-50%) so the loop is
+   seamless regardless of message length. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee 18s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+}
+
 /* Site-wide hover transitions so nothing snaps instantly (a baseline for
    a premium feel). [class*="hover:"] matches any element whose class
    attribute string contains "hover:", so we don't have to add a
